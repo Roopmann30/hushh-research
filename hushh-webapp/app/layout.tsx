@@ -3,8 +3,7 @@
 import React, { useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
-import {
+import { VaultProvider } from "@/lib/vault/vault-context";import {
   ChevronRight,
   Home,
   Database,
@@ -92,9 +91,11 @@ export default function RootLayout({
           Main Content Shell 
           The padding-bottom ensures content isn't cut off by floating elements.
       */}
-      <main className="flex-1 overflow-y-auto pb-10">
-        {children}
-      </main>
+     <VaultProvider>
+  <div className="flex min-h-screen w-full flex-col bg-background">
+    ...
+  </div>
+</VaultProvider>
 
       {/* 
           Optional Bottom Nav for Mobile Efficiency 
