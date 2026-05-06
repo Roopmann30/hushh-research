@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { 
   ChevronRight, 
   Home, 
-  Settings, 
   Database, 
   ShieldCheck, 
   User,
