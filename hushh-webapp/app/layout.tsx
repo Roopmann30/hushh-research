@@ -3,15 +3,16 @@
 import React, { useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  ChevronRight, 
-  Home, 
-  Settings, 
-  Database, 
-  ShieldCheck, 
+
+import {
+  ChevronRight,
+  Home,
+  Database,
+  ShieldCheck,
   User,
-  LayoutDashboard
+  LayoutDashboard,
 } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 
 /**
