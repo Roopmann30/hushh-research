@@ -3,7 +3,10 @@
 import React, { useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { VaultProvider } from "@/lib/vault/vault-context";import {
+import { AuthProvider } from "@/lib/firebase/auth-context";
+import { VaultProvider } from "@/lib/vault/vault-context";
+
+import {
   ChevronRight,
   Home,
   Database,
@@ -40,8 +43,9 @@ export default function RootLayout({
     });
   }, [pathname]);
 return (
-  <VaultProvider>
-    <div className="flex min-h-screen w-full flex-col bg-background">
+  <AuthProvider>
+    <VaultProvider>
+      <div className="flex min-h-screen w-full flex-col bg-background">
       {/* Sticky Navigation Header */}
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center gap-4 px-4">
@@ -127,6 +131,7 @@ return (
           </Link>
         </div>
       </footer>
-    </div>
-  </VaultProvider>
+          </div>
+    </VaultProvider>
+  </AuthProvider>
 )};
