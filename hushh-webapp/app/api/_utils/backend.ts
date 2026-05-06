@@ -4,16 +4,47 @@
  * Optimized for resilience with build-time safety to ensure CI validation passes.
  */
 export function getPythonApiUrl(): string {
-  return process.env.PYTHON_API_URL || process.env.BACKEND_URL || "http://127.0.0.1:8000";
+  const runtimeUrl =
+    process.env.PYTHON_API_URL || process.env.BACKEND_URL;
+
+  const appEnv = process.env.NEXT_PUBLIC_APP_ENV || "local";
+  const isHosted = appEnv !== "local";
+
+  // Local development fallback
+  if (!runtimeUrl && !isHosted) {
+    return "http://127.0.0.1:8000";
+  }
+
+  // Hosted environments must provide backend origin
+  if (!runtimeUrl && isHosted) {
+    throw new Error("Missing backend origin");
+  }
+
+  // Hosted environments cannot use localhost
+  if (
+    isHosted &&
+    runtimeUrl &&
+    runtimeUrl.includes("localhost")
+  ) {
+    throw new Error(
+      "resolved backend origin to localhost"
+    );
+  }
+
+  // Canonicalize localhost → 127.0.0.1
+  return runtimeUrl!.replace(
+    "http://localhost:",
+    "http://127.0.0.1:"
+  );
 }
 
 export function getDeveloperApiUrl(): string {
-  return process.env.DEVELOPER_API_URL || process.env.BACKEND_URL || "http://127.0.0.1:8000";
+  return (
+    process.env.DEVELOPER_API_URL ||
+    process.env.BACKEND_URL ||
+    "http://127.0.0.1:8000"
+  );
 }
-
-/**
- * PR 2: High-efficiency request handler with exponential backoff and timeout.
- */
 export async function proxyWithRetry(
   path: string,
   options: RequestInit & { timeout?: number; retries?: number } = {}
