@@ -1,16 +1,13 @@
 "use client";
 
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ComponentPropsWithoutRef,
-  type ElementType,
-  type ReactNode,
-  type CSSProperties
-} from "react";
-import { NativeTestBeacon, type NativeTestAuthState, type NativeTestDataState } from "@/components/app-ui/native-test-beacon";
+import type { ComponentPropsWithoutRef, ElementType } from "react";
+import type { CSSProperties } from "react";
+
+import {
+  NativeTestBeacon,
+  type NativeTestAuthState,
+  type NativeTestDataState,
+} from "@/components/app-ui/native-test-beacon";
 import { cn } from "@/lib/utils";
 
 /**
@@ -29,30 +26,37 @@ export const APP_SHELL_MAX_WIDTHS: Record<AppPageShellWidth, string> = {
   profile: "54rem",
 };
 
-/** 
- * Lightweight context to allow child components to check shell state 
- * without re-rendering the entire page tree.
- */
-const ShellContext = createContext<{ scrolled: boolean; width: AppPageShellWidth }>({
-  scrolled: false,
-  width: "standard"
-});
+export const APP_SHELL_FRAME_CLASSNAME =
+  "mx-auto w-full px-[var(--page-inline-gutter-standard)]";
 
-export const useShellState = () => useContext(ShellContext);
+export const APP_SHELL_FRAME_STYLE: CSSProperties = {
+  maxWidth: APP_SHELL_MAX_WIDTHS.standard,
+};
 
-interface AppPageRegionProps<T extends ElementType> {
+export const APP_MEASURE_STYLES: Record<"reading" | "standard" | "expanded", CSSProperties> = {
+  reading: { maxWidth: APP_SHELL_MAX_WIDTHS.reading },
+  standard: { maxWidth: APP_SHELL_MAX_WIDTHS.standard },
+  expanded: { maxWidth: APP_SHELL_MAX_WIDTHS.expanded },
+} as const;
+
+type AppPageShellProps<T extends ElementType> = {
   as?: T;
-  children?: ReactNode;
-  className?: string;
-}
+  width?: AppPageShellWidth;
+  density?: AppPageDensity;
+  nativeTest?: {
+    routeId: string;
+    marker: string;
+    authState: NativeTestAuthState;
+    dataState: NativeTestDataState;
+    errorCode?: string | null;
+    errorMessage?: string | null;
+  };
+} & Omit<ComponentPropsWithoutRef<T>, "as">;
 
-/**
- * High-Efficiency AppPageShell
- * Features: 
- * 1. Intersection-free scroll tracking for header effects.
- * 2. Optimized CSS Variable injection for layout stability.
- * 3. Atomic region rendering to prevent layout shifts.
- */
+type AppPageRegionProps<T extends ElementType> = {
+  as?: T;
+} & Omit<ComponentPropsWithoutRef<T>, "as">;
+
 export function AppPageShell<T extends ElementType = "main">({
   as,
   width = "standard",
@@ -62,74 +66,41 @@ export function AppPageShell<T extends ElementType = "main">({
   style,
   children,
   ...props
-}: {
-  as?: T;
-  width?: AppPageShellWidth;
-  density?: AppPageDensity;
-  nativeTest?: {
-    routeId: string;
-    marker: string;
-    authState: NativeTestAuthState;
-    dataState: NativeTestDataState;
-  };
-} & Omit<ComponentPropsWithoutRef<T>, "as">) {
+}: AppPageShellProps<T>) {
   const Component = as ?? "main";
-  const [scrolled, setScrolled] = useState(false);
-
-  // Passive scroll listener for better performance on mobile devices
-  useEffect(() => {
-    const handleScroll = () => {
-      const isScrolled = window.scrollY > 20;
-      if (isScrolled !== scrolled) setScrolled(isScrolled);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [scrolled]);
-
-  return (
-    <ShellContext.Provider value={{ scrolled, width }}>
-      <Component
-        className={cn(
-          "app-page-shell relative mx-auto w-full transition-all duration-300",
-          scrolled ? "shell-scrolled" : "shell-top",
-          className
-        )}
-        style={{
-          "--shell-max-width": APP_SHELL_MAX_WIDTHS[width],
-          maxWidth: "var(--shell-max-width)",
-          ...style
-        } as CSSProperties}
-        data-app-density={density}
-        data-app-shell-width={width}
-        data-scrolled={scrolled}
-        data-top-content-anchor="true"
-        {...props}
-      >
-        {nativeTest && <NativeTestBeacon {...nativeTest} />}
-        <div className="flex flex-col min-h-screen">
-          {children}
-        </div>
-      </Component>
-    </ShellContext.Provider>
-  );
-}
-
-export function AppPageHeaderRegion<T extends ElementType = "div">({
-  as,
-  className,
-  ...props
-}: AppPageRegionProps<T> & Omit<ComponentPropsWithoutRef<T>, "as">) {
-  const Component = as ?? "div";
-  const { scrolled } = useShellState();
 
   return (
     <Component
       className={cn(
-        "app-page-header-region sticky top-0 z-40 w-full min-w-0 transition-shadow",
-        scrolled ? "bg-background/80 backdrop-blur-md border-b" : "bg-transparent",
+        "app-page-shell mx-auto w-full",
         className
       )}
-      data-scrolled={scrolled}
+      style={{ maxWidth: APP_SHELL_MAX_WIDTHS[width], ...style }}
+      data-app-density={density}
+      data-app-shell-width={width}
+      data-top-content-anchor="true"
+      {...props}
+    >
+      {nativeTest ? <NativeTestBeacon {...nativeTest} /> : null}
+      {children}
+    </Component>
+  );
+}
+
+/**
+ * Shared Region Component Logic
+ */
+function AppPageRegion<T extends ElementType = "div">({
+  as,
+  className,
+  baseClass,
+  ...props
+}: AppPageRegionProps<T>) {
+  const Component = as ?? "div";
+
+  return (
+    <Component
+      className={cn("app-page-header-region w-full min-w-0", className)}
       {...props}
     />
   );
@@ -139,14 +110,12 @@ export function AppPageContentRegion<T extends ElementType = "div">({
   as,
   className,
   ...props
-}: AppPageRegionProps<T> & Omit<ComponentPropsWithoutRef<T>, "as">) {
+}: AppPageRegionProps<T>) {
   const Component = as ?? "div";
+
   return (
     <Component
-      className={cn(
-        "app-page-content-region flex-1 w-full min-w-0 px-[var(--page-inline-gutter-standard)]",
-        className
-      )}
+      className={cn("app-page-content-region w-full min-w-0", className)}
       {...props}
     />
   );
