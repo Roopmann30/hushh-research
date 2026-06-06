@@ -86,9 +86,9 @@ export default function ProfileAppearanceLiquidGlassLab() {
 
   return (
     <LiquidGlassRendererModeProvider mode={rendererMode}>
-      <div className="min-h-screen bg-[#050505] text-white">
+      <div className="min-h-dvh bg-[#050505] text-white">
         <div
-          className="min-h-screen"
+          className="min-h-dvh"
           style={{
             backgroundImage:
               "linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px)",

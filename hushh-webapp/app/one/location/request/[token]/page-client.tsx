@@ -118,8 +118,8 @@ export default function PublicLocationRequestPageClient() {
       : "Request sent. Sign in with this phone and open One Location Agent once so the owner can approve encrypted sharing.";
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto flex min-h-screen w-full max-w-2xl flex-col justify-center px-5 py-10">
+    <main className="min-h-dvh bg-background text-foreground">
+      <div className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col justify-center px-5 py-10">
         <div className="space-y-6 rounded-[var(--app-card-radius-standard)] border border-border/70 bg-[color:var(--app-card-surface-default-solid)] p-5 shadow-[var(--shadow-xs)] sm:p-7">
           <div className="flex items-start gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-700 dark:text-amber-200">

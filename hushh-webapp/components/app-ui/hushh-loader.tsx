@@ -25,7 +25,7 @@ export interface HushhLoaderProps {
 const loaderVariants = cva("flex items-center justify-center text-muted-foreground", {
   variants: {
     variant: {
-      fullscreen: "h-screen w-full",
+      fullscreen: "h-dvh w-full",
       page: "min-h-[60vh] w-full",
       inline: "w-full py-6",
       compact: "inline-block",
