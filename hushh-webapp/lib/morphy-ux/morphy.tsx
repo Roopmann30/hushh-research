@@ -170,35 +170,35 @@ export const generateColorCSS = () => `
 // ============================================================================
 
 export const getGradientClasses = (
-  variant: "primary" | "secondary" = "primary"
+  variant: "primary" | "secondary" = "primary",
 ) => {
   return `bg-gradient-to-r from-[var(--morphy-${variant}-start)] to-[var(--morphy-${variant}-end)]`;
 };
 
 export const getColorClass = (
   variant: "primary" | "secondary" = "primary",
-  type: "start" | "end" = "start"
+  type: "start" | "end" = "start",
 ) => {
   return `text-[var(--morphy-${variant}-${type})]`;
 };
 
 export const getBackgroundClass = (
   variant: "primary" | "secondary" = "primary",
-  opacity: keyof typeof colorTokens.opacity = "medium"
+  opacity: keyof typeof colorTokens.opacity = "medium",
 ) => {
   return `bg-[var(--morphy-${variant}-start)]/${colorTokens.opacity[opacity]}`;
 };
 
 export const getBorderClass = (
   variant: "primary" | "secondary" = "primary",
-  opacity: keyof typeof colorTokens.opacity = "medium"
+  opacity: keyof typeof colorTokens.opacity = "medium",
 ) => {
   return `border-[var(--morphy-${variant}-start)]/${colorTokens.opacity[opacity]}`;
 };
 
 export const getBadgeClasses = (
   variant: "primary" | "secondary" = "primary",
-  size: "sm" | "md" = "sm"
+  size: "sm" | "md" = "sm",
 ) => {
   const sizeClasses =
     size === "sm" ? "text-[9px] px-1.5 py-0.5" : "text-[10px] px-2 py-0.5";
@@ -317,7 +317,7 @@ export const getTypographyClass = (type: keyof typeof typography.classes) => {
 
 export const getLegacyColorClass = (
   color: keyof typeof colors,
-  shade: keyof typeof colors.blue
+  shade: keyof typeof colors.blue,
 ) => {
   return `text-[${colors[color][shade]}]`;
 };

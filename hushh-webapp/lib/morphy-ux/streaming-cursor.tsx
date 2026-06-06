@@ -53,7 +53,7 @@ export function StreamingCursor({
         colorClasses[color],
         // Solid when streaming, blink when idle
         isStreaming ? "opacity-100" : "animate-cursor-blink",
-        className
+        className,
       )}
       aria-hidden="true"
       role="presentation"

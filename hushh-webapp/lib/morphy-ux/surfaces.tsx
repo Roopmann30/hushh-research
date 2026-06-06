@@ -12,7 +12,12 @@ import {
 } from "@/lib/morphy-ux/card";
 import { cn } from "@/lib/utils";
 
-export type SurfaceTone = "default" | "feature" | "warning" | "success" | "critical";
+export type SurfaceTone =
+  | "default"
+  | "feature"
+  | "warning"
+  | "success"
+  | "critical";
 export type SurfaceAccent =
   | "none"
   | "neutral"
@@ -59,28 +64,34 @@ const SURFACE_ACCENT_CLASSNAMES: Record<SurfaceAccent, string> = {
 export const surfaceDataTableShellClassName = cn(
   "overflow-x-auto overflow-y-hidden rounded-[var(--app-card-radius-standard)] border",
   "border-[color:var(--app-card-border-standard)] bg-[color:var(--app-card-surface-default-solid)]",
-  "shadow-[var(--app-card-shadow-standard)]"
+  "shadow-[var(--app-card-shadow-standard)]",
 );
 
 export const surfaceInteractiveShellClassName = cn(
   "rounded-[var(--app-card-radius-feature)] border border-transparent",
   "bg-[color:var(--app-card-surface-default-solid)] shadow-[var(--app-card-shadow-standard)]",
   "transition-[background-color,border-color,box-shadow] duration-200 ease-out",
-  "hover:bg-[color:var(--app-card-surface-default-solid)] hover:shadow-[var(--app-card-shadow-feature)]"
+  "hover:bg-[color:var(--app-card-surface-default-solid)] hover:shadow-[var(--app-card-shadow-feature)]",
 );
 
 export const surfaceInsetClassName = cn(
   "rounded-[var(--app-card-radius-compact)] border border-transparent",
-  "bg-[color:var(--app-card-surface-compact)] shadow-[var(--shadow-xs)]"
+  "bg-[color:var(--app-card-surface-compact)] shadow-[var(--shadow-xs)]",
 );
 
-type SurfaceCardProps = Omit<CardProps, "effect" | "preset" | "showRipple" | "variant"> & {
+type SurfaceCardProps = Omit<
+  CardProps,
+  "effect" | "preset" | "showRipple" | "variant"
+> & {
   tone?: SurfaceTone;
   accent?: SurfaceAccent;
 };
 
 export const SurfaceCard = React.forwardRef<HTMLDivElement, SurfaceCardProps>(
-  ({ tone = "default", accent = "none", className, children, ...props }, ref) => (
+  (
+    { tone = "default", accent = "none", className, children, ...props },
+    ref,
+  ) => (
     <Card
       ref={ref}
       type="apple"
@@ -92,13 +103,13 @@ export const SurfaceCard = React.forwardRef<HTMLDivElement, SurfaceCardProps>(
         "min-w-0 overflow-visible",
         SURFACE_TONE_CLASSNAMES[tone],
         SURFACE_ACCENT_CLASSNAMES[accent],
-        className
+        className,
       )}
       {...props}
     >
       {children}
     </Card>
-  )
+  ),
 );
 
 SurfaceCard.displayName = "SurfaceCard";
@@ -111,7 +122,7 @@ export const SurfaceCardHeader = React.forwardRef<
     ref={ref}
     className={cn(
       "px-[var(--surface-card-header-px)] pb-[var(--surface-card-header-pb)] pt-[var(--surface-card-header-pt)]",
-      className
+      className,
     )}
     {...props}
   />
@@ -125,7 +136,10 @@ export const SurfaceCardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CardTitle
     ref={ref}
-    className={cn("text-sm font-semibold tracking-tight sm:text-[15px]", className)}
+    className={cn(
+      "text-sm font-semibold tracking-tight sm:text-[15px]",
+      className,
+    )}
     {...props}
   />
 ));
@@ -138,7 +152,10 @@ export const SurfaceCardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CardDescription
     ref={ref}
-    className={cn("text-[11px] leading-4 text-muted-foreground sm:text-[12px]", className)}
+    className={cn(
+      "text-[11px] leading-4 text-muted-foreground sm:text-[12px]",
+      className,
+    )}
     {...props}
   />
 ));
@@ -153,7 +170,7 @@ export const SurfaceCardContent = React.forwardRef<
     ref={ref}
     className={cn(
       "px-[var(--surface-card-content-px)] pb-[var(--surface-card-content-pb)] pt-0",
-      className
+      className,
     )}
     {...props}
   />
@@ -165,7 +182,16 @@ export function SurfaceInset({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn(surfaceInsetClassName, "p-[var(--surface-inset-p)]", className)} {...props} />;
+  return (
+    <div
+      className={cn(
+        surfaceInsetClassName,
+        "p-[var(--surface-inset-p)]",
+        className,
+      )}
+      {...props}
+    />
+  );
 }
 
 export function SurfaceStack({
@@ -177,7 +203,11 @@ export function SurfaceStack({
 }) {
   return (
     <div
-      className={cn("surface-stack", compact && "surface-stack-compact", className)}
+      className={cn(
+        "surface-stack",
+        compact && "surface-stack-compact",
+        className,
+      )}
       {...props}
     />
   );
@@ -187,7 +217,9 @@ export function SurfaceDataTableShell({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn(surfaceDataTableShellClassName, className)} {...props} />;
+  return (
+    <div className={cn(surfaceDataTableShellClassName, className)} {...props} />
+  );
 }
 
 type ChartSurfaceCardProps = Omit<SurfaceCardProps, "title"> & {
@@ -212,9 +244,13 @@ export function ChartSurfaceCard({
     <SurfaceCard tone={tone} accent={accent} className={className} {...props}>
       <SurfaceCardHeader className={headerClassName}>
         <SurfaceCardTitle>{title}</SurfaceCardTitle>
-        {description ? <SurfaceCardDescription>{description}</SurfaceCardDescription> : null}
+        {description ? (
+          <SurfaceCardDescription>{description}</SurfaceCardDescription>
+        ) : null}
       </SurfaceCardHeader>
-      <SurfaceCardContent className={contentClassName}>{children}</SurfaceCardContent>
+      <SurfaceCardContent className={contentClassName}>
+        {children}
+      </SurfaceCardContent>
     </SurfaceCard>
   );
 }
@@ -246,7 +282,7 @@ export function FallbackSurfaceCard({
       <div
         className={cn(
           surfaceInsetClassName,
-          "border-dashed p-4 text-sm text-muted-foreground"
+          "border-dashed p-4 text-sm text-muted-foreground",
         )}
       >
         {detail}

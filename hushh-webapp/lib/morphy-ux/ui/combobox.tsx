@@ -64,7 +64,7 @@ function ensureMorphyComboboxStyles() {
  * - ensure pointer/tap selects items reliably
  */
 export function ComboboxItem(
-  props: React.ComponentProps<typeof StockComboboxItem>
+  props: React.ComponentProps<typeof StockComboboxItem>,
 ) {
   ensureMorphyComboboxStyles();
 

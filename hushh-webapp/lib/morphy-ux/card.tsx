@@ -19,8 +19,7 @@ import { MaterialRipple } from "@/lib/morphy-ux/material-ripple";
 export type CardType = "apple" | "legacy";
 
 export interface CardProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    MorphyCardBaseProps {
+  extends React.HTMLAttributes<HTMLDivElement>, MorphyCardBaseProps {
   asChild?: boolean;
   type?: CardType;
   icon?: {
@@ -82,7 +81,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       children,
       ...props
     },
-    ref
+    ref,
   ) => {
     const isApple = type === "apple";
     const Comp = asChild ? Slot : StockCard;
@@ -117,15 +116,23 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
 
       const gradient = Boolean(icon?.gradient);
       return (
-        <div className={cn("flex items-center gap-3 w-full", iconAlignClasses[iconPosition])}>
+        <div
+          className={cn(
+            "flex items-center gap-3 w-full",
+            iconAlignClasses[iconPosition],
+          )}
+        >
           <div
             className={cn(
               "h-10 w-10 rounded-lg border flex items-center justify-center transition-colors duration-200",
-              getIconBoxStyle(gradient)
+              getIconBoxStyle(gradient),
             )}
           >
             <IconComponent
-              className={cn("h-5 w-5 transition-colors duration-200", getIconColor(gradient))}
+              className={cn(
+                "h-5 w-5 transition-colors duration-200",
+                getIconColor(gradient),
+              )}
               weight="regular"
             />
           </div>
@@ -139,7 +146,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     };
 
     return (
-        <Comp
+      <Comp
         ref={ref}
         className={cn(
           "relative !overflow-visible transition-[box-shadow,background-color] duration-200",
@@ -156,7 +163,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
           interactive ? "cursor-pointer" : "",
           fullHeight ? "h-full" : "",
           selected ? "ring-1 ring-foreground/10 dark:ring-white/10" : "",
-          className
+          className,
         )}
         {...props}
       >
@@ -170,7 +177,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
               glassAccent === "soft" &&
                 "bg-[linear-gradient(180deg,rgba(255,255,255,0.26)_0%,rgba(255,255,255,0.14)_16%,rgba(255,255,255,0.05)_34%,transparent_52%),radial-gradient(135%_96%_at_50%_0%,rgba(255,255,255,0.32)_0%,transparent_54%),radial-gradient(135%_96%_at_50%_100%,rgba(148,163,184,0.11)_0%,transparent_62%)] dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.055)_0%,rgba(255,255,255,0.022)_16%,transparent_32%),radial-gradient(135%_96%_at_50%_0%,rgba(255,255,255,0.06)_0%,transparent_56%),radial-gradient(135%_96%_at_50%_100%,rgba(0,0,0,0.22)_0%,transparent_64%)]",
               glassAccent === "balanced" &&
-                "bg-[linear-gradient(180deg,rgba(255,255,255,0.3)_0%,rgba(255,255,255,0.16)_16%,rgba(255,255,255,0.06)_36%,transparent_54%),radial-gradient(140%_100%_at_50%_0%,rgba(255,255,255,0.36)_0%,transparent_54%),radial-gradient(140%_100%_at_50%_100%,rgba(148,163,184,0.13)_0%,transparent_64%)] dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.065)_0%,rgba(255,255,255,0.026)_16%,transparent_34%),radial-gradient(140%_100%_at_50%_0%,rgba(255,255,255,0.075)_0%,transparent_56%),radial-gradient(140%_100%_at_50%_100%,rgba(0,0,0,0.24)_0%,transparent_66%)]"
+                "bg-[linear-gradient(180deg,rgba(255,255,255,0.3)_0%,rgba(255,255,255,0.16)_16%,rgba(255,255,255,0.06)_36%,transparent_54%),radial-gradient(140%_100%_at_50%_0%,rgba(255,255,255,0.36)_0%,transparent_54%),radial-gradient(140%_100%_at_50%_100%,rgba(148,163,184,0.13)_0%,transparent_64%)] dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.065)_0%,rgba(255,255,255,0.026)_16%,transparent_34%),radial-gradient(140%_100%_at_50%_0%,rgba(255,255,255,0.075)_0%,transparent_56%),radial-gradient(140%_100%_at_50%_100%,rgba(0,0,0,0.24)_0%,transparent_66%)]",
             )}
             style={{ borderRadius: "inherit" }}
           />
@@ -199,7 +206,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
         ) : null}
       </Comp>
     );
-  }
+  },
 );
 
 Card.displayName = "Card";
@@ -208,7 +215,11 @@ const CardHeader = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<typeof StockCardHeader>
 >(({ className, ...props }, ref) => (
-  <StockCardHeader ref={ref} className={cn("px-0 space-y-4 pb-2.5", className)} {...props} />
+  <StockCardHeader
+    ref={ref}
+    className={cn("px-0 space-y-4 pb-2.5", className)}
+    {...props}
+  />
 ));
 CardHeader.displayName = "CardHeader";
 
@@ -240,7 +251,11 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<typeof StockCardContent>
 >(({ className, ...props }, ref) => (
-  <StockCardContent ref={ref} className={cn("px-0 space-y-4", className)} {...props} />
+  <StockCardContent
+    ref={ref}
+    className={cn("px-0 space-y-4", className)}
+    {...props}
+  />
 ));
 CardContent.displayName = "CardContent";
 
@@ -256,4 +271,11 @@ const CardFooter = React.forwardRef<
 ));
 CardFooter.displayName = "CardFooter";
 
-export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter };
+export {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+};

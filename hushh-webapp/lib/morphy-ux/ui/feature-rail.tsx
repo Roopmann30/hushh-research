@@ -23,10 +23,7 @@ export function FeatureRail({
     <div
       aria-hidden
       style={style}
-      className={cn(
-        "pointer-events-none absolute left-0 z-0 w-12",
-        className
-      )}
+      className={cn("pointer-events-none absolute left-0 z-0 w-12", className)}
     >
       <div className="absolute inset-0">
         <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 overflow-hidden">

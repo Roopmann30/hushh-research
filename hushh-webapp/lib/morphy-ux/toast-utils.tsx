@@ -78,7 +78,7 @@ class GlobalToastManager {
         // Only keep toasts from the last 30 seconds to avoid showing stale toasts
         const now = Date.now();
         this.pendingToasts = this.store.filter(
-          (toast) => now - toast.timestamp < 30000
+          (toast) => now - toast.timestamp < 30000,
         );
         // Clear the stored toasts
         this.store = [];
@@ -101,7 +101,7 @@ class GlobalToastManager {
   private showToast(
     type: MorphyToastTone,
     message: string,
-    options?: PersistentToastOptions
+    options?: PersistentToastOptions,
   ) {
     switch (toSonnerTone(type)) {
       case "success":
@@ -123,7 +123,7 @@ class GlobalToastManager {
   persistToast(
     type: MorphyToastTone,
     message: string,
-    options?: PersistentToastOptions
+    options?: PersistentToastOptions,
   ) {
     if (typeof window === "undefined") return;
 
@@ -166,15 +166,12 @@ const getToastVariantAccentClassName = (variant?: ColorVariant) => {
   return `morphy-sonner-accent-${variant}`;
 };
 
-const getToastToneClassName = (
-  tone: MorphyToastTone,
-  variant?: ColorVariant
-) =>
+const getToastToneClassName = (tone: MorphyToastTone, variant?: ColorVariant) =>
   cn(
     "morphy-sonner-toast",
     `morphy-sonner-tone-${tone}`,
     tone === "danger" ? "morphy-sonner-tone-error" : undefined,
-    getToastVariantAccentClassName(variant)
+    getToastVariantAccentClassName(variant),
   );
 
 // ============================================================================
@@ -196,10 +193,7 @@ export const useMorphyToast = () => {
       duration,
       description,
       icon: (
-        <CheckCircleIcon
-          className="h-4 w-4 text-current"
-          weight={iconWeight}
-        />
+        <CheckCircleIcon className="h-4 w-4 text-current" weight={iconWeight} />
       ),
       className: cn(getToastToneClassName("success", variant), className),
     });
@@ -212,10 +206,7 @@ export const useMorphyToast = () => {
       duration,
       description,
       icon: (
-        <XCircleIcon
-          className="h-4 w-4 text-current"
-          weight={iconWeight}
-        />
+        <XCircleIcon className="h-4 w-4 text-current" weight={iconWeight} />
       ),
       className: cn(getToastToneClassName("error", variant), className),
     });
@@ -228,10 +219,7 @@ export const useMorphyToast = () => {
       duration,
       description,
       icon: (
-        <XCircleIcon
-          className="h-4 w-4 text-current"
-          weight={iconWeight}
-        />
+        <XCircleIcon className="h-4 w-4 text-current" weight={iconWeight} />
       ),
       className: cn(getToastToneClassName("danger", variant), className),
     });
@@ -244,10 +232,7 @@ export const useMorphyToast = () => {
       duration,
       description,
       icon: (
-        <WarningIcon
-          className="h-4 w-4 text-current"
-          weight={iconWeight}
-        />
+        <WarningIcon className="h-4 w-4 text-current" weight={iconWeight} />
       ),
       className: cn(getToastToneClassName("warning", variant), className),
     });
@@ -259,41 +244,27 @@ export const useMorphyToast = () => {
     return toast.info(message, {
       duration,
       description,
-      icon: (
-        <InfoIcon
-          className="h-4 w-4 text-current"
-          weight={iconWeight}
-        />
-      ),
+      icon: <InfoIcon className="h-4 w-4 text-current" weight={iconWeight} />,
       className: cn(getToastToneClassName("info", variant), className),
     });
   };
 
   const custom = (
     message: string,
-    options: ToastOptions & { icon?: React.ReactNode } = {}
+    options: ToastOptions & { icon?: React.ReactNode } = {},
   ) => {
-    const {
-      variant,
-      duration = 4000,
-      description,
-      icon,
-      className,
-    } = options;
+    const { variant, duration = 4000, description, icon, className } = options;
 
     return toast(message, {
       duration,
       description,
       icon: icon || (
-        <SparkleIcon
-          className="h-4 w-4 text-current"
-          weight={iconWeight}
-        />
+        <SparkleIcon className="h-4 w-4 text-current" weight={iconWeight} />
       ),
       className: cn(
         "morphy-sonner-toast",
         getToastVariantAccentClassName(variant),
-        className
+        className,
       ),
     });
   };
@@ -394,7 +365,7 @@ export const morphyToast = {
 
   custom: (
     message: string,
-    options?: ToastOptions & { icon?: React.ReactNode }
+    options?: ToastOptions & { icon?: React.ReactNode },
   ) => {
     const {
       variant,
@@ -411,7 +382,7 @@ export const morphyToast = {
       className: cn(
         "morphy-sonner-toast",
         getToastVariantAccentClassName(variant),
-        className
+        className,
       ),
     });
   },

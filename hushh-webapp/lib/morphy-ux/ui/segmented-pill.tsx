@@ -69,7 +69,10 @@ const SIZE_STYLES: Record<
   },
 };
 
-export const SegmentedPill = React.forwardRef<HTMLDivElement, SegmentedPillProps>(
+export const SegmentedPill = React.forwardRef<
+  HTMLDivElement,
+  SegmentedPillProps
+>(
   (
     {
       value,
@@ -81,13 +84,13 @@ export const SegmentedPill = React.forwardRef<HTMLDivElement, SegmentedPillProps
       className,
       ariaLabel = "Segmented selector",
     },
-    ref
+    ref,
   ) => {
     const styles = SIZE_STYLES[size];
     const isStacked = layout === "stacked";
     const activeIndex = Math.max(
       0,
-      options.findIndex((option) => option.value === value)
+      options.findIndex((option) => option.value === value),
     );
 
     return (
@@ -99,7 +102,7 @@ export const SegmentedPill = React.forwardRef<HTMLDivElement, SegmentedPillProps
         className={cn(
           "pointer-events-none relative grid items-center rounded-full border-0 bg-background/80 shadow-[0_11px_34px_0_var(--theme-color-boxShadow)] backdrop-blur-[var(--blur-standard)]",
           isStacked ? styles.stackedContainer : styles.container,
-          className
+          className,
         )}
         style={{
           gridTemplateColumns: `repeat(${Math.max(options.length, 1)}, minmax(0, 1fr))`,
@@ -135,7 +138,9 @@ export const SegmentedPill = React.forwardRef<HTMLDivElement, SegmentedPillProps
               className={cn(
                 "relative z-10 flex min-w-0 items-center justify-center overflow-hidden rounded-full text-center transition-[color,opacity,transform] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] disabled:cursor-not-allowed",
                 "pointer-events-auto",
-                hitArea === "content" ? "w-fit flex-none self-center" : "h-full w-full",
+                hitArea === "content"
+                  ? "w-fit flex-none self-center"
+                  : "h-full w-full",
                 isStacked ? "flex-col" : "flex-row",
                 isStacked ? styles.stackedButton : styles.button,
                 isStacked ? styles.stackedGap : styles.gap,
@@ -144,10 +149,11 @@ export const SegmentedPill = React.forwardRef<HTMLDivElement, SegmentedPillProps
                   : isAccent
                     ? "text-primary/85 hover:text-primary"
                     : "text-foreground/60 hover:text-foreground/80",
-                isDisabled && "opacity-45"
+                isDisabled && "opacity-45",
               )}
             >
-              {option.icon || (typeof option.badge === "number" && option.badge > 0) ? (
+              {option.icon ||
+              (typeof option.badge === "number" && option.badge > 0) ? (
                 <span className="relative flex shrink-0 items-center justify-center">
                   {option.icon ? (
                     <Icon
@@ -155,7 +161,7 @@ export const SegmentedPill = React.forwardRef<HTMLDivElement, SegmentedPillProps
                       size={styles.icon}
                       className={cn(
                         "transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]",
-                        isActive && "scale-105"
+                        isActive && "scale-105",
                       )}
                     />
                   ) : null}
@@ -168,8 +174,10 @@ export const SegmentedPill = React.forwardRef<HTMLDivElement, SegmentedPillProps
               ) : null}
               <span
                 className={cn(
-                  isStacked ? "max-w-full whitespace-normal" : "whitespace-nowrap",
-                  isStacked ? styles.stackedLabel : styles.label
+                  isStacked
+                    ? "max-w-full whitespace-normal"
+                    : "whitespace-nowrap",
+                  isStacked ? styles.stackedLabel : styles.label,
                 )}
               >
                 {option.label}
@@ -190,7 +198,7 @@ export const SegmentedPill = React.forwardRef<HTMLDivElement, SegmentedPillProps
                 className={cn(
                   "pointer-events-none relative z-10 flex min-w-0 items-center justify-center",
                   hitArea === "segment" ? "h-full px-[2px] py-[2px]" : "",
-                  hitArea === "content" && isStacked ? "py-0.5" : ""
+                  hitArea === "content" && isStacked ? "py-0.5" : "",
                 )}
               >
                 {button}
@@ -202,7 +210,7 @@ export const SegmentedPill = React.forwardRef<HTMLDivElement, SegmentedPillProps
         })}
       </div>
     );
-  }
+  },
 );
 
 SegmentedPill.displayName = "SegmentedPill";

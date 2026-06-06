@@ -66,7 +66,7 @@ export const useRipple = () => {
   }, []);
 
   const addRipple = (
-    event: React.MouseEvent<HTMLElement> | React.PointerEvent<HTMLElement>
+    event: React.MouseEvent<HTMLElement> | React.PointerEvent<HTMLElement>,
   ) => {
     const rect = event.currentTarget.getBoundingClientRect();
     // Use actual mouse position relative to the element
@@ -140,7 +140,7 @@ export const Ripple = ({ className, children, ...props }: RippleProps) => {
         <span
           className={cn(
             "absolute rounded-full animate-ripple pointer-events-none",
-            getRippleColor("gradient")
+            getRippleColor("gradient"),
           )}
           style={{
             left: ripple.x,

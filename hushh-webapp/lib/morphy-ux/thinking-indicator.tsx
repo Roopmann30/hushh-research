@@ -53,17 +53,19 @@ export function ThinkingIndicator({
   className,
 }: ThinkingIndicatorProps) {
   const spinner = (
-    <Loader2 
+    <Loader2
       className={cn(
         "animate-spin",
         colorClasses[color],
-        spinnerSizeClasses[size]
-      )} 
+        spinnerSizeClasses[size],
+      )}
     />
   );
 
   if (variant === "minimal") {
-    return <div className={cn("flex items-center gap-2", className)}>{spinner}</div>;
+    return (
+      <div className={cn("flex items-center gap-2", className)}>{spinner}</div>
+    );
   }
 
   if (variant === "card") {
@@ -73,7 +75,7 @@ export function ThinkingIndicator({
           "flex items-center gap-3 p-4",
           "bg-muted/30 rounded-xl border border-border/50",
           "animate-in fade-in slide-in-from-bottom-2",
-          className
+          className,
         )}
       >
         {spinner}
@@ -137,7 +139,7 @@ export function StreamingStageIndicator({
                 ? "bg-[var(--morphy-primary-start)]"
                 : i === currentStage
                   ? "bg-[var(--morphy-primary-start)] animate-pulse"
-                  : "bg-muted"
+                  : "bg-muted",
             )}
           />
         ))}
@@ -151,7 +153,7 @@ export function StreamingStageIndicator({
               key={stage}
               className={cn(
                 "text-xs transition-colors",
-                i <= currentStage ? "text-foreground" : "text-muted-foreground"
+                i <= currentStage ? "text-foreground" : "text-muted-foreground",
               )}
             >
               {stage}

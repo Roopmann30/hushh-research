@@ -26,7 +26,13 @@
 
 import { useRef, useEffect, useState, useCallback } from "react";
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
-import { ChevronDownIcon, Sparkles, Loader2, Database, CheckCircle2 } from "lucide-react";
+import {
+  ChevronDownIcon,
+  Sparkles,
+  Loader2,
+  Database,
+  CheckCircle2,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import { cn } from "./cn";
@@ -51,7 +57,7 @@ function formatThinkingText(text: string) {
 
   // Split by line
   const lines = text.split("\n");
-  
+
   return lines.map((line, i) => {
     const trimmedLine = line.trim();
     if (!trimmedLine) return <div key={i} className="h-2" />;
@@ -74,7 +80,8 @@ function formatThinkingText(text: string) {
 
     // Match pattern: **Header text** (with or without trailing content)
     // Be more aggressive in stripping stars from the start and end
-    const boldHeaderMatch = trimmedLine.match(/^\*\*(.+?)\*\*$/) || trimmedLine.match(/^\*\*(.+)$/);
+    const boldHeaderMatch =
+      trimmedLine.match(/^\*\*(.+?)\*\*$/) || trimmedLine.match(/^\*\*(.+)$/);
     if (boldHeaderMatch && boldHeaderMatch[1]) {
       const title = boldHeaderMatch[1].replace(/\*\*$/, "").trim();
       return (
@@ -98,7 +105,7 @@ function formatThinkingText(text: string) {
         </div>
       );
     }
-    
+
     // Regular line - remove ALL instances of ** as requested
     const cleanLine = trimmedLine.replace(/\*\*/g, "");
 
@@ -109,8 +116,6 @@ function formatThinkingText(text: string) {
     );
   });
 }
-
-
 
 // ============================================================================
 // Types
@@ -136,10 +141,16 @@ export interface StreamingAccordionProps {
   /** Callback when user manually toggles */
   onToggle?: (isOpen: boolean) => void;
   /** Icon to show in header (default: spinner) - can be string or React component */
-  icon?: "brain" | "sparkles" | "spinner" | "database" | "none" | "check" | React.ReactNode;
+  icon?:
+    | "brain"
+    | "sparkles"
+    | "spinner"
+    | "database"
+    | "none"
+    | "check"
+    | React.ReactNode;
   /** Custom class for the icon */
   iconClassName?: string;
-
 
   /** Show streaming cursor */
   showCursor?: boolean;
@@ -175,7 +186,6 @@ export function StreamingAccordion({
   bodyClassName,
   emptyStreamingMessage = "Preparing stream...",
 }: StreamingAccordionProps) {
-
   // Accordion open state
   const [isOpen, setIsOpen] = useState(defaultExpanded);
   const wasStreamingRef = useRef(false);
@@ -411,14 +421,17 @@ export function StreamingAccordion({
       onValueChange={handleValueChange}
       className={cn("w-full", className)}
     >
-      <AccordionPrimitive.Item value={id} className="border rounded-lg overflow-hidden">
+      <AccordionPrimitive.Item
+        value={id}
+        className="border rounded-lg overflow-hidden"
+      >
         <AccordionPrimitive.Header className="flex">
           <AccordionPrimitive.Trigger
             className={cn(
               "flex flex-1 items-center justify-between gap-3 px-4 py-3",
               "text-left text-sm font-medium transition-all",
               "hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              "[&[data-state=open]>svg.chevron]:rotate-180"
+              "[&[data-state=open]>svg.chevron]:rotate-180",
             )}
           >
             <div className="flex items-center gap-2">
@@ -427,11 +440,15 @@ export function StreamingAccordion({
                   icon={lucideIcon}
                   size="sm"
                   className={cn(
-                    isStreaming && typeof icon === "string" && (icon === "spinner" || icon === "brain")
+                    isStreaming &&
+                      typeof icon === "string" &&
+                      (icon === "spinner" || icon === "brain")
                       ? "animate-spin"
                       : "",
-                    isStreaming && typeof icon === "string" ? "text-primary" : "",
-                    iconClassName
+                    isStreaming && typeof icon === "string"
+                      ? "text-primary"
+                      : "",
+                    iconClassName,
                   )}
                 />
               ) : (
@@ -454,24 +471,29 @@ export function StreamingAccordion({
               ref={contentRef}
               className={cn(
                 "overflow-y-auto overscroll-contain px-4 pb-4",
-                "scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent"
+                "scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent",
               )}
               style={{ maxHeight }}
             >
               {isEmpty ? (
                 <p className="text-muted-foreground text-sm italic">
-                  {isStreaming ? emptyStreamingMessage : "Waiting for AI response..."}
+                  {isStreaming
+                    ? emptyStreamingMessage
+                    : "Waiting for AI response..."}
                 </p>
               ) : (
                 <div
                   className={cn(
                     "text-sm text-muted-foreground leading-relaxed",
-                    bodyClassName
+                    bodyClassName,
                   )}
                 >
                   {formatThinkingText(displayText)}
                   {showCursor && isStreaming && (
-                    <StreamingCursor isStreaming={isStreaming} color="primary" />
+                    <StreamingCursor
+                      isStreaming={isStreaming}
+                      color="primary"
+                    />
                   )}
                 </div>
               )}
@@ -480,6 +502,7 @@ export function StreamingAccordion({
             {/* Scroll to bottom button */}
             {userScrolledUp && isStreaming && isOpen && (
               <button
+                type="button"
                 onClick={handleScrollToBottom}
                 className={cn(
                   "absolute bottom-2 left-1/2 -translate-x-1/2 z-10",
@@ -487,7 +510,7 @@ export function StreamingAccordion({
                   "bg-primary text-primary-foreground text-xs font-medium",
                   "shadow-lg hover:shadow-xl transition-all",
                   "animate-in fade-in slide-in-from-bottom-2",
-                  "flex items-center gap-1.5"
+                  "flex items-center gap-1.5",
                 )}
               >
                 <svg

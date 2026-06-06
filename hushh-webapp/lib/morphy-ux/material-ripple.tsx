@@ -1,4 +1,3 @@
-
 "use client";
 
 /**
@@ -32,7 +31,7 @@ interface MdRipple extends HTMLElement {
 export const getMaterialRippleColors = (
   variant: ColorVariant,
   effect: ComponentEffect = "fill",
-  isDarkMode: boolean = false
+  isDarkMode: boolean = false,
 ): {
   hoverColor: string;
   pressedColor: string;
@@ -176,7 +175,7 @@ export const MaterialRipple = ({
       } catch (error) {
         console.warn(
           "[MaterialRipple] Material Web ripple is unavailable. Rendering without the custom ripple element.",
-          error
+          error,
         );
         if (!cancelled) setIsRippleReady(false);
       }
@@ -223,19 +222,19 @@ export const MaterialRipple = ({
     if (containerRef.current) {
       containerRef.current.style.setProperty(
         "--md-ripple-hover-color",
-        colors.hoverColor
+        colors.hoverColor,
       );
       containerRef.current.style.setProperty(
         "--md-ripple-pressed-color",
-        colors.pressedColor
+        colors.pressedColor,
       );
       containerRef.current.style.setProperty(
         "--md-ripple-hover-opacity",
-        String(colors.hoverOpacity)
+        String(colors.hoverOpacity),
       );
       containerRef.current.style.setProperty(
         "--md-ripple-pressed-opacity",
-        String(colors.pressedOpacity)
+        String(colors.pressedOpacity),
       );
     }
   }, [variant, effect]);
@@ -252,11 +251,11 @@ export const MaterialRipple = ({
           if (containerRef.current) {
             containerRef.current.style.setProperty(
               "--md-ripple-hover-color",
-              colors.hoverColor
+              colors.hoverColor,
             );
             containerRef.current.style.setProperty(
               "--md-ripple-pressed-color",
-              colors.pressedColor
+              colors.pressedColor,
             );
           }
         }

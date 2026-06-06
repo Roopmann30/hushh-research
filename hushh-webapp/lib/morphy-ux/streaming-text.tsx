@@ -154,22 +154,22 @@ export function StreamingTextDisplay({
 
     const atBottom = checkIfAtBottom();
     const currentScrollHeight = container.scrollHeight;
-    
+
     // Detect if this is a user scroll vs programmatic scroll
     // If scrollHeight changed, it's likely content was added and we auto-scrolled
     const isContentGrowth = currentScrollHeight !== lastScrollHeightRef.current;
     lastScrollHeightRef.current = currentScrollHeight;
-    
+
     // Only consider it a user scroll if content didn't just grow
     if (!isContentGrowth) {
       hasUserScrolledRef.current = true;
-      
+
       // If user scrolled up (away from bottom), stop auto-scrolling
       if (!atBottom) {
         setUserScrolledUp(true);
       }
     }
-    
+
     // If user scrolled back to bottom, resume auto-scrolling
     if (atBottom && userScrolledUp && hasUserScrolledRef.current) {
       setUserScrolledUp(false);
@@ -180,7 +180,7 @@ export function StreamingTextDisplay({
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-    
+
     // Don't auto-scroll if user has scrolled up
     if (userScrolledUp) return;
 
@@ -188,10 +188,10 @@ export function StreamingTextDisplay({
     requestAnimationFrame(() => {
       // Double-check container still exists
       if (!containerRef.current) return;
-      
+
       // Update scroll height tracking before scrolling
       lastScrollHeightRef.current = containerRef.current.scrollHeight;
-      
+
       containerRef.current.scrollTo({
         top: containerRef.current.scrollHeight,
         behavior: smoothScroll ? "smooth" : "auto",
@@ -276,7 +276,7 @@ export function StreamingTextDisplay({
       className={cn(
         "overflow-y-auto overscroll-contain",
         "scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent",
-        className
+        className,
       )}
     >
       {isEmpty && !isStreaming ? (
@@ -285,7 +285,7 @@ export function StreamingTextDisplay({
         <p
           className={cn(
             "whitespace-pre-wrap leading-relaxed text-sm",
-            textClassName
+            textClassName,
           )}
         >
           {displayText}
@@ -298,6 +298,7 @@ export function StreamingTextDisplay({
       {/* Scroll to bottom button (shows when user scrolled up during streaming) */}
       {userScrolledUp && isStreaming && (
         <button
+          type="button"
           onClick={handleScrollToBottom}
           className={cn(
             "sticky bottom-2 left-1/2 -translate-x-1/2 z-10",
@@ -305,7 +306,7 @@ export function StreamingTextDisplay({
             "bg-primary text-primary-foreground text-xs font-medium",
             "shadow-lg hover:shadow-xl transition-all",
             "animate-in fade-in slide-in-from-bottom-2",
-            "flex items-center gap-1.5"
+            "flex items-center gap-1.5",
           )}
         >
           <svg

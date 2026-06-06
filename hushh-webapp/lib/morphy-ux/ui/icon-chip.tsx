@@ -17,8 +17,10 @@ const TONE_VARIABLE_CLASSES: Record<IconChipTone, string> = {
     "[--chip-fg:var(--tone-orange)] [--chip-bg:var(--tone-orange-bg)] [--chip-glow:var(--tone-orange-glow)]",
 };
 
-export interface IconChipProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
+export interface IconChipProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "children"
+> {
   icon: LucideIcon;
   tone: IconChipTone;
   state?: IconChipState;
@@ -40,14 +42,14 @@ export const IconChip = React.forwardRef<HTMLDivElement, IconChipProps>(
           "data-[state=active]:ring-1 data-[state=active]:ring-[var(--chip-fg)]/28",
           "data-[state=active]:shadow-[0_0_18px_var(--chip-glow)]",
           TONE_VARIABLE_CLASSES[tone],
-          className
+          className,
         )}
         {...props}
       >
         <Icon icon={icon} size="lg" />
       </div>
     );
-  }
+  },
 );
 
 IconChip.displayName = "IconChip";

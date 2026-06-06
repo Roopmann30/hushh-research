@@ -37,15 +37,16 @@ const sidebarMenuButtonVariants = cva(
     defaultVariants: {
       size: "default",
     },
-  }
+  },
 );
 
 // ============================================================================
 // SIDEBAR MENU BUTTON COMPONENT
 // ============================================================================
 
-export interface SidebarMenuButtonProps
-  extends VariantProps<typeof sidebarMenuButtonVariants> {
+export interface SidebarMenuButtonProps extends VariantProps<
+  typeof sidebarMenuButtonVariants
+> {
   href: string;
   isActive?: boolean;
   className?: string;
@@ -59,7 +60,7 @@ const SidebarMenuButton = React.forwardRef<
 >(
   (
     { className, size = "default", isActive = false, href, children, onClick },
-    ref
+    ref,
   ) => {
     const { isMobile, setOpenMobile } = useSidebar();
 
@@ -86,7 +87,7 @@ const SidebarMenuButton = React.forwardRef<
         <MaterialRipple variant="link" effect="glass" />
       </Link>
     );
-  }
+  },
 );
 
 SidebarMenuButton.displayName = "SidebarMenuButton";

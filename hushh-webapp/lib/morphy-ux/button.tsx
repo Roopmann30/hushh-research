@@ -14,7 +14,8 @@ import { useIconWeight } from "@/lib/morphy-ux/icon-theme-context";
 type MorphyButtonSize = "sm" | "default" | "lg" | "xl" | "icon" | "icon-sm";
 
 export interface ButtonProps
-  extends Omit<React.ComponentProps<typeof StockButton>, "variant" | "size">,
+  extends
+    Omit<React.ComponentProps<typeof StockButton>, "variant" | "size">,
     MorphyButtonBaseProps {
   asChild?: boolean;
   size?: MorphyButtonSize;
@@ -63,7 +64,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       disabled,
       ...props
     },
-    ref
+    ref,
   ) => {
     const iconWeight = useIconWeight();
     const IconComponent = icon?.icon;
@@ -118,7 +119,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
               className={cn(
                 "mr-2.5 flex items-center justify-center rounded-lg border",
                 getIconBoxSize(),
-                iconBoxClass
+                iconBoxClass,
               )}
             >
               <IconComponent
@@ -165,7 +166,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             isXl ? "h-16 px-12 text-lg" : "",
             fullWidth ? "w-full" : "",
             loading ? "cursor-wait" : "",
-            className
+            className,
           )}
           {...props}
         >
@@ -197,14 +198,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           isXl ? "h-16 px-12 text-lg" : "",
           fullWidth ? "w-full" : "",
           loading ? "cursor-wait" : "",
-          className
+          className,
         )}
         {...props}
       >
         {content}
       </StockButton>
     );
-  }
+  },
 );
 
 Button.displayName = "Button";
