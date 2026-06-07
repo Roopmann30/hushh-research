@@ -1806,3 +1806,13 @@ html.dark .morphy-app-bg {
   background-color: #1c1c1e !important;
   background-image: none !important;
 }
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

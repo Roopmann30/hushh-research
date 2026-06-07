@@ -2505,7 +2505,7 @@ export function OneLocationAgentPageContent() {
 
                 <div className="space-y-2">
                   {sectionLabel("KAI Circle")}
-                  <div className="flex gap-4 overflow-x-auto px-1 pb-2 pt-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  <div className="flex gap-4 overflow-x-auto px-1 pb-2 pt-1 no-scrollbar">
                     {rankedRecipients.length ? (
                       rankedRecipients.map((recipient, index) => {
                         const label = displayNameFromRecipient(recipient);
