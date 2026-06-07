@@ -2,7 +2,7 @@
 
 /**
  * Profile Layout
- * 
+ *
  * Profile page allows sign out even when vault is locked.
  * Existing vault users stay unblocked here; no-vault users still satisfy the
  * post-login phone mandate before the broader app flow continues.

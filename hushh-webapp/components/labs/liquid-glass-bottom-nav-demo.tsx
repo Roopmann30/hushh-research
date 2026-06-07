@@ -16,7 +16,11 @@ import {
   LiquidGlassSceneRoot,
   useSceneMetrics,
 } from "@/components/labs/liquid-glass-scene";
-import { paintLabBackdrop, roundedRectPath, useLabSceneImage } from "@/lib/labs/liquid-glass-scene-paint";
+import {
+  paintLabBackdrop,
+  roundedRectPath,
+  useLabSceneImage,
+} from "@/lib/labs/liquid-glass-scene-paint";
 import { useLiquidGlassRendererMode } from "@/components/labs/liquid-glass-renderer-mode";
 import { useSpringValue } from "@/lib/labs/liquid-glass-core";
 import { cn } from "@/lib/utils";
@@ -118,122 +122,127 @@ export function LiquidGlassBottomNavDemo() {
             backgroundRepeat: "repeat, repeat, no-repeat",
             backgroundAttachment: "scroll",
           },
-    [showBackgroundImage]
+    [showBackgroundImage],
   );
 
   return (
     <LiquidGlassSceneProvider sceneStyle={sceneStyle}>
       <section className="space-y-5">
-      <div className="flex flex-wrap justify-end gap-3">
-        <label className="inline-flex items-center gap-2 rounded-full bg-black/5 px-3 py-1.5 text-sm font-medium text-black/60 transition-colors hover:bg-black/10 dark:bg-white/10 dark:text-white/60 dark:hover:bg-white/20">
-          <input
-            type="checkbox"
-            checked={alwaysShowGlass}
-            onChange={(event) => setAlwaysShowGlass(event.target.checked)}
-            className="accent-black dark:accent-white"
-          />
-          Always Show Glass
-        </label>
-        <label className="inline-flex items-center gap-2 rounded-full bg-black/5 px-3 py-1.5 text-sm font-medium text-black/60 transition-colors hover:bg-black/10 dark:bg-white/10 dark:text-white/60 dark:hover:bg-white/20">
-          <input
-            type="checkbox"
-            checked={showBackgroundImage}
-            onChange={(event) => setShowBackgroundImage(event.target.checked)}
-            className="accent-black dark:accent-white"
-          />
-          Show Background Image
-        </label>
-      </div>
+        <div className="flex flex-wrap justify-end gap-3">
+          <label className="inline-flex items-center gap-2 rounded-full bg-black/5 px-3 py-1.5 text-sm font-medium text-black/60 transition-colors hover:bg-black/10 dark:bg-white/10 dark:text-white/60 dark:hover:bg-white/20">
+            <input
+              type="checkbox"
+              checked={alwaysShowGlass}
+              onChange={(event) => setAlwaysShowGlass(event.target.checked)}
+              className="accent-black dark:accent-white"
+            />
+            Always Show Glass
+          </label>
+          <label className="inline-flex items-center gap-2 rounded-full bg-black/5 px-3 py-1.5 text-sm font-medium text-black/60 transition-colors hover:bg-black/10 dark:bg-white/10 dark:text-white/60 dark:hover:bg-white/20">
+            <input
+              type="checkbox"
+              checked={showBackgroundImage}
+              onChange={(event) => setShowBackgroundImage(event.target.checked)}
+              className="accent-black dark:accent-white"
+            />
+            Show Background Image
+          </label>
+        </div>
 
-      <div
-        className={cn(
-          "relative -ml-4 h-[38rem] w-[calc(100%+32px)] overflow-hidden rounded-xl border border-black/10 text-black/5 transition-all duration-500 ease-in-out dark:border-white/10 dark:text-white/5"
-        )}
-      >
-        <LiquidGlassSceneRoot
-          className={cn("absolute inset-0", showBackgroundImage ? "animate-bg-pan" : "")}
+        <div
+          className={cn(
+            "relative -ml-4 h-[38rem] w-[calc(100%+32px)] overflow-hidden rounded-xl border border-black/10 text-black/5 transition-all duration-500 ease-in-out dark:border-white/10 dark:text-white/5",
+          )}
         >
-          {showBackgroundImage ? (
-            <>
-              <div className="absolute inset-0" />
-              <a
-                href="https://unsplash.com/@visaxslr"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="absolute left-3 top-3 inline-block text-[9px] uppercase tracking-wider text-white/40"
-              >
-                Photo by @visaxslr
-                <br />
-                on Unsplash
-              </a>
-            </>
-          ) : null}
+          <LiquidGlassSceneRoot
+            className={cn(
+              "absolute inset-0",
+              showBackgroundImage ? "animate-bg-pan" : "",
+            )}
+          >
+            {showBackgroundImage ? (
+              <>
+                <div className="absolute inset-0" />
+                <a
+                  href="https://unsplash.com/@visaxslr"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute left-3 top-3 inline-block text-[9px] uppercase tracking-wider text-white/40"
+                >
+                  Photo by @visaxslr
+                  <br />
+                  on Unsplash
+                </a>
+              </>
+            ) : null}
 
-          <div className="absolute inset-x-10 top-10 grid grid-cols-3 gap-4">
-            {["Watchlist", "Momentum", "Alerts"].map((label, index) => (
-              <div
-                key={label}
-                className="rounded-[2rem] border border-white/10 bg-black/20 px-5 py-4 backdrop-blur-[1px]"
-                style={{
-                  transform: `translateY(${index * 6}px)`,
-                }}
-              >
-                <div className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/46">
-                  {label}
+            <div className="absolute inset-x-10 top-10 grid grid-cols-3 gap-4">
+              {["Watchlist", "Momentum", "Alerts"].map((label, index) => (
+                <div
+                  key={label}
+                  className="rounded-[2rem] border border-white/10 bg-black/20 px-5 py-4 backdrop-blur-[1px]"
+                  style={{
+                    transform: `translateY(${index * 6}px)`,
+                  }}
+                >
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/46">
+                    {label}
+                  </div>
+                  <div className="mt-3 h-3 rounded-full bg-white/18" />
+                  <div className="mt-2 h-3 w-4/5 rounded-full bg-white/10" />
+                  <div className="mt-2 h-16 rounded-[1.5rem] bg-white/8" />
                 </div>
-                <div className="mt-3 h-3 rounded-full bg-white/18" />
-                <div className="mt-2 h-3 w-4/5 rounded-full bg-white/10" />
-                <div className="mt-2 h-16 rounded-[1.5rem] bg-white/8" />
-              </div>
-            ))}
+              ))}
+            </div>
+
+            <div className="absolute inset-x-12 bottom-24 grid grid-cols-4 gap-4">
+              {Array.from({ length: 8 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="h-20 rounded-[1.75rem] border border-white/8 bg-black/20"
+                  style={{ opacity: 0.45 + (index % 4) * 0.08 }}
+                />
+              ))}
+            </div>
+          </LiquidGlassSceneRoot>
+
+          <div className="relative z-10 mb-8 pt-14 text-center font-medium text-black/80 dark:text-white/80">
+            Active:{" "}
+            <span className="font-bold uppercase tracking-[0.24em]">
+              {activeTab}
+            </span>
           </div>
 
-          <div className="absolute inset-x-12 bottom-24 grid grid-cols-4 gap-4">
-            {Array.from({ length: 8 }).map((_, index) => (
-              <div
-                key={index}
-                className="h-20 rounded-[1.75rem] border border-white/8 bg-black/20"
-                style={{ opacity: 0.45 + (index % 4) * 0.08 }}
-              />
-            ))}
+          <div className="relative z-10 flex h-[calc(100%-120px)] flex-col items-center justify-center gap-8">
+            <LiquidGlassNav
+              size="small"
+              value={activeTab}
+              onValueChange={setActiveTab}
+              items={NAV_ITEMS}
+              alwaysShowGlass={alwaysShowGlass}
+              backgroundImage={backgroundImage}
+              showBackgroundImage={showBackgroundImage}
+            />
+            <LiquidGlassNav
+              size="medium"
+              value={activeTab}
+              onValueChange={setActiveTab}
+              items={NAV_ITEMS}
+              alwaysShowGlass={alwaysShowGlass}
+              backgroundImage={backgroundImage}
+              showBackgroundImage={showBackgroundImage}
+            />
+            <LiquidGlassNav
+              size="large"
+              value={activeTab}
+              onValueChange={setActiveTab}
+              items={NAV_ITEMS}
+              alwaysShowGlass={alwaysShowGlass}
+              backgroundImage={backgroundImage}
+              showBackgroundImage={showBackgroundImage}
+            />
           </div>
-        </LiquidGlassSceneRoot>
-
-        <div className="relative z-10 mb-8 pt-14 text-center font-medium text-black/80 dark:text-white/80">
-          Active:{" "}
-          <span className="font-bold uppercase tracking-[0.24em]">{activeTab}</span>
         </div>
-
-        <div className="relative z-10 flex h-[calc(100%-120px)] flex-col items-center justify-center gap-8">
-          <LiquidGlassNav
-            size="small"
-            value={activeTab}
-            onValueChange={setActiveTab}
-            items={NAV_ITEMS}
-            alwaysShowGlass={alwaysShowGlass}
-            backgroundImage={backgroundImage}
-            showBackgroundImage={showBackgroundImage}
-          />
-          <LiquidGlassNav
-            size="medium"
-            value={activeTab}
-            onValueChange={setActiveTab}
-            items={NAV_ITEMS}
-            alwaysShowGlass={alwaysShowGlass}
-            backgroundImage={backgroundImage}
-            showBackgroundImage={showBackgroundImage}
-          />
-          <LiquidGlassNav
-            size="large"
-            value={activeTab}
-            onValueChange={setActiveTab}
-            items={NAV_ITEMS}
-            alwaysShowGlass={alwaysShowGlass}
-            backgroundImage={backgroundImage}
-            showBackgroundImage={showBackgroundImage}
-          />
-        </div>
-      </div>
       </section>
     </LiquidGlassSceneProvider>
   );
@@ -267,7 +276,7 @@ function LiquidGlassNav({
   const centerOffset = (itemWidth - thumbWidth) / 2;
   const selectedIndex = Math.max(
     0,
-    items.findIndex((item) => item.id === value)
+    items.findIndex((item) => item.id === value),
   );
   const targetThumbX = selectedIndex * itemWidth + centerOffset;
   const filterId = useId().replace(/:/g, "-");
@@ -280,10 +289,12 @@ function LiquidGlassNav({
   const [wobbleScaleY, setWobbleScaleY] = useState(1);
   const pointerStartXRef = useRef(0);
   const thumbStartXRef = useRef(targetThumbX);
-  const hideGlassTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hideGlassTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const containerRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
-  
+
   const containerMetrics = useSceneMetrics(containerRef);
   const thumbMetrics = useSceneMetrics(thumbRef);
 
@@ -307,12 +318,15 @@ function LiquidGlassNav({
   }, [pointerDown, selectedIndex]);
 
   const isActive = alwaysShowGlass || pointerDown || glassVisible;
-  const visualState =
-    pointerDown ? "dragging" : alwaysShowGlass ? "held" : glassVisible ? "settling" : "idle";
-  const thumbScale =
-    (isActive ? dimensions.thumbScale : 1) * wobbleScaleX;
-  const thumbScaleY =
-    (isActive ? dimensions.thumbScaleY : 1) * wobbleScaleY;
+  const visualState = pointerDown
+    ? "dragging"
+    : alwaysShowGlass
+      ? "held"
+      : glassVisible
+        ? "settling"
+        : "idle";
+  const thumbScale = (isActive ? dimensions.thumbScale : 1) * wobbleScaleX;
+  const thumbScaleY = (isActive ? dimensions.thumbScaleY : 1) * wobbleScaleY;
   const thumbTop = (sliderHeight - thumbHeight) / 2;
   const thumbFilterOptions = useMemo(
     () => ({
@@ -329,7 +343,13 @@ function LiquidGlassNav({
       specularOpacity: 0.4,
       specularSaturation: 10,
     }),
-    [dimensions.bezelWidth, dimensions.glassThickness, thumbHeight, thumbRadius, thumbWidth]
+    [
+      dimensions.bezelWidth,
+      dimensions.glassThickness,
+      thumbHeight,
+      thumbRadius,
+      thumbWidth,
+    ],
   );
 
   useEffect(() => {
@@ -367,7 +387,15 @@ function LiquidGlassNav({
       }
       showGlassBriefly();
     },
-    [currentThumbX, itemWidth, items, onValueChange, targetThumbX, thumbWidth, value]
+    [
+      currentThumbX,
+      itemWidth,
+      items,
+      onValueChange,
+      targetThumbX,
+      thumbWidth,
+      value,
+    ],
   );
 
   const handlePointerMove = useCallback(
@@ -393,13 +421,14 @@ function LiquidGlassNav({
       setWobbleScaleY((prev: number) => prev * 0.8 + squashFactor * 0.2);
       setCurrentThumbX(nextPos);
     },
-    [centerOffset, currentThumbX, sliderWidth, thumbWidth]
+    [centerOffset, currentThumbX, sliderWidth, thumbWidth],
   );
 
   useEffect(() => {
     if (!pointerDown) return;
 
-    const onPointerMove = (event: PointerEvent) => handlePointerMove(event.clientX);
+    const onPointerMove = (event: PointerEvent) =>
+      handlePointerMove(event.clientX);
     const onPointerUp = (event: PointerEvent) => {
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
@@ -424,7 +453,10 @@ function LiquidGlassNav({
   };
 
   const paintMirrorScene = useCallback(
-    (ctx: CanvasRenderingContext2D, env: { width: number; height: number; scale: number; padding?: number }) => {
+    (
+      ctx: CanvasRenderingContext2D,
+      env: { width: number; height: number; scale: number; padding?: number },
+    ) => {
       paintLabBackdrop(ctx, {
         width: env.width,
         height: env.height,
@@ -437,7 +469,9 @@ function LiquidGlassNav({
       });
 
       // Subtle depth tint - significantly reduced to avoid "black blob" effect
-      ctx.fillStyle = showBackgroundImage ? "rgba(8, 10, 16, 0.08)" : "rgba(8, 10, 16, 0.04)";
+      ctx.fillStyle = showBackgroundImage
+        ? "rgba(8, 10, 16, 0.08)"
+        : "rgba(8, 10, 16, 0.04)";
       ctx.fillRect(-100, -100, env.width + 200, env.height + 200);
 
       ctx.save();
@@ -451,7 +485,18 @@ function LiquidGlassNav({
       });
       ctx.restore();
     },
-    [backgroundImage, thumbMetrics.x, thumbMetrics.y, thumbMetrics.width, thumbMetrics.height, showBackgroundImage, sliderHeight, sliderWidth, springTargetX, thumbTop]
+    [
+      backgroundImage,
+      thumbMetrics.x,
+      thumbMetrics.y,
+      thumbMetrics.width,
+      thumbMetrics.height,
+      showBackgroundImage,
+      sliderHeight,
+      sliderWidth,
+      springTargetX,
+      thumbTop,
+    ],
   );
 
   const backgroundFilterOptions = useMemo(
@@ -469,11 +514,14 @@ function LiquidGlassNav({
       specularOpacity: 1,
       specularSaturation: 19,
     }),
-    [dimensions.backgroundBezelWidth, sliderHeight, sliderWidth]
+    [dimensions.backgroundBezelWidth, sliderHeight, sliderWidth],
   );
 
   const paintBarMirrorScene = useCallback(
-    (ctx: CanvasRenderingContext2D, env: { width: number; height: number; scale: number; padding?: number }) => {
+    (
+      ctx: CanvasRenderingContext2D,
+      env: { width: number; height: number; scale: number; padding?: number },
+    ) => {
       paintLabBackdrop(ctx, {
         width: env.width,
         height: env.height,
@@ -485,10 +533,19 @@ function LiquidGlassNav({
         image: backgroundImage,
       });
       // Very subtle bar tint
-      ctx.fillStyle = showBackgroundImage ? "rgba(8, 10, 16, 0.12)" : "rgba(8, 10, 16, 0.06)";
+      ctx.fillStyle = showBackgroundImage
+        ? "rgba(8, 10, 16, 0.12)"
+        : "rgba(8, 10, 16, 0.06)";
       ctx.fillRect(-100, -100, env.width + 200, env.height + 200);
     },
-    [backgroundImage, containerMetrics.x, containerMetrics.y, containerMetrics.width, containerMetrics.height, showBackgroundImage]
+    [
+      backgroundImage,
+      containerMetrics.x,
+      containerMetrics.y,
+      containerMetrics.width,
+      containerMetrics.height,
+      showBackgroundImage,
+    ],
   );
 
   return (
@@ -500,163 +557,162 @@ function LiquidGlassNav({
         transition: "transform 0.1s ease-out",
       }}
     >
-        <div
-          className="relative"
-          style={{
-            width: sliderWidth,
-            height: sliderHeight,
-            borderRadius: sliderHeight / 2,
-          }}
-        >
-          {rendererMode === "reference" ? (
-            <>
-              <LiquidGlassFilter
-                filterId={backgroundFilterId}
-                enabled
-                mode={rendererMode}
-                options={backgroundFilterOptions}
-              />
-
-              <LiquidGlassBody
-                filterId={backgroundFilterId}
-                mode={rendererMode}
-                className="absolute inset-0"
-                style={{
-                  borderRadius: sliderHeight / 2,
-                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
-                  overflow: "hidden",
-                }}
-              />
-            </>
-          ) : (
-            <>
-              <LiquidGlassFilter
-                filterId={backgroundFilterId}
-                enabled
-                mode={rendererMode}
-                options={backgroundFilterOptions}
-              />
-              <LiquidGlassBody
-                filterId={backgroundFilterId}
-                mode={rendererMode}
-                mirrorOptions={backgroundFilterOptions}
-                mirrorScene={paintBarMirrorScene}
-                className="absolute inset-0"
-                style={{
-                  borderRadius: sliderHeight / 2,
-                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
-                  overflow: "hidden",
-                }}
-              />
-            </>
-          )}
-
-          <div className="absolute inset-0 z-30 flex">
-            {items.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                className={cn(CONTROL_RESET_CLASS, "h-full cursor-pointer")}
-                style={{ width: itemWidth }}
-                onMouseDown={() => {
-                  if (item.id !== value) {
-                    onValueChange(item.id);
-                    showGlassBriefly();
-                  }
-                }}
-              />
-            ))}
-          </div>
-
-          <div
-            ref={thumbRef}
-            className={cn(
-              "absolute z-40 cursor-pointer",
-              "transition-transform duration-100 ease-out"
-            )}
-            style={{
-              height: thumbHeight,
-              width: thumbWidth,
-              transform: `translateX(${springTargetX}px) translateY(-50%) scale(${thumbScale}) scaleY(${thumbScaleY})`,
-              top: sliderHeight / 2,
-              left: 0,
-              pointerEvents: "auto",
-            }}
-            onPointerDown={handleThumbPointerDown}
-          >
+      <div
+        className="relative"
+        style={{
+          width: sliderWidth,
+          height: sliderHeight,
+          borderRadius: sliderHeight / 2,
+        }}
+      >
+        {rendererMode === "reference" ? (
+          <>
             <LiquidGlassFilter
-              filterId={filterId}
+              filterId={backgroundFilterId}
               enabled
               mode={rendererMode}
-              options={thumbFilterOptions}
+              options={backgroundFilterOptions}
             />
+
             <LiquidGlassBody
-              filterId={filterId}
+              filterId={backgroundFilterId}
               mode={rendererMode}
-              compact
-              pressed={isActive}
-              state={visualState}
-              mirrorOptions={thumbFilterOptions}
-              mirrorScene={paintMirrorScene}
-              className={cn(
-                "absolute inset-0 overflow-hidden",
-                rendererMode === "reference" && !isActive
-                  ? "bg-[var(--glass-rgb)]/[var(--glass-bg-alpha)]"
-                  : ""
-              )}
+              className="absolute inset-0"
               style={{
-                borderRadius: thumbRadius,
-                border: "1px solid rgba(255,255,255,0.12)",
-                transition: "background-color 0.1s ease, box-shadow 0.1s ease",
+                borderRadius: sliderHeight / 2,
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+                overflow: "hidden",
               }}
             />
-          </div>
+          </>
+        ) : (
+          <>
+            <LiquidGlassFilter
+              filterId={backgroundFilterId}
+              enabled
+              mode={rendererMode}
+              options={backgroundFilterOptions}
+            />
+            <LiquidGlassBody
+              filterId={backgroundFilterId}
+              mode={rendererMode}
+              mirrorOptions={backgroundFilterOptions}
+              mirrorScene={paintBarMirrorScene}
+              className="absolute inset-0"
+              style={{
+                borderRadius: sliderHeight / 2,
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+                overflow: "hidden",
+              }}
+            />
+          </>
+        )}
 
-          <div
+        <div className="absolute inset-0 z-30 flex">
+          {items.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className={cn(CONTROL_RESET_CLASS, "h-full cursor-pointer")}
+              style={{ width: itemWidth }}
+              onMouseDown={() => {
+                if (item.id !== value) {
+                  onValueChange(item.id);
+                  showGlassBriefly();
+                }
+              }}
+            />
+          ))}
+        </div>
+
+        <div
+          ref={thumbRef}
+          className={cn(
+            "absolute z-40 cursor-pointer",
+            "transition-transform duration-100 ease-out",
+          )}
+          style={{
+            height: thumbHeight,
+            width: thumbWidth,
+            transform: `translateX(${springTargetX}px) translateY(-50%) scale(${thumbScale}) scaleY(${thumbScaleY})`,
+            top: sliderHeight / 2,
+            left: 0,
+            pointerEvents: "auto",
+          }}
+          onPointerDown={handleThumbPointerDown}
+        >
+          <LiquidGlassFilter
+            filterId={filterId}
+            enabled
+            mode={rendererMode}
+            options={thumbFilterOptions}
+          />
+          <LiquidGlassBody
+            filterId={filterId}
+            mode={rendererMode}
+            compact
+            pressed={isActive}
+            state={visualState}
+            mirrorOptions={thumbFilterOptions}
+            mirrorScene={paintMirrorScene}
             className={cn(
-              "absolute inset-0 flex items-center justify-between pointer-events-none",
-              isActive ? "z-20" : "z-50"
+              "absolute inset-0 overflow-hidden",
+              rendererMode === "reference" && !isActive
+                ? "bg-[var(--glass-rgb)]/[var(--glass-bg-alpha)]"
+                : "",
             )}
-          >
-            {items.map((item) => {
-              const active = item.id === value;
-              const ItemIcon = item.icon;
-              return (
-                <div
-                  key={item.id}
-                  className="flex flex-col items-center justify-center transition-all duration-100"
+            style={{
+              borderRadius: thumbRadius,
+              border: "1px solid rgba(255,255,255,0.12)",
+              transition: "background-color 0.1s ease, box-shadow 0.1s ease",
+            }}
+          />
+        </div>
+
+        <div
+          className={cn(
+            "absolute inset-0 flex items-center justify-between pointer-events-none",
+            isActive ? "z-20" : "z-50",
+          )}
+        >
+          {items.map((item) => {
+            const active = item.id === value;
+            const ItemIcon = item.icon;
+            return (
+              <div
+                key={item.id}
+                className="flex flex-col items-center justify-center transition-all duration-100"
+                style={{
+                  width: itemWidth,
+                  height: "100%",
+                  opacity: active ? 1 : 0.6,
+                  transform: active ? "scale(1.05)" : "scale(1)",
+                  gap: Math.max(2, Math.round(dimensions.iconSize * 0.18)),
+                }}
+              >
+                <ItemIcon
+                  size={dimensions.iconSize}
+                  className="shrink-0 transition-colors"
+                  style={{ color: active ? "red" : "white" }}
+                />
+                <span
+                  className="truncate text-center font-medium leading-none text-black transition-colors dark:text-white"
                   style={{
-                    width: itemWidth,
-                    height: "100%",
-                    opacity: active ? 1 : 0.6,
-                    transform: active ? "scale(1.05)" : "scale(1)",
-                    gap: Math.max(2, Math.round(dimensions.iconSize * 0.18)),
+                    fontSize: dimensions.fontSize,
+                    color: active ? "red" : "white",
+                    lineHeight: 1,
                   }}
                 >
-                  <ItemIcon
-                    size={dimensions.iconSize}
-                    className="shrink-0 transition-colors"
-                    style={{ color: active ? "red" : "white" }}
-                  />
-                  <span
-                    className="truncate text-center font-medium leading-none text-black transition-colors dark:text-white"
-                    style={{
-                      fontSize: dimensions.fontSize,
-                      color: active ? "red" : "white",
-                      lineHeight: 1,
-                    }}
-                  >
-                    {item.label}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+                  {item.label}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
+    </div>
   );
 }
-
 
 function paintNavSubstrate(
   ctx: CanvasRenderingContext2D,
@@ -665,7 +721,7 @@ function paintNavSubstrate(
     height,
     radius,
     emphasis = 1,
-  }: { width: number; height: number; radius: number; emphasis?: number }
+  }: { width: number; height: number; radius: number; emphasis?: number },
 ) {
   const gradient = ctx.createLinearGradient(0, 0, 0, height);
   gradient.addColorStop(0, `rgba(255,255,255,${0.11 * emphasis})`);
@@ -678,11 +734,25 @@ function paintNavSubstrate(
   ctx.lineWidth = 1;
   ctx.stroke();
 
-  roundedRectPath(ctx, width * 0.12, height * 0.18, width * 0.76, height * 0.22, height * 0.11);
+  roundedRectPath(
+    ctx,
+    width * 0.12,
+    height * 0.18,
+    width * 0.76,
+    height * 0.22,
+    height * 0.11,
+  );
   ctx.fillStyle = `rgba(255,255,255,${0.11 * emphasis})`;
   ctx.fill();
 
-  roundedRectPath(ctx, width * 0.16, height * 0.64, width * 0.68, height * 0.18, height * 0.09);
+  roundedRectPath(
+    ctx,
+    width * 0.16,
+    height * 0.64,
+    width * 0.68,
+    height * 0.18,
+    height * 0.09,
+  );
   ctx.fillStyle = `rgba(0,0,0,${0.12 * emphasis})`;
   ctx.fill();
 

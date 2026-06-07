@@ -133,28 +133,36 @@ export function ConsentDialog({
         <div className="space-y-4 py-4">
           <div
             className="flex items-start gap-3 p-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200/60 dark:border-blue-800/40"
-            style={scopeInfo.colorHex ? {
-              backgroundColor: `${scopeInfo.colorHex}08`,
-              borderColor: `${scopeInfo.colorHex}20`,
-            } : undefined}
+            style={
+              scopeInfo.colorHex
+                ? {
+                    backgroundColor: `${scopeInfo.colorHex}08`,
+                    borderColor: `${scopeInfo.colorHex}20`,
+                  }
+                : undefined
+            }
           >
             <div
               className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
-              style={scopeInfo.colorHex ? {
-                backgroundColor: `${scopeInfo.colorHex}18`,
-              } : undefined}
+              style={
+                scopeInfo.colorHex
+                  ? {
+                      backgroundColor: `${scopeInfo.colorHex}18`,
+                    }
+                  : undefined
+              }
             >
               <Icon
                 icon={Shield}
                 size="md"
                 className="text-blue-500"
-                style={scopeInfo.colorHex ? { color: scopeInfo.colorHex } : undefined}
+                style={
+                  scopeInfo.colorHex ? { color: scopeInfo.colorHex } : undefined
+                }
               />
             </div>
             <div>
-              <p className="font-medium text-foreground">
-                {scopeInfo.title}
-              </p>
+              <p className="font-medium text-foreground">{scopeInfo.title}</p>
               <p className="text-sm text-muted-foreground">
                 {scopeInfo.description}
               </p>
@@ -207,7 +215,7 @@ export function ConsentDialog({
           >
             {isGranting ? (
               <>
-              <HushhLoader variant="compact" className="mr-2 text-white" />
+                <HushhLoader variant="compact" className="mr-2 text-white" />
                 Granting...
               </>
             ) : (
@@ -251,10 +259,10 @@ export function useConsent(): UseConsentReturn {
       // This would integrate with a global consent manager
       // For now, we'll use a simple confirm (to be replaced with dialog)
       return window.confirm(
-        `${request.agentName} wants to: ${request.scopeDescription}\n\nAllow?`
+        `${request.agentName} wants to: ${request.scopeDescription}\n\nAllow?`,
       );
     },
-    []
+    [],
   );
 
   return { requestConsent };

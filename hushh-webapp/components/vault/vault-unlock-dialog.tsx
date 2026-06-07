@@ -14,7 +14,13 @@ type VaultUnlockDialogProps = {
   user: User;
   open: boolean;
   onOpenChange?: (open: boolean) => void;
-  onSuccess: (meta?: { mode: "passphrase" | "generated_default_native_biometric" | "generated_default_web_prf" | "generated_default_native_passkey_prf" }) => void;
+  onSuccess: (meta?: {
+    mode:
+      | "passphrase"
+      | "generated_default_native_biometric"
+      | "generated_default_web_prf"
+      | "generated_default_native_passkey_prf";
+  }) => void;
   title: string;
   description: string;
   enableGeneratedDefault?: boolean;

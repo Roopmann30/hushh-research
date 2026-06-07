@@ -12,7 +12,7 @@ import { useVault } from "@/lib/vault/vault-context";
 
 function updateBootstrapStatus(
   stage: string,
-  options?: { userId?: string | null; error?: string | null }
+  options?: { userId?: string | null; error?: string | null },
 ) {
   if (typeof window === "undefined") {
     return;
@@ -77,9 +77,12 @@ export function NativeTestBootstrap() {
     const now = Date.now();
     const retryInMs = 5_000 - (now - authAttemptedAtRef.current);
     if (authAttemptedRef.current && retryInMs > 0) {
-      const timer = window.setTimeout(() => {
-        setAuthRetryTick((value) => value + 1);
-      }, Math.max(250, retryInMs));
+      const timer = window.setTimeout(
+        () => {
+          setAuthRetryTick((value) => value + 1);
+        },
+        Math.max(250, retryInMs),
+      );
       return () => window.clearTimeout(timer);
     }
 
@@ -98,23 +101,28 @@ export function NativeTestBootstrap() {
     nativeTestReviewerBootstrapInflight ??= (async () => {
       try {
         const localReviewerCredentials = resolveLocalReviewerCredentials(
-          typeof window !== "undefined" ? window.location.hostname : null
+          typeof window !== "undefined" ? window.location.hostname : null,
         );
         const authResult = localReviewerCredentials
           ? await AuthService.signInWithEmailAndPassword(
               localReviewerCredentials.email,
-              localReviewerCredentials.password
+              localReviewerCredentials.password,
             )
           : await (async () => {
-              const { token } = await ApiService.createAppReviewModeSession("reviewer", {
-                smokePassphrase: config.vaultPassphrase,
-              });
+              const { token } = await ApiService.createAppReviewModeSession(
+                "reviewer",
+                {
+                  smokePassphrase: config.vaultPassphrase,
+                },
+              );
               return AuthService.signInWithCustomToken(token);
             })();
         const authenticatedUser = authResult.user;
 
         if (!authenticatedUser) {
-          throw new Error("Native test bootstrap returned no authenticated user");
+          throw new Error(
+            "Native test bootstrap returned no authenticated user",
+          );
         }
 
         if (
@@ -122,7 +130,7 @@ export function NativeTestBootstrap() {
           authenticatedUser.uid !== config.expectedUserId
         ) {
           throw new Error(
-            `Native test bootstrap signed in unexpected uid ${authenticatedUser.uid}`
+            `Native test bootstrap signed in unexpected uid ${authenticatedUser.uid}`,
           );
         }
 
@@ -132,7 +140,9 @@ export function NativeTestBootstrap() {
         });
       } catch (error) {
         const message =
-          error instanceof Error ? error.message : "Native test auth bootstrap failed";
+          error instanceof Error
+            ? error.message
+            : "Native test auth bootstrap failed";
         updateBootstrapStatus("auth_error", {
           error: message,
         });
@@ -157,7 +167,11 @@ export function NativeTestBootstrap() {
   ]);
 
   useEffect(() => {
-    if (!config.enabled || !config.autoReviewerLogin || !config.vaultPassphrase) {
+    if (
+      !config.enabled ||
+      !config.autoReviewerLogin ||
+      !config.vaultPassphrase
+    ) {
       return;
     }
 
@@ -210,10 +224,12 @@ export function NativeTestBootstrap() {
           throw new Error("Vault unlock returned no decrypted key");
         }
 
-        const { token, expiresAt } = await VaultService.getOrIssueVaultOwnerToken(
-          user.uid
-        );
-        if (typeof window !== "undefined" && window.__HUSHH_NATIVE_TEST__?.enabled) {
+        const { token, expiresAt } =
+          await VaultService.getOrIssueVaultOwnerToken(user.uid);
+        if (
+          typeof window !== "undefined" &&
+          window.__HUSHH_NATIVE_TEST__?.enabled
+        ) {
           window.__HUSHH_NATIVE_TEST__.replayVaultUnlock = () => {
             unlockVault(decryptedKey, token, expiresAt);
           };
@@ -224,7 +240,9 @@ export function NativeTestBootstrap() {
         });
       } catch (error) {
         const message =
-          error instanceof Error ? error.message : "Native test vault bootstrap failed";
+          error instanceof Error
+            ? error.message
+            : "Native test vault bootstrap failed";
         updateBootstrapStatus("vault_error", {
           userId: user.uid,
           error: message,

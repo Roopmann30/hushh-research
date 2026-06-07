@@ -28,9 +28,13 @@ export function PhoneMandateGuard({
   const searchParams = useSearchParams();
   const { user, loading, phoneNumber } = useAuth();
   const [hasVault, setHasVault] = useState<boolean | null>(null);
-  const [backendPhoneVerified, setBackendPhoneVerified] = useState<boolean | null>(null);
-  const hostname = typeof window === "undefined" ? null : window.location.hostname;
-  const localPhoneMandateBypassed = shouldBypassPhoneMandateForLocalhost(hostname);
+  const [backendPhoneVerified, setBackendPhoneVerified] = useState<
+    boolean | null
+  >(null);
+  const hostname =
+    typeof window === "undefined" ? null : window.location.hostname;
+  const localPhoneMandateBypassed =
+    shouldBypassPhoneMandateForLocalhost(hostname);
   const firebasePhoneVerified = hasVerifiedPhoneNumber(phoneNumber);
 
   useEffect(() => {
@@ -59,7 +63,10 @@ export function PhoneMandateGuard({
           setHasVault(exists);
         }
       } catch (error) {
-        console.warn("[PhoneMandateGuard] Failed to check vault presence:", error);
+        console.warn(
+          "[PhoneMandateGuard] Failed to check vault presence:",
+          error,
+        );
         if (!cancelled) {
           vaultPresenceCache.set(user.uid, true);
           setHasVault(true);
@@ -94,12 +101,18 @@ export function PhoneMandateGuard({
 
     const loadIdentityState = async () => {
       try {
-        const identity = await AccountIdentityService.refreshCurrentUserIdentity(user);
+        const identity =
+          await AccountIdentityService.refreshCurrentUserIdentity(user);
         if (!cancelled) {
-          setBackendPhoneVerified(AccountIdentityService.hasVerifiedPhone(identity));
+          setBackendPhoneVerified(
+            AccountIdentityService.hasVerifiedPhone(identity),
+          );
         }
       } catch (error) {
-        console.warn("[PhoneMandateGuard] Failed to check account phone claim:", error);
+        console.warn(
+          "[PhoneMandateGuard] Failed to check account phone claim:",
+          error,
+        );
         if (!cancelled) {
           setBackendPhoneVerified(false);
         }

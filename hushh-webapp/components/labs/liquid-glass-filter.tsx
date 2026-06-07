@@ -2,8 +2,14 @@
 
 import type { CSSProperties, ReactNode } from "react";
 
-import { LiquidGlassCanvasLens, type LiquidGlassMirrorScenePainter } from "@/components/labs/liquid-glass-canvas-lens";
-import { useLiquidFilterAssets, type LiquidFilterOptions } from "@/lib/labs/liquid-glass-core";
+import {
+  LiquidGlassCanvasLens,
+  type LiquidGlassMirrorScenePainter,
+} from "@/components/labs/liquid-glass-canvas-lens";
+import {
+  useLiquidFilterAssets,
+  type LiquidFilterOptions,
+} from "@/lib/labs/liquid-glass-core";
 import {
   resolveLiquidGlassStyle,
   resolveMirrorGlassContainerStyle,
@@ -29,8 +35,8 @@ export function LiquidGlassFilter({
       16,
       options.bezelWidth * 1.75,
       assets ? assets.scale * 0.45 : 0,
-      (assets ? assets.blur : options.blur ?? 0) * 24
-    )
+      (assets ? assets.blur : (options.blur ?? 0)) * 24,
+    ),
   );
 
   if (!enabled || !assets || mode !== "reference") return null;
@@ -54,7 +60,11 @@ export function LiquidGlassFilter({
           primitiveUnits="userSpaceOnUse"
           colorInterpolationFilters="sRGB"
         >
-          <feGaussianBlur in="SourceGraphic" stdDeviation={assets.blur} result="blurred_source" />
+          <feGaussianBlur
+            in="SourceGraphic"
+            stdDeviation={assets.blur}
+            result="blurred_source"
+          />
           <feImage
             href={assets.displacementMapUrl}
             x="0"
@@ -94,7 +104,12 @@ export function LiquidGlassFilter({
           <feComponentTransfer in="specular_layer" result="specular_faded">
             <feFuncA type="linear" slope={assets.specularOpacity} />
           </feComponentTransfer>
-          <feBlend in="specular_saturated" in2="displaced" mode="normal" result="withSaturation" />
+          <feBlend
+            in="specular_saturated"
+            in2="displaced"
+            mode="normal"
+            result="withSaturation"
+          />
           <feBlend in="specular_faded" in2="withSaturation" mode="normal" />
         </filter>
       </defs>
@@ -133,22 +148,29 @@ export function LiquidGlassBody({
     return (
       <div
         className={className}
-        style={glassBackdropStyle(filterId, style ?? {}, { mode, compact, pressed, state })}
+        style={glassBackdropStyle(filterId, style ?? {}, {
+          mode,
+          compact,
+          pressed,
+          state,
+        })}
       >
         {children}
       </div>
     );
   }
 
-  const resolvedState = state ?? (pressed ? "pressed" : compact ? "active" : "idle");
+  const resolvedState =
+    state ?? (pressed ? "pressed" : compact ? "active" : "idle");
 
-  const resolvedStyle = resolveMirrorGlassContainerStyle(style ?? {}, { compact, pressed, state: resolvedState });
+  const resolvedStyle = resolveMirrorGlassContainerStyle(style ?? {}, {
+    compact,
+    pressed,
+    state: resolvedState,
+  });
 
   return (
-    <div
-      className={className}
-      style={resolvedStyle}
-    >
+    <div className={className} style={resolvedStyle}>
       {mirrorOptions && mirrorScene ? (
         <LiquidGlassCanvasLens
           options={mirrorOptions}
@@ -168,7 +190,13 @@ export function LiquidGlassBody({
           }}
         />
       ) : null}
-      <div style={resolveMirrorHighlightStyle({ compact, pressed, state: resolvedState })} />
+      <div
+        style={resolveMirrorHighlightStyle({
+          compact,
+          pressed,
+          state: resolvedState,
+        })}
+      />
       {children}
     </div>
   );
@@ -187,7 +215,11 @@ export function glassBackdropStyle(
     compact?: boolean;
     pressed?: boolean;
     state?: LiquidGlassMirrorVisualState;
-  } = {}
+  } = {},
 ): CSSProperties {
-  return resolveLiquidGlassStyle(filterId, mode, base, { compact, pressed, state });
+  return resolveLiquidGlassStyle(filterId, mode, base, {
+    compact,
+    pressed,
+    state,
+  });
 }

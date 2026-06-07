@@ -17,8 +17,16 @@ import {
   SurfaceCardContent,
   SurfaceInset,
 } from "@/components/app-ui/surfaces";
-import { PkmJsonTree, PkmManifestTree } from "@/components/profile/pkm-tree-view";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  PkmJsonTree,
+  PkmManifestTree,
+} from "@/components/profile/pkm-tree-view";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { useVault } from "@/lib/vault/vault-context";
@@ -51,7 +59,8 @@ export function PkmExplorerPanel() {
   const { user, loading } = useAuth();
   const { isVaultUnlocked, vaultKey, vaultOwnerToken } = useVault();
 
-  const [metadata, setMetadata] = useState<PersonalKnowledgeModelMetadata | null>(null);
+  const [metadata, setMetadata] =
+    useState<PersonalKnowledgeModelMetadata | null>(null);
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
   const [bootstrapLoading, setBootstrapLoading] = useState(true);
   const [bootstrapError, setBootstrapError] = useState<string | null>(null);
@@ -91,13 +100,18 @@ export function PkmExplorerPanel() {
         const nextMetadata = await PersonalKnowledgeModelService.getMetadata(
           user.uid,
           forceRefresh,
-          vaultOwnerToken
+          vaultOwnerToken,
         );
         if (cancelled) return;
         setMetadata(nextMetadata);
         setSelectedDomain((current) => {
-          const nextVisibleDomains = nextMetadata.domains.filter(isConsumerVisiblePkmDomain);
-          if (current && nextVisibleDomains.some((domain) => domain.key === current)) {
+          const nextVisibleDomains = nextMetadata.domains.filter(
+            isConsumerVisiblePkmDomain,
+          );
+          if (
+            current &&
+            nextVisibleDomains.some((domain) => domain.key === current)
+          ) {
             return current;
           }
           return nextVisibleDomains[0]?.key || null;
@@ -105,7 +119,9 @@ export function PkmExplorerPanel() {
       } catch (nextError) {
         if (!cancelled) {
           setBootstrapError(
-            nextError instanceof Error ? nextError.message : "Failed to load saved PKM."
+            nextError instanceof Error
+              ? nextError.message
+              : "Failed to load saved PKM.",
           );
         }
       } finally {
@@ -125,7 +141,13 @@ export function PkmExplorerPanel() {
     let cancelled = false;
 
     async function loadDomainState() {
-      if (!user || !selectedDomain || !vaultKey || !vaultOwnerToken || !isVaultUnlocked) {
+      if (
+        !user ||
+        !selectedDomain ||
+        !vaultKey ||
+        !vaultOwnerToken ||
+        !isVaultUnlocked
+      ) {
         if (!cancelled) {
           setDomainState({
             manifest: null,
@@ -144,9 +166,13 @@ export function PkmExplorerPanel() {
           PersonalKnowledgeModelService.getDomainManifest(
             user.uid,
             selectedDomain,
-            vaultOwnerToken
+            vaultOwnerToken,
           ),
-          PersonalKnowledgeModelService.getDomainData(user.uid, selectedDomain, vaultOwnerToken),
+          PersonalKnowledgeModelService.getDomainData(
+            user.uid,
+            selectedDomain,
+            vaultOwnerToken,
+          ),
           PersonalKnowledgeModelService.loadDomainData({
             userId: user.uid,
             domain: selectedDomain,
@@ -169,7 +195,9 @@ export function PkmExplorerPanel() {
             encrypted: null,
             decrypted: null,
             error:
-              nextError instanceof Error ? nextError.message : "Failed to load saved PKM domain.",
+              nextError instanceof Error
+                ? nextError.message
+                : "Failed to load saved PKM domain.",
             loading: false,
           });
         }
@@ -184,20 +212,25 @@ export function PkmExplorerPanel() {
 
   const selectedSummary = useMemo<DomainSummary | null>(() => {
     if (!metadata || !selectedDomain) return null;
-    return metadata.domains.find((domain) => domain.key === selectedDomain) || null;
+    return (
+      metadata.domains.find((domain) => domain.key === selectedDomain) || null
+    );
   }, [metadata, selectedDomain]);
 
   const visibleDomains = useMemo(
     () => (metadata?.domains || []).filter(isConsumerVisiblePkmDomain),
-    [metadata?.domains]
+    [metadata?.domains],
   );
 
   const selectedScopeEntries = useMemo(
     () => domainState.manifest?.scope_registry || [],
-    [domainState.manifest]
+    [domainState.manifest],
   );
 
-  const selectedPaths = useMemo(() => domainState.manifest?.paths || [], [domainState.manifest]);
+  const selectedPaths = useMemo(
+    () => domainState.manifest?.paths || [],
+    [domainState.manifest],
+  );
 
   async function handleRefresh() {
     if (!user || !vaultOwnerToken || !isVaultUnlocked) return;
@@ -208,19 +241,26 @@ export function PkmExplorerPanel() {
       const nextMetadata = await PersonalKnowledgeModelService.getMetadata(
         user.uid,
         true,
-        vaultOwnerToken
+        vaultOwnerToken,
       );
       setMetadata(nextMetadata);
       setSelectedDomain((current) => {
-        const nextVisibleDomains = nextMetadata.domains.filter(isConsumerVisiblePkmDomain);
-        if (current && nextVisibleDomains.some((domain) => domain.key === current)) {
+        const nextVisibleDomains = nextMetadata.domains.filter(
+          isConsumerVisiblePkmDomain,
+        );
+        if (
+          current &&
+          nextVisibleDomains.some((domain) => domain.key === current)
+        ) {
           return current;
         }
         return nextVisibleDomains[0]?.key || null;
       });
     } catch (nextError) {
       setBootstrapError(
-        nextError instanceof Error ? nextError.message : "Failed to refresh saved PKM."
+        nextError instanceof Error
+          ? nextError.message
+          : "Failed to refresh saved PKM.",
       );
     } finally {
       setBootstrapLoading(false);
@@ -257,12 +297,18 @@ export function PkmExplorerPanel() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {metadata ? <Badge variant="secondary">{visibleDomains.length} domains</Badge> : null}
           {metadata ? (
-            <Badge variant="secondary">{metadata.totalAttributes} attributes</Badge>
+            <Badge variant="secondary">{visibleDomains.length} domains</Badge>
+          ) : null}
+          {metadata ? (
+            <Badge variant="secondary">
+              {metadata.totalAttributes} attributes
+            </Badge>
           ) : null}
           {selectedSummary ? (
-            <Badge variant="secondary">Selected: {selectedSummary.displayName}</Badge>
+            <Badge variant="secondary">
+              Selected: {selectedSummary.displayName}
+            </Badge>
           ) : null}
         </div>
 
@@ -284,9 +330,10 @@ export function PkmExplorerPanel() {
           </div>
         ) : null}
         <div className="rounded-2xl border bg-muted/30 p-4 text-sm text-muted-foreground">
-          Start with the domain list, then expand only the manifest, scopes, or decrypted payload
-          sections you need. Everything stays collapsed by default so larger PKM accounts remain
-          easy to inspect on smaller screens.
+          Start with the domain list, then expand only the manifest, scopes, or
+          decrypted payload sections you need. Everything stays collapsed by
+          default so larger PKM accounts remain easy to inspect on smaller
+          screens.
         </div>
       </SurfaceInset>
 
@@ -316,11 +363,17 @@ export function PkmExplorerPanel() {
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold">{domain.displayName}</p>
-                        <p className="text-xs text-muted-foreground">{domain.key}</p>
+                        <p className="text-sm font-semibold">
+                          {domain.displayName}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {domain.key}
+                        </p>
                       </div>
                       <div className="flex flex-col items-end gap-1">
-                        <Badge variant="secondary">{domain.attributeCount}</Badge>
+                        <Badge variant="secondary">
+                          {domain.attributeCount}
+                        </Badge>
                       </div>
                     </div>
                     <p className="mt-2 text-xs text-muted-foreground">
@@ -416,17 +469,19 @@ export function PkmExplorerPanel() {
                   accent="emerald"
                 />
                 <div className="flex flex-wrap gap-2">
-                  {(domainState.encrypted?.segmentIds || domainState.manifest?.segment_ids || [
-                    "root",
-                  ]).map((segmentId) => (
+                  {(
+                    domainState.encrypted?.segmentIds ||
+                    domainState.manifest?.segment_ids || ["root"]
+                  ).map((segmentId) => (
                     <Badge key={segmentId} variant="secondary">
                       {segmentId}
                     </Badge>
                   ))}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Ciphertext is stored in `pkm_blobs`, while manifest and scope exposure live in
-                  `pkm_manifests`, `pkm_manifest_paths`, and `pkm_scope_registry`.
+                  Ciphertext is stored in `pkm_blobs`, while manifest and scope
+                  exposure live in `pkm_manifests`, `pkm_manifest_paths`, and
+                  `pkm_scope_registry`.
                 </p>
               </SurfaceInset>
 
@@ -444,28 +499,32 @@ export function PkmExplorerPanel() {
                   className="rounded-2xl border px-4"
                 >
                   <AccordionItem value="storage-flow">
-                    <AccordionTrigger>How this domain is stored</AccordionTrigger>
+                    <AccordionTrigger>
+                      How this domain is stored
+                    </AccordionTrigger>
                     <AccordionContent className="space-y-3">
                       <div className="grid gap-3 lg:grid-cols-3">
                         <div className="rounded-2xl border bg-muted/30 p-4 text-sm">
                           <p className="font-medium">Discovery index</p>
                           <p className="mt-1 text-muted-foreground">
-                            `pkm_index` keeps domain presence, freshness, and lightweight summary
-                            metadata for fast lookups.
+                            `pkm_index` keeps domain presence, freshness, and
+                            lightweight summary metadata for fast lookups.
                           </p>
                         </div>
                         <div className="rounded-2xl border bg-muted/30 p-4 text-sm">
                           <p className="font-medium">Encrypted content</p>
                           <p className="mt-1 text-muted-foreground">
-                            `pkm_blobs` stores the encrypted per-segment payload. Only the needed
-                            segments are fetched after vault unlock.
+                            `pkm_blobs` stores the encrypted per-segment
+                            payload. Only the needed segments are fetched after
+                            vault unlock.
                           </p>
                         </div>
                         <div className="rounded-2xl border bg-muted/30 p-4 text-sm">
                           <p className="font-medium">Manifest and scopes</p>
                           <p className="mt-1 text-muted-foreground">
-                            `pkm_manifests`, `pkm_manifest_paths`, and `pkm_scope_registry`
-                            explain structure and scoped exposure without exposing the payload.
+                            `pkm_manifests`, `pkm_manifest_paths`, and
+                            `pkm_scope_registry` explain structure and scoped
+                            exposure without exposing the payload.
                           </p>
                         </div>
                       </div>
@@ -478,29 +537,47 @@ export function PkmExplorerPanel() {
                     </AccordionTrigger>
                     <AccordionContent>
                       {selectedScopeEntries.length ? (
-                        <Accordion type="multiple" className="rounded-2xl border px-4">
+                        <Accordion
+                          type="multiple"
+                          className="rounded-2xl border px-4"
+                        >
                           {selectedScopeEntries.map((scope) => (
-                            <AccordionItem key={scope.scope_handle} value={scope.scope_handle}>
+                            <AccordionItem
+                              key={scope.scope_handle}
+                              value={scope.scope_handle}
+                            >
                               <AccordionTrigger>
                                 <div className="flex flex-wrap items-center gap-2 text-left">
-                                  <Badge variant="secondary">{scope.scope_label}</Badge>
-                                  <Badge variant="outline">{scope.scope_handle}</Badge>
+                                  <Badge variant="secondary">
+                                    {scope.scope_label}
+                                  </Badge>
+                                  <Badge variant="outline">
+                                    {scope.scope_handle}
+                                  </Badge>
                                 </div>
                               </AccordionTrigger>
                               <AccordionContent className="space-y-3">
                                 <div className="flex flex-wrap gap-2">
-                                  {(scope.segment_ids || []).map((segmentId) => (
-                                    <Badge key={segmentId} variant="secondary">
-                                      {segmentId}
-                                    </Badge>
-                                  ))}
+                                  {(scope.segment_ids || []).map(
+                                    (segmentId) => (
+                                      <Badge
+                                        key={segmentId}
+                                        variant="secondary"
+                                      >
+                                        {segmentId}
+                                      </Badge>
+                                    ),
+                                  )}
                                   {scope.sensitivity_tier ? (
-                                    <Badge variant="secondary">{scope.sensitivity_tier}</Badge>
+                                    <Badge variant="secondary">
+                                      {scope.sensitivity_tier}
+                                    </Badge>
                                   ) : null}
                                 </div>
                                 <p className="text-sm text-muted-foreground">
-                                  This is the public scope handle. Raw internal JSON paths stay
-                                  private to first-party tooling after vault unlock.
+                                  This is the public scope handle. Raw internal
+                                  JSON paths stay private to first-party tooling
+                                  after vault unlock.
                                 </p>
                               </AccordionContent>
                             </AccordionItem>
@@ -509,7 +586,8 @@ export function PkmExplorerPanel() {
                       ) : (
                         <SurfaceCard tone="warning">
                           <SurfaceCardContent className="text-sm text-muted-foreground">
-                            No scope registry entries are available for this domain yet.
+                            No scope registry entries are available for this
+                            domain yet.
                           </SurfaceCardContent>
                         </SurfaceCard>
                       )}
@@ -517,14 +595,18 @@ export function PkmExplorerPanel() {
                   </AccordionItem>
 
                   <AccordionItem value="manifest-tree">
-                    <AccordionTrigger>Manifest path tree ({selectedPaths.length})</AccordionTrigger>
+                    <AccordionTrigger>
+                      Manifest path tree ({selectedPaths.length})
+                    </AccordionTrigger>
                     <AccordionContent>
                       <PkmManifestTree paths={selectedPaths} />
                     </AccordionContent>
                   </AccordionItem>
 
                   <AccordionItem value="decrypted-preview">
-                    <AccordionTrigger>First-party decrypted payload</AccordionTrigger>
+                    <AccordionTrigger>
+                      First-party decrypted payload
+                    </AccordionTrigger>
                     <AccordionContent className="space-y-3">
                       {domainState.loading ? (
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">

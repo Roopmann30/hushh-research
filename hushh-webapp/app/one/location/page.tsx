@@ -1329,7 +1329,7 @@ export function OneLocationAgentPageContent() {
               {description}
             </p>
           </div>
-          <button
+          <button type="button"
             onClick={() => {
               toast.dismiss(toastKey);
               openLocationShareFromNotification(grant.id);

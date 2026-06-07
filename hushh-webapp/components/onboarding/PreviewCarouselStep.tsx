@@ -15,7 +15,10 @@ import { OnboardingLocalService } from "@/lib/services/onboarding-local-service"
 import { ChevronRight } from "lucide-react";
 import { Icon } from "@/lib/morphy-ux/ui";
 import { prefersReducedMotion, getGsap } from "@/lib/morphy-ux/gsap";
-import { ensureMorphyGsapReady, getMorphyEaseName } from "@/lib/morphy-ux/gsap-init";
+import {
+  ensureMorphyGsapReady,
+  getMorphyEaseName,
+} from "@/lib/morphy-ux/gsap-init";
 import { getMotionCssVars } from "@/lib/morphy-ux/motion";
 import { KAI_EXPERIENCE_CONTRACT } from "@/lib/kai/experience-contract";
 
@@ -30,7 +33,11 @@ type Slide = {
   preview: React.ReactNode;
 };
 
-export function PreviewCarouselStep({ onContinue }: { onContinue: () => void }) {
+export function PreviewCarouselStep({
+  onContinue,
+}: {
+  onContinue: () => void;
+}) {
   const slides: Slide[] = useMemo(
     () => [
       {
@@ -54,7 +61,7 @@ export function PreviewCarouselStep({ onContinue }: { onContinue: () => void }) 
         preview: <DecisionPreviewCompact />,
       },
     ],
-    []
+    [],
   );
 
   const [api, setApi] = useState<CarouselApi | null>(null);
@@ -104,7 +111,7 @@ export function PreviewCarouselStep({ onContinue }: { onContinue: () => void }) 
           ease: getMorphyEaseName("emphasized"),
           overwrite: "auto",
           clearProps: "opacity,transform",
-        }
+        },
       );
     })();
     return () => {
@@ -149,7 +156,7 @@ export function PreviewCarouselStep({ onContinue }: { onContinue: () => void }) 
               ease: getMorphyEaseName("emphasized"),
               overwrite: "auto",
               clearProps: "opacity,transform",
-            }
+            },
           );
         },
       });
@@ -176,12 +183,15 @@ export function PreviewCarouselStep({ onContinue }: { onContinue: () => void }) 
     <main
       ref={mountRef}
       className={cn(
-        "min-h-[100dvh] w-full bg-transparent flex flex-col overflow-x-hidden"
+        "min-h-[100dvh] w-full bg-transparent flex flex-col overflow-x-hidden",
       )}
     >
       <div className="w-full min-h-[100dvh] px-4 pt-[calc(16px+var(--app-safe-area-top-effective,0px))] pb-[var(--app-screen-footer-pad)]">
         <div className="relative mx-auto flex h-full w-full flex-col">
-          <div className="z-10 flex justify-end" style={{ paddingRight: "4rem" }}>
+          <div
+            className="z-10 flex justify-end"
+            style={{ paddingRight: "4rem" }}
+          >
             <Button
               variant="blue-gradient"
               effect="fade"
@@ -200,13 +210,15 @@ export function PreviewCarouselStep({ onContinue }: { onContinue: () => void }) 
               "w-full mx-auto text-center flex flex-col justify-end gap-3",
               // Keep copy + spacing responsive without clipping on larger screens.
               "min-h-[clamp(148px,20vh,220px)] pt-5",
-              "sm:max-w-lg"
+              "sm:max-w-lg",
             )}
           >
             <h2 className="text-[clamp(2rem,5.6vw,3.2rem)] font-black tracking-tight leading-[1.08]">
               {slides[displayIndex]?.title}
               <br />
-              <span className="hushh-gradient-text">{slides[displayIndex]?.accent}</span>
+              <span className="hushh-gradient-text">
+                {slides[displayIndex]?.accent}
+              </span>
             </h2>
             <p className="mx-auto max-w-[19rem] text-[clamp(0.95rem,2.2vw,1.05rem)] text-muted-foreground leading-relaxed">
               {slides[displayIndex]?.subtitle}
@@ -234,8 +246,14 @@ export function PreviewCarouselStep({ onContinue }: { onContinue: () => void }) 
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious aria-label="Previous slide" className="left-2 border border-[var(--morphy-primary-start)]/25 bg-gradient-to-r from-[var(--morphy-primary-start)]/14 to-[var(--morphy-primary-end)]/14 text-[var(--morphy-primary-start)] backdrop-blur-sm transition-colors hover:from-[var(--morphy-primary-start)]/20 hover:to-[var(--morphy-primary-end)]/20 disabled:border-border/60 disabled:bg-muted/70 disabled:text-muted-foreground disabled:opacity-100" />
-              <CarouselNext aria-label="Next slide" className="right-2 border border-[var(--morphy-primary-start)]/25 bg-gradient-to-r from-[var(--morphy-primary-start)]/14 to-[var(--morphy-primary-end)]/14 text-[var(--morphy-primary-start)] backdrop-blur-sm transition-colors hover:from-[var(--morphy-primary-start)]/20 hover:to-[var(--morphy-primary-end)]/20 disabled:border-border/60 disabled:bg-muted/70 disabled:text-muted-foreground disabled:opacity-100" />
+              <CarouselPrevious
+                aria-label="Previous slide"
+                className="left-2 border border-[var(--morphy-primary-start)]/25 bg-gradient-to-r from-[var(--morphy-primary-start)]/14 to-[var(--morphy-primary-end)]/14 text-[var(--morphy-primary-start)] backdrop-blur-sm transition-colors hover:from-[var(--morphy-primary-start)]/20 hover:to-[var(--morphy-primary-end)]/20 disabled:border-border/60 disabled:bg-muted/70 disabled:text-muted-foreground disabled:opacity-100"
+              />
+              <CarouselNext
+                aria-label="Next slide"
+                className="right-2 border border-[var(--morphy-primary-start)]/25 bg-gradient-to-r from-[var(--morphy-primary-start)]/14 to-[var(--morphy-primary-end)]/14 text-[var(--morphy-primary-start)] backdrop-blur-sm transition-colors hover:from-[var(--morphy-primary-start)]/20 hover:to-[var(--morphy-primary-end)]/20 disabled:border-border/60 disabled:bg-muted/70 disabled:text-muted-foreground disabled:opacity-100"
+              />
             </Carousel>
           </div>
 
@@ -269,7 +287,7 @@ function Dots(props: { count: number; activeIndex: number }) {
             "h-2 w-2 rounded-full transition-colors",
             i === props.activeIndex
               ? "bg-[var(--morphy-primary-start)]"
-              : "bg-[var(--morphy-primary-start)]/20"
+              : "bg-[var(--morphy-primary-start)]/20",
           )}
           aria-hidden
         />

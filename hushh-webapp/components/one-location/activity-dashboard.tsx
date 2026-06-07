@@ -194,7 +194,10 @@ export function OneLocationActivityDashboard({
           >
             <div className="flex h-32 items-end gap-2">
               {activity.buckets.map((bucket) => {
-                const height = Math.max(12, (bucket.total / maxBucketTotal) * 100);
+                const height = Math.max(
+                  12,
+                  (bucket.total / maxBucketTotal) * 100,
+                );
                 return (
                   <div
                     key={bucket.key}

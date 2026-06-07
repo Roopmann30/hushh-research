@@ -78,9 +78,12 @@ export class RouteErrorBoundary extends Component<Props, State> {
                 <AlertTriangle className="h-7 w-7 text-red-500 dark:text-red-400" />
               </div>
               <div className="space-y-1.5">
-                <h2 className="text-lg font-semibold tracking-tight">Something went wrong</h2>
+                <h2 className="text-lg font-semibold tracking-tight">
+                  Something went wrong
+                </h2>
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  An unexpected error occurred. You can try again or return to the home screen.
+                  An unexpected error occurred. You can try again or return to
+                  the home screen.
                 </p>
               </div>
               <div className="flex gap-3 pt-1">

@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  SurfaceCard,
-  SurfaceCardContent,
-} from "@/components/app-ui/surfaces";
+import { SurfaceCard, SurfaceCardContent } from "@/components/app-ui/surfaces";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -97,12 +94,17 @@ export function PortfolioSourceSwitcher({
     activeSource === "statement" &&
     statementSnapshots.length > 1 &&
     typeof onStatementSnapshotChange === "function";
-  const activeStatementId = activeStatementSnapshotId || statementSnapshots[0]?.id || null;
-  const showStatementControls = activeSource === "statement" && statementSnapshots.length > 0;
+  const activeStatementId =
+    activeStatementSnapshotId || statementSnapshots[0]?.id || null;
+  const showStatementControls =
+    activeSource === "statement" && statementSnapshots.length > 0;
   const showDeleteStatement =
-    showStatementControls && activeStatementId && typeof onDeleteStatementSnapshot === "function";
+    showStatementControls &&
+    activeStatementId &&
+    typeof onDeleteStatementSnapshot === "function";
   const showImportStatement = typeof onImportStatement === "function";
-  const showPlaidActions = activeSource === "plaid" && availableSources.includes("plaid");
+  const showPlaidActions =
+    activeSource === "plaid" && availableSources.includes("plaid");
 
   return (
     <SurfaceCard>
@@ -115,7 +117,9 @@ export function PortfolioSourceSwitcher({
             <SegmentedPill
               value={activeSource}
               options={options}
-              onValueChange={(value) => onSourceChange(value as PortfolioSource)}
+              onValueChange={(value) =>
+                onSourceChange(value as PortfolioSource)
+              }
               ariaLabel="Portfolio source selector"
               size="compact"
               className="w-full max-w-md"
@@ -138,10 +142,12 @@ export function PortfolioSourceSwitcher({
               <>
                 <Badge variant="outline" className="gap-1.5">
                   <Building2 className="h-3.5 w-3.5" />
-                  {freshness?.itemCount || 0} item{(freshness?.itemCount || 0) === 1 ? "" : "s"}
+                  {freshness?.itemCount || 0} item
+                  {(freshness?.itemCount || 0) === 1 ? "" : "s"}
                 </Badge>
                 <Badge variant="outline">
-                  Synced {formatRelativeTimestamp(freshness?.lastSyncedAt || null)}
+                  Synced{" "}
+                  {formatRelativeTimestamp(freshness?.lastSyncedAt || null)}
                 </Badge>
                 {onRefreshPlaid ? (
                   <Button
@@ -158,13 +164,25 @@ export function PortfolioSourceSwitcher({
                   </Button>
                 ) : null}
                 {onCancelRefreshPlaid && isRefreshing ? (
-                  <Button variant="none" effect="fade" size="sm" onClick={onCancelRefreshPlaid}>
+                  <Button
+                    variant="none"
+                    effect="fade"
+                    size="sm"
+                    onClick={onCancelRefreshPlaid}
+                  >
                     Cancel
                   </Button>
                 ) : null}
                 {onManageConnections ? (
-                  <Button variant="none" effect="fade" size="sm" onClick={onManageConnections}>
-                    {(freshness?.itemCount || 0) > 0 ? "Connect Another Brokerage" : "Connect Plaid"}
+                  <Button
+                    variant="none"
+                    effect="fade"
+                    size="sm"
+                    onClick={onManageConnections}
+                  >
+                    {(freshness?.itemCount || 0) > 0
+                      ? "Connect Another Brokerage"
+                      : "Connect Plaid"}
                   </Button>
                 ) : null}
               </>
@@ -206,7 +224,10 @@ export function PortfolioSourceSwitcher({
                   onValueChange={onStatementSnapshotChange}
                   disabled={isDeletingStatementSnapshot}
                 >
-                  <SelectTrigger size="sm" className="w-full min-w-0 sm:w-[260px]">
+                  <SelectTrigger
+                    size="sm"
+                    className="w-full min-w-0 sm:w-[260px]"
+                  >
                     <SelectValue placeholder="Select statement" />
                   </SelectTrigger>
                   <SelectContent>

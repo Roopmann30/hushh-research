@@ -48,7 +48,7 @@ export function KaiControlSurface({
     <div
       className={cn(
         "relative flex-1 overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-4 sm:px-5 sm:pt-5",
-        bodyClassName
+        bodyClassName,
       )}
     >
       {children}
@@ -65,9 +65,13 @@ export function KaiControlSurface({
                 {eyebrow}
               </p>
             ) : null}
-            <DrawerTitle className="text-base font-semibold tracking-tight">{title}</DrawerTitle>
+            <DrawerTitle className="text-base font-semibold tracking-tight">
+              {title}
+            </DrawerTitle>
             {description ? (
-              <DrawerDescription className="text-sm leading-6">{description}</DrawerDescription>
+              <DrawerDescription className="text-sm leading-6">
+                {description}
+              </DrawerDescription>
             ) : null}
           </DrawerHeader>
           {body}
@@ -83,13 +87,13 @@ export function KaiControlSurface({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange} modal>
-        <DialogContent
-          showCloseButton
-          className={cn(
-            "max-h-[calc(100dvh-3rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] gap-0 overflow-hidden border border-[color:var(--app-card-border-standard)] bg-[color:var(--app-card-surface-default-solid)] p-0 sm:max-w-[min(42rem,calc(100vw-4.5rem))] lg:max-w-[min(46rem,calc(100vw-8rem))]",
-            contentClassName
-          )}
-        >
+      <DialogContent
+        showCloseButton
+        className={cn(
+          "max-h-[calc(100dvh-3rem)] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] gap-0 overflow-hidden border border-[color:var(--app-card-border-standard)] bg-[color:var(--app-card-surface-default-solid)] p-0 sm:max-w-[min(42rem,calc(100vw-4.5rem))] lg:max-w-[min(46rem,calc(100vw-8rem))]",
+          contentClassName,
+        )}
+      >
         <DialogHeader className="relative z-10 border-b border-[color:var(--app-card-border-standard)] px-6 py-5 text-left">
           {eyebrow ? (
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">

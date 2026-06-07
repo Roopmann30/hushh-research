@@ -15,7 +15,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/lib/morphy-ux/button";
-import { getRouteScope, routePersonaForScope } from "@/lib/navigation/route-scope";
+import {
+  getRouteScope,
+  routePersonaForScope,
+} from "@/lib/navigation/route-scope";
 import { ROUTES } from "@/lib/navigation/routes";
 import { usePersonaState } from "@/lib/persona/persona-context";
 import type { Persona } from "@/lib/services/ria-service";
@@ -57,7 +60,14 @@ export function PersonaBootstrapRedirect() {
   const routeScope = getRouteScope(pathname);
   const routePersona = routePersonaForScope(routeScope);
   const mismatch = useMemo(() => {
-    if (!isAuthenticated || !user || loading || refreshing || !personaState || !isVaultUnlocked) {
+    if (
+      !isAuthenticated ||
+      !user ||
+      loading ||
+      refreshing ||
+      !personaState ||
+      !isVaultUnlocked
+    ) {
       return null;
     }
     if (personaTransitionTarget) {
@@ -71,8 +81,10 @@ export function PersonaBootstrapRedirect() {
       routePersona,
       activePersona,
       primaryTarget: activePersona,
-      scopedRouteLabel: routePersona === "ria" ? "RIA workspace" : "Kai workspace",
-      activePersonaLabel: activePersona === "ria" ? "RIA workspace" : "Investor workspace",
+      scopedRouteLabel:
+        routePersona === "ria" ? "RIA workspace" : "Kai workspace",
+      activePersonaLabel:
+        activePersona === "ria" ? "RIA workspace" : "Investor workspace",
     };
   }, [
     activePersona,
@@ -96,7 +108,7 @@ export function PersonaBootstrapRedirect() {
           lastKaiPath,
           lastRiaPath,
           riaEntryRoute,
-        })
+        }),
       );
     } finally {
       setResolving(null);
@@ -117,7 +129,10 @@ export function PersonaBootstrapRedirect() {
       await switchPersona(targetPersona);
       router.replace(pathname);
     } catch (error) {
-      console.error("[PersonaBootstrapRedirect] Failed to resolve route mismatch:", error);
+      console.error(
+        "[PersonaBootstrapRedirect] Failed to resolve route mismatch:",
+        error,
+      );
       toast.error("We couldn't switch roles right now. Please retry.");
     } finally {
       setResolving(null);
@@ -133,7 +148,12 @@ export function PersonaBootstrapRedirect() {
     }
 
     void handleStayOnScopedRoute();
-  }, [handleStayOnScopedRoute, mismatch, resolving, shouldAutoResolveNativeMismatch]);
+  }, [
+    handleStayOnScopedRoute,
+    mismatch,
+    resolving,
+    shouldAutoResolveNativeMismatch,
+  ]);
 
   if (!mismatch) {
     return null;
@@ -143,8 +163,10 @@ export function PersonaBootstrapRedirect() {
     return null;
   }
 
-  const targetNeedsSetup = mismatch.routePersona === "ria" && riaCapability !== "switch";
-  const PromptIcon = mismatch.routePersona === "ria" ? BriefcaseBusiness : UserRound;
+  const targetNeedsSetup =
+    mismatch.routePersona === "ria" && riaCapability !== "switch";
+  const PromptIcon =
+    mismatch.routePersona === "ria" ? BriefcaseBusiness : UserRound;
   const primaryLabel =
     resolving === "route"
       ? `Opening ${mismatch.activePersonaLabel}...`
@@ -167,10 +189,12 @@ export function PersonaBootstrapRedirect() {
               Your active role and current route are out of sync
             </AlertDialogTitle>
             <AlertDialogDescription className="text-left text-sm leading-6 text-muted-foreground">
-              You are currently in {activePersona === "ria" ? "RIA" : "Investor"} mode, but this
-              page belongs to the {mismatch.routePersona === "ria" ? "RIA" : "Investor"} shell.
-              We can move you back to the correct workspace, or you can stay here and switch roles
-              explicitly.
+              You are currently in{" "}
+              {activePersona === "ria" ? "RIA" : "Investor"} mode, but this page
+              belongs to the{" "}
+              {mismatch.routePersona === "ria" ? "RIA" : "Investor"} shell. We
+              can move you back to the correct workspace, or you can stay here
+              and switch roles explicitly.
             </AlertDialogDescription>
           </div>
         </AlertDialogHeader>
@@ -182,7 +206,9 @@ export function PersonaBootstrapRedirect() {
             disabled={resolving !== null}
             className="w-full"
           >
-            {resolving === "route" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            {resolving === "route" ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : null}
             {primaryLabel}
           </Button>
           <Button
@@ -192,7 +218,9 @@ export function PersonaBootstrapRedirect() {
             disabled={resolving !== null}
             className="w-full"
           >
-            {resolving === "persona" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            {resolving === "persona" ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : null}
             {secondaryLabel}
           </Button>
         </AlertDialogFooter>

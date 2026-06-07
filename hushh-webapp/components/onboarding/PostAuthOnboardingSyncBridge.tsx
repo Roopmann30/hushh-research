@@ -18,7 +18,13 @@ export function PostAuthOnboardingSyncBridge() {
   const lastSyncedSignatureRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (loading || !userId || !isVaultUnlocked || !vaultKey || !vaultOwnerToken) {
+    if (
+      loading ||
+      !userId ||
+      !isVaultUnlocked ||
+      !vaultKey ||
+      !vaultOwnerToken
+    ) {
       return;
     }
 
@@ -43,7 +49,7 @@ export function PostAuthOnboardingSyncBridge() {
         lastSyncedSignatureRef.current = null;
         console.warn(
           "[PostAuthOnboardingSyncBridge] Post-unlock sync failed, will retry later:",
-          error
+          error,
         );
       })
       .finally(() => {

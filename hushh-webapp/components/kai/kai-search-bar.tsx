@@ -333,11 +333,11 @@ export function KaiSearchBar({
   const [lastReplyText, setLastReplyText] = useState<string>("");
   const [micPermissionStatus, setMicPermissionStatus] =
     useState<string>("unknown");
-    // If the text is stored in finalTranscript:
-const debouncedSearch = useDebouncedValue(finalTranscript, 500);
+  // If the text is stored in finalTranscript:
+  const debouncedSearch = useDebouncedValue(finalTranscript, 500);
 
-// OR, if there is a standard text input state further down like 'query':
-// const debouncedSearch = useDebouncedValue(query, 500);
+  // OR, if there is a standard text input state further down like 'query':
+  // const debouncedSearch = useDebouncedValue(query, 500);
   const [stableMicDisabledReason, setStableMicDisabledReason] = useState<
     string | null
   >(null);
@@ -1643,11 +1643,14 @@ const debouncedSearch = useDebouncedValue(finalTranscript, 500);
   const isRiaSurface = surfaceVariant === "ria";
   const riaVoiceActive = ambientMode !== "idle";
   const riaVoiceDisabled =
-    !riaVoiceActive && (disabled || micDisabled || voiceVisibilityMode === "hidden");
+    !riaVoiceActive &&
+    (disabled || micDisabled || voiceVisibilityMode === "hidden");
   const handleRiaVoiceClick = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
       if (riaVoiceDisabled) {
-        toast.info(stableMicDisabledReason || "Voice is unavailable right now.");
+        toast.info(
+          stableMicDisabledReason || "Voice is unavailable right now.",
+        );
         return;
       }
       if (riaVoiceActive) {
@@ -1701,11 +1704,13 @@ const debouncedSearch = useDebouncedValue(finalTranscript, 500);
                 variant="pill"
                 wrapperClassName="w-full"
                 contentClassName="gap-1.5"
-                aria-label={riaVoiceActive ? "End RIA voice session" : "Start RIA voice"}
+                aria-label={
+                  riaVoiceActive ? "End RIA voice session" : "Start RIA voice"
+                }
                 aria-disabled={riaVoiceDisabled}
                 className={cn(
                   "h-10 w-full min-w-0 px-2 text-[12px] sm:text-[13px]",
-                  riaVoiceDisabled && "opacity-60"
+                  riaVoiceDisabled && "opacity-60",
                 )}
                 onClick={handleRiaVoiceClick}
               >
@@ -1769,10 +1774,14 @@ const debouncedSearch = useDebouncedValue(finalTranscript, 500);
               onEnd={cancelListening}
               onStopSpeaking={handleStopSpeaking}
               onReplay={
-                showSpeakingCompact || showRetryCompact ? handleReplay : undefined
+                showSpeakingCompact || showRetryCompact
+                  ? handleReplay
+                  : undefined
               }
               onRetry={
-                showRetryCompact && !pendingConfirmation ? handleRetry : undefined
+                showRetryCompact && !pendingConfirmation
+                  ? handleRetry
+                  : undefined
               }
               onConfirm={
                 showRetryCompact && pendingConfirmation

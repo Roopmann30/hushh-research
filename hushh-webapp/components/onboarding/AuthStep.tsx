@@ -30,7 +30,10 @@ import {
   resolveGrowthJourneyForPath,
   trackGrowthFunnelStepCompleted,
 } from "@/lib/observability/growth";
-import { getNativeTestConfig, useNativeTestConfig } from "@/lib/testing/native-test";
+import {
+  getNativeTestConfig,
+  useNativeTestConfig,
+} from "@/lib/testing/native-test";
 import { resolveLocalReviewerCredentials } from "@/lib/testing/local-reviewer-auth";
 
 export function AuthStep({
@@ -47,7 +50,7 @@ export function AuthStep({
   const lastNavigationKeyRef = useRef<string | null>(null);
   const autoReviewerLoginStartedRef = useRef(false);
   const [nativeReviewerVisible, setNativeReviewerVisible] = useState(
-    nativeTestConfig.autoReviewerLogin
+    nativeTestConfig.autoReviewerLogin,
   );
   const [nativeAuthState, setNativeAuthState] = useState<
     "anonymous" | "pending" | "authenticated"
@@ -57,9 +60,9 @@ export function AuthStep({
   >(nativeTestConfig.autoReviewerLogin ? "loading" : "loaded");
   const [nativeErrorCode, setNativeErrorCode] = useState<string | null>(null);
 
-  const [reviewModeConfig, setReviewModeConfig] = useState<{ enabled: boolean }>(
-    { enabled: false }
-  );
+  const [reviewModeConfig, setReviewModeConfig] = useState<{
+    enabled: boolean;
+  }>({ enabled: false });
   const shouldUseNativeTestBootstrap =
     nativeTestConfig.enabled &&
     nativeTestConfig.autoReviewerLogin &&
@@ -69,14 +72,16 @@ export function AuthStep({
     nativeTestConfig.enabled &&
     nativeTestConfig.expectedRoute === ROUTES.KAI_ONBOARDING &&
     redirectPath === ROUTES.KAI_ONBOARDING;
-  const growthJourney = useMemo(() => resolveGrowthJourneyForPath(redirectPath), [redirectPath]);
+  const growthJourney = useMemo(
+    () => resolveGrowthJourneyForPath(redirectPath),
+    [redirectPath],
+  );
   const growthEntrySurface = useMemo(
     () => resolveGrowthEntrySurface(redirectPath),
-    [redirectPath]
+    [redirectPath],
   );
-  const [activeLegalDoc, setActiveLegalDoc] = useState<KaiLegalDocumentType | null>(
-    null
-  );
+  const [activeLegalDoc, setActiveLegalDoc] =
+    useState<KaiLegalDocumentType | null>(null);
   const openLegalDoc = useCallback((docType: KaiLegalDocumentType) => {
     // Defer open so the originating tap does not get interpreted as outside-interact.
     requestAnimationFrame(() => setActiveLegalDoc(docType));
@@ -98,7 +103,8 @@ export function AuthStep({
           return;
         }
         const resolvedIdToken =
-          idToken || (user ? await user.getIdToken().catch(() => undefined) : undefined);
+          idToken ||
+          (user ? await user.getIdToken().catch(() => undefined) : undefined);
         const resolvedPath = await PostAuthRouteService.resolveAfterLogin({
           userId,
           redirectPath,
@@ -107,7 +113,8 @@ export function AuthStep({
         });
 
         const resumeImportFlow =
-          resolvedPath === ROUTES.KAI_HOME && isOnboardingFlowActiveCookieEnabled();
+          resolvedPath === ROUTES.KAI_HOME &&
+          isOnboardingFlowActiveCookieEnabled();
         const nextPath = resumeImportFlow ? ROUTES.KAI_IMPORT : resolvedPath;
 
         setOnboardingRequiredCookie(nextPath === ROUTES.KAI_ONBOARDING);
@@ -117,7 +124,8 @@ export function AuthStep({
         console.warn("[AuthStep] Failed to resolve post-auth route:", error);
         const fallbackPath = redirectPath || ROUTES.KAI_HOME;
         const safeFallbackPath =
-          fallbackPath === ROUTES.KAI_ONBOARDING || fallbackPath === ROUTES.KAI_IMPORT
+          fallbackPath === ROUTES.KAI_ONBOARDING ||
+          fallbackPath === ROUTES.KAI_IMPORT
             ? ROUTES.KAI_HOME
             : fallbackPath;
         setOnboardingRequiredCookie(safeFallbackPath === ROUTES.KAI_ONBOARDING);
@@ -125,7 +133,7 @@ export function AuthStep({
         router.push(safeFallbackPath);
       }
     },
-    [preserveOnboardingAuditRoute, redirectPath, router, user]
+    [preserveOnboardingAuditRoute, redirectPath, router, user],
   );
 
   const debugLog = (...args: unknown[]) => {
@@ -179,12 +187,15 @@ export function AuthStep({
               dedupeWindowMs: 5_000,
             });
           }
-          debugLog("[AuthStep] Redirect result found, navigating to:", redirectPath);
+          debugLog(
+            "[AuthStep] Redirect result found, navigating to:",
+            redirectPath,
+          );
           setNativeUser(result.user);
           void resolveAndNavigate(
             result.user.uid,
             await result.user.getIdToken(),
-            result.user.phoneNumber
+            result.user.phoneNumber,
           );
         }
       })
@@ -234,7 +245,7 @@ export function AuthStep({
     });
     try {
       const localReviewerCredentials = resolveLocalReviewerCredentials(
-        typeof window !== "undefined" ? window.location.hostname : null
+        typeof window !== "undefined" ? window.location.hostname : null,
       );
 
       if (
@@ -248,14 +259,17 @@ export function AuthStep({
       const authResult = localReviewerCredentials
         ? await AuthService.signInWithEmailAndPassword(
             localReviewerCredentials.email,
-            localReviewerCredentials.password
+            localReviewerCredentials.password,
           )
         : await (async () => {
-            const { token } = await ApiService.createAppReviewModeSession("reviewer", {
-              smokePassphrase: nativeTestConfig.autoReviewerLogin
-                ? nativeTestConfig.vaultPassphrase
-                : null,
-            });
+            const { token } = await ApiService.createAppReviewModeSession(
+              "reviewer",
+              {
+                smokePassphrase: nativeTestConfig.autoReviewerLogin
+                  ? nativeTestConfig.vaultPassphrase
+                  : null,
+              },
+            );
             return AuthService.signInWithCustomToken(token);
           })();
       const authenticatedUser = authResult.user;
@@ -282,7 +296,7 @@ export function AuthStep({
         await resolveAndNavigate(
           authenticatedUser.uid,
           await authenticatedUser.getIdToken(),
-          authenticatedUser.phoneNumber
+          authenticatedUser.phoneNumber,
         );
       } else {
         trackEvent("auth_failed", {
@@ -394,7 +408,7 @@ export function AuthStep({
         await resolveAndNavigate(
           authenticatedUser.uid,
           await authenticatedUser.getIdToken(),
-          authenticatedUser.phoneNumber
+          authenticatedUser.phoneNumber,
         );
       } else {
         debugError("[AuthStep] No user returned from signInWithGoogle");
@@ -403,9 +417,12 @@ export function AuthStep({
           result: "error",
           error_class: "missing_user",
         });
-        morphyToast.error("Sign-in completed but no user session was returned.", {
-          description: "Please try again.",
-        });
+        morphyToast.error(
+          "Sign-in completed but no user session was returned.",
+          {
+            description: "Please try again.",
+          },
+        );
       }
     } catch (err: any) {
       debugError("[AuthStep] Google login failed", err);
@@ -446,7 +463,7 @@ export function AuthStep({
         await resolveAndNavigate(
           authenticatedUser.uid,
           await authenticatedUser.getIdToken(),
-          authenticatedUser.phoneNumber
+          authenticatedUser.phoneNumber,
         );
       } else {
         debugError("[AuthStep] No user returned from signInWithApple");
@@ -455,9 +472,12 @@ export function AuthStep({
           result: "error",
           error_class: "missing_user",
         });
-        morphyToast.error("Sign-in completed but no user session was returned.", {
-          description: "Please try again.",
-        });
+        morphyToast.error(
+          "Sign-in completed but no user session was returned.",
+          {
+            description: "Please try again.",
+          },
+        );
       }
     } catch (err: any) {
       debugError("[AuthStep] Apple login failed", err);
@@ -500,7 +520,10 @@ export function AuthStep({
       ];
 
   return (
-    <main className="min-h-[100dvh] w-full bg-transparent" data-testid="auth-step-primary">
+    <main
+      className="min-h-[100dvh] w-full bg-transparent"
+      data-testid="auth-step-primary"
+    >
       <NativeTestBeacon
         routeId="/login"
         marker="native-route-login"
@@ -532,7 +555,11 @@ export function AuthStep({
         }
       >
         <header className="flex-none text-center">
-          <BrandMark size={compact ? "sm" : "md"} unframed className="mx-auto" />
+          <BrandMark
+            size={compact ? "sm" : "md"}
+            unframed
+            className="mx-auto"
+          />
           {compact ? (
             <>
               <h1 className="mt-6 text-[clamp(1.75rem,5.8vw,2.35rem)] font-black tracking-tight leading-[1.12]">
@@ -558,7 +585,13 @@ export function AuthStep({
           )}
         </header>
 
-        <section className={compact ? "flex-1 min-h-0 flex items-center pt-6" : "flex-1 min-h-0 flex items-center"}>
+        <section
+          className={
+            compact
+              ? "flex-1 min-h-0 flex items-center pt-6"
+              : "flex-1 min-h-0 flex items-center"
+          }
+        >
           <div className="mx-auto w-full max-w-[20rem] space-y-3">
             {authOptions.map((option) => (
               <AuthProviderButton
@@ -570,7 +603,8 @@ export function AuthStep({
             ))}
 
             <p className="pt-1 text-center text-xs text-muted-foreground">
-              After sign-in, Kai requires a verified phone number before you continue.
+              After sign-in, Kai requires a verified phone number before you
+              continue.
             </p>
 
             {(reviewModeConfig.enabled || nativeReviewerVisible) && (
@@ -641,7 +675,12 @@ function GoogleIcon() {
 
 function AppleIcon() {
   return (
-    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <svg
+      className="h-5 w-5"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden
+    >
       <path d="M17.05 20.28c-.98.95-2.05.88-3.08.38-1.07-.52-2.07-.51-3.2 0-1.01.43-2.1.49-2.98-.38C5.22 17.63 2.7 12 5.45 8.04c1.47-2.09 3.8-2.31 5.33-1.18 1.1.75 3.3.73 4.45-.04 2.1-1.31 3.55-.95 4.5 1.14-.15.08.2.14 0 .2-2.63 1.34-3.35 6.03.95 7.84-.46 1.4-1.25 2.89-2.26 4.4l-.07.08-.05-.2zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.17 2.22-1.8 4.19-3.74 4.25z" />
     </svg>
   );

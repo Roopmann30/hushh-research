@@ -22,19 +22,22 @@ export interface HushhLoaderProps {
  * - No spinner/progress glyphs here; top StepProgressBar owns progress indication.
  * - This component renders only neutral static placeholder text.
  */
-const loaderVariants = cva("flex items-center justify-center text-muted-foreground", {
-  variants: {
-    variant: {
-      fullscreen: "h-screen w-full",
-      page: "min-h-[60vh] w-full",
-      inline: "w-full py-6",
-      compact: "inline-block",
+const loaderVariants = cva(
+  "flex items-center justify-center text-muted-foreground",
+  {
+    variants: {
+      variant: {
+        fullscreen: "h-screen w-full",
+        page: "min-h-[60vh] w-full",
+        inline: "w-full py-6",
+        compact: "inline-block",
+      },
+    },
+    defaultVariants: {
+      variant: "page",
     },
   },
-  defaultVariants: {
-    variant: "page",
-  },
-});
+);
 
 export function HushhLoader({
   label = "Loading…",
@@ -43,7 +46,10 @@ export function HushhLoader({
 }: HushhLoaderProps) {
   if (variant === "compact") {
     return (
-      <span className={cn(loaderVariants({ variant }), className)} aria-hidden="true">
+      <span
+        className={cn(loaderVariants({ variant }), className)}
+        aria-hidden="true"
+      >
         …
       </span>
     );
@@ -57,7 +63,14 @@ export function HushhLoader({
       aria-atomic="true"
       className={cn(loaderVariants({ variant }), className)}
     >
-      <p className={cn("text-sm motion-safe:animate-pulse", variant === "inline" && "text-xs")}>{label}</p>
+      <p
+        className={cn(
+          "text-sm motion-safe:animate-pulse",
+          variant === "inline" && "text-xs",
+        )}
+      >
+        {label}
+      </p>
     </div>
   );
 }

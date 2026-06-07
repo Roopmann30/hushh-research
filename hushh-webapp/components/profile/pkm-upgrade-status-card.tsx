@@ -35,9 +35,12 @@ export function PkmUpgradeStatusCard({
 }: Props) {
   const run = status?.run ?? null;
   const isRecoverable = status?.upgradeStatus === "failed";
-  const showResume = Boolean(status && isRecoverable && showRecoveryAction && onResume);
+  const showResume = Boolean(
+    status && isRecoverable && showRecoveryAction && onResume,
+  );
   const upgradableDomains = status?.upgradableDomains || [];
-  const hasCurrentTruth = status?.upgradeStatus === "current" && upgradableDomains.length === 0;
+  const hasCurrentTruth =
+    status?.upgradeStatus === "current" && upgradableDomains.length === 0;
   const showCurrentDomain = Boolean(run?.currentDomain && !hasCurrentTruth);
   const showLatestIssue = Boolean(run?.lastError && !hasCurrentTruth);
   const versionBadgeLabel = hasCurrentTruth
@@ -82,11 +85,17 @@ export function PkmUpgradeStatusCard({
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        {(upgradableDomains.length > 0 ? upgradableDomains : []).slice(0, 4).map((domain) => (
-          <Badge key={domain.domain} variant="outline" className="rounded-full px-3 py-1">
-            {humanizeDomain(domain.domain)}
-          </Badge>
-        ))}
+        {(upgradableDomains.length > 0 ? upgradableDomains : [])
+          .slice(0, 4)
+          .map((domain) => (
+            <Badge
+              key={domain.domain}
+              variant="outline"
+              className="rounded-full px-3 py-1"
+            >
+              {humanizeDomain(domain.domain)}
+            </Badge>
+          ))}
         {status && upgradableDomains.length === 0 ? (
           <Badge variant="outline" className="rounded-full px-3 py-1">
             No pending updates
@@ -133,7 +142,8 @@ export function PkmUpgradeStatusCard({
             Update paused
           </p>
           <p className="mt-1 text-sm text-foreground">
-            We could not finish updating your saved details. Try again after unlocking your vault.
+            We could not finish updating your saved details. Try again after
+            unlocking your vault.
           </p>
         </div>
       ) : null}

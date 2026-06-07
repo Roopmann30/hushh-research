@@ -285,7 +285,10 @@ function applyManifestExposureChange(
   return updated ? nextManifest : manifest;
 }
 
-function defaultAvailableScopeForPermission(domainKey: string, topLevelScopePath: string): string {
+function defaultAvailableScopeForPermission(
+  domainKey: string,
+  topLevelScopePath: string,
+): string {
   return `attr.${domainKey}.${topLevelScopePath}.*`;
 }
 
@@ -314,7 +317,10 @@ function buildPkmEntityDeletionCandidate(
   topLevelScopePath: string,
   entityKey: string,
 ): Record<string, unknown> {
-  const segments = topLevelScopePath.split(".").map((segment) => segment.trim()).filter(Boolean);
+  const segments = topLevelScopePath
+    .split(".")
+    .map((segment) => segment.trim())
+    .filter(Boolean);
   const root: Record<string, unknown> = {};
   let current = root;
 
@@ -627,8 +633,8 @@ function ProfilePageContent() {
   const { registerSteps, completeStep, reset } = useStepProgress();
 
   const [showVaultUnlock, setShowVaultUnlock] = useState(false);
-  const [agentTtsVoice, setAgentTtsVoice] = useState<AgentGeminiTtsVoice>(() =>
-    readAgentVoiceSettings().ttsVoice
+  const [agentTtsVoice, setAgentTtsVoice] = useState<AgentGeminiTtsVoice>(
+    () => readAgentVoiceSettings().ttsVoice,
   );
   const [vaultUnlockReason, setVaultUnlockReason] = useState<
     "profile_data" | "delete_account"
@@ -2002,8 +2008,7 @@ function ProfilePageContent() {
       {
         id: "profile_my_data",
         label: "Personal Data",
-        purpose:
-          "opens your saved details and sharing controls.",
+        purpose: "opens your saved details and sharing controls.",
         actionId: "route.profile_my_data",
         role: "card",
         voiceAliases: ["personal knowledge model", "my data", "pkm"],
@@ -2581,10 +2586,18 @@ function ProfilePageContent() {
     }
   };
 
-  const handleDeletePkmPreviewEntity = async (entity: PkmSectionPreviewEntity) => {
+  const handleDeletePkmPreviewEntity = async (
+    entity: PkmSectionPreviewEntity,
+  ) => {
     const domainKey = domainPreview.domainKey || selectedDomain?.key || null;
     const topLevelScopePath = domainPreview.topLevelScopePath;
-    if (!user?.uid || !vaultKey || !vaultOwnerToken || !domainKey || !topLevelScopePath) {
+    if (
+      !user?.uid ||
+      !vaultKey ||
+      !vaultOwnerToken ||
+      !domainKey ||
+      !topLevelScopePath
+    ) {
       requestVaultUnlock("profile_data");
       return;
     }
@@ -2600,7 +2613,10 @@ function ProfilePageContent() {
         userId: user.uid,
         vaultKey,
         domain: domainKey,
-        domainData: buildPkmEntityDeletionCandidate(topLevelScopePath, entity.key),
+        domainData: buildPkmEntityDeletionCandidate(
+          topLevelScopePath,
+          entity.key,
+        ),
         summary: {},
         mergeDecision: {
           merge_mode: "delete_entity",
@@ -2608,7 +2624,8 @@ function ProfilePageContent() {
           target_entity_id: entity.key,
           target_entity_path: `${topLevelScopePath}.entities.${entity.key}`,
           match_confidence: 1,
-          match_reason: "User removed this saved PKM entry from the profile interface.",
+          match_reason:
+            "User removed this saved PKM entry from the profile interface.",
         },
         vaultOwnerToken,
       });
@@ -2629,8 +2646,10 @@ function ProfilePageContent() {
         presentation: buildPkmSectionPreviewPresentation({
           domain: domainKey,
           domainTitle: selectedDomain?.title || domainKey,
-          permissionLabel: permission?.label || current.title || topLevelScopePath,
-          permissionDescription: permission?.description || current.description || null,
+          permissionLabel:
+            permission?.label || current.title || topLevelScopePath,
+          permissionDescription:
+            permission?.description || current.description || null,
           topLevelScopePath,
           value: data,
         }),
@@ -2644,7 +2663,9 @@ function ProfilePageContent() {
       toast.success("Saved entry removed.");
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Couldn't remove this saved entry.";
+        error instanceof Error
+          ? error.message
+          : "Couldn't remove this saved entry.";
       setDomainPreview((current) => ({
         ...current,
         error: message,
@@ -2743,22 +2764,29 @@ function ProfilePageContent() {
         ],
       });
 
-      let updatedManifest = result.manifest ?? optimisticManifest ?? previousManifest;
+      let updatedManifest =
+        result.manifest ?? optimisticManifest ?? previousManifest;
       if (nextPosture === "default_available" && projectionPayload) {
         const projectionResult =
-          await PersonalKnowledgeModelService.publishDefaultAvailableProjection({
-            userId: user.uid,
-            domain: domainKey,
-            scope: defaultAvailableScopeForPermission(domainKey, permission.topLevelScopePath),
-            scopeHandle: permission.scopeHandle || undefined,
-            topLevelScopePath: permission.topLevelScopePath,
-            projectionPayload,
-            manifestVersion: result.manifestVersion ?? previousManifest.manifest_version,
-            vaultOwnerToken,
-            metadata: {
-              source: "profile_visibility_posture",
+          await PersonalKnowledgeModelService.publishDefaultAvailableProjection(
+            {
+              userId: user.uid,
+              domain: domainKey,
+              scope: defaultAvailableScopeForPermission(
+                domainKey,
+                permission.topLevelScopePath,
+              ),
+              scopeHandle: permission.scopeHandle || undefined,
+              topLevelScopePath: permission.topLevelScopePath,
+              projectionPayload,
+              manifestVersion:
+                result.manifestVersion ?? previousManifest.manifest_version,
+              vaultOwnerToken,
+              metadata: {
+                source: "profile_visibility_posture",
+              },
             },
-          });
+          );
         updatedManifest = projectionResult.manifest ?? updatedManifest;
       }
 

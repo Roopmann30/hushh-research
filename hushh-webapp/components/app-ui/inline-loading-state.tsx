@@ -1,11 +1,11 @@
-import { Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 interface InlineLoadingStateProps {
-  label?: string
-  className?: string
-  iconClassName?: string
+  label?: string;
+  className?: string;
+  iconClassName?: string;
 }
 
 export function InlineLoadingState({
@@ -19,13 +19,16 @@ export function InlineLoadingState({
       aria-label={label}
       className={cn(
         "flex items-center gap-2 px-4 py-5 text-sm text-muted-foreground",
-        className
+        className,
       )}
     >
       <Loader2
-        className={cn("h-4 w-4 shrink-0 motion-safe:animate-spin", iconClassName)}
+        className={cn(
+          "h-4 w-4 shrink-0 motion-safe:animate-spin",
+          iconClassName,
+        )}
       />
       <span>{label}</span>
     </div>
-  )
+  );
 }

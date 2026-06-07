@@ -11,11 +11,7 @@ import type {
 } from "@/lib/profile/pkm-section-preview";
 import { cn } from "@/lib/utils";
 
-function PreviewFieldList({
-  fields,
-}: {
-  fields: PkmSectionPreviewField[];
-}) {
+function PreviewFieldList({ fields }: { fields: PkmSectionPreviewField[] }) {
   return (
     <dl className="divide-y divide-[color:var(--app-card-border-standard)]">
       {fields.map((field) => (
@@ -29,7 +25,7 @@ function PreviewFieldList({
           <dd
             className={cn(
               "min-w-0 break-words text-sm leading-6 text-foreground",
-              field.tone === "muted" ? "text-muted-foreground" : null
+              field.tone === "muted" ? "text-muted-foreground" : null,
             )}
           >
             {field.value}
@@ -86,7 +82,9 @@ function PreviewEntityRow({
 
   function handleDelete() {
     if (!onDeleteEntity) return;
-    const confirmed = window.confirm(`Remove "${entity.title}" from your personal data?`);
+    const confirmed = window.confirm(
+      `Remove "${entity.title}" from your personal data?`,
+    );
     if (!confirmed) return;
     onDeleteEntity(entity);
   }
@@ -95,9 +93,13 @@ function PreviewEntityRow({
     <div className="space-y-3 px-4 py-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
-          <p className="text-sm font-semibold tracking-tight text-foreground">{entity.title}</p>
+          <p className="text-sm font-semibold tracking-tight text-foreground">
+            {entity.title}
+          </p>
           {entity.subtitle ? (
-            <span className="text-xs text-muted-foreground">{entity.subtitle}</span>
+            <span className="text-xs text-muted-foreground">
+              {entity.subtitle}
+            </span>
           ) : null}
         </div>
         {canDelete ? (
@@ -116,7 +118,9 @@ function PreviewEntityRow({
           </button>
         ) : null}
       </div>
-      {entity.fields.length > 0 ? <PreviewFieldList fields={entity.fields} /> : null}
+      {entity.fields.length > 0 ? (
+        <PreviewFieldList fields={entity.fields} />
+      ) : null}
       {entity.sections?.length ? (
         <div className="space-y-3">
           {entity.sections.map((section) => (
@@ -145,7 +149,9 @@ export function PkmSectionPreview({
   return (
     <div className="space-y-4">
       {presentation.summary ? (
-        <p className="text-sm leading-6 text-foreground/90">{presentation.summary}</p>
+        <p className="text-sm leading-6 text-foreground/90">
+          {presentation.summary}
+        </p>
       ) : null}
 
       {presentation.stats.length > 0 ? (
@@ -159,7 +165,10 @@ export function PkmSectionPreview({
       ) : null}
 
       {presentation.groups.map((group, index) => (
-        <section key={`${group.kind}:${group.title || index}`} className="space-y-3">
+        <section
+          key={`${group.kind}:${group.title || index}`}
+          className="space-y-3"
+        >
           {group.title || group.description ? (
             <div className="space-y-1">
               {group.title ? (
@@ -168,7 +177,9 @@ export function PkmSectionPreview({
                 </h3>
               ) : null}
               {group.description ? (
-                <p className="text-sm text-muted-foreground">{group.description}</p>
+                <p className="text-sm text-muted-foreground">
+                  {group.description}
+                </p>
               ) : null}
             </div>
           ) : null}
@@ -193,7 +204,10 @@ export function PkmSectionPreview({
             <div className="overflow-hidden rounded-[var(--app-card-radius-compact)] border border-[color:var(--app-card-border-standard)] bg-[color:var(--app-card-surface-compact)] px-4 py-3">
               <ul className="space-y-2">
                 {group.items.map((item) => (
-                  <li key={item} className="text-sm leading-6 text-foreground/90">
+                  <li
+                    key={item}
+                    className="text-sm leading-6 text-foreground/90"
+                  >
                     {item}
                   </li>
                 ))}

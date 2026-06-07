@@ -1,8 +1,8 @@
 // components/vault/recovery-key-dialog.tsx
 
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,13 +10,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/lib/morphy-ux/morphy';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Copy, Check, Download, AlertTriangle } from 'lucide-react';
-import { downloadTextFile } from '@/lib/utils/native-download';
-import { Icon } from '@/lib/morphy-ux/ui';
-import { copyToClipboard } from '@/lib/utils/clipboard';
+} from "@/components/ui/dialog";
+import { Button } from "@/lib/morphy-ux/morphy";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Copy, Check, Download, AlertTriangle } from "lucide-react";
+import { downloadTextFile } from "@/lib/utils/native-download";
+import { Icon } from "@/lib/morphy-ux/ui";
+import { copyToClipboard } from "@/lib/utils/clipboard";
 
 interface RecoveryKeyDialogProps {
   open: boolean;
@@ -41,13 +41,13 @@ export function RecoveryKeyDialog({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      console.error('Failed to copy:', error);
+      console.error("Failed to copy:", error);
     }
   };
 
   const handleDownload = async () => {
     const content = `Hussh Vault Recovery Key\n\n${recoveryKey}\n\nKeep this safe! You'll need it if you forget your passphrase.`;
-    const success = await downloadTextFile(content, 'hushh-recovery-key.txt');
+    const success = await downloadTextFile(content, "hushh-recovery-key.txt");
     if (success) {
       setDownloaded(true);
     }
@@ -55,15 +55,18 @@ export function RecoveryKeyDialog({
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="sm:max-w-lg" onPointerDownOutside={(e) => e.preventDefault()}>
+      <DialogContent
+        className="sm:max-w-lg"
+        onPointerDownOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Icon icon={AlertTriangle} size="lg" className="text-orange-500" />
             Save Your Recovery Key
           </DialogTitle>
           <DialogDescription>
-            This is the ONLY way to recover your vault if you forget your passphrase.
-            Save it somewhere safe!
+            This is the ONLY way to recover your vault if you forget your
+            passphrase. Save it somewhere safe!
           </DialogDescription>
         </DialogHeader>
 
@@ -71,22 +74,17 @@ export function RecoveryKeyDialog({
           <Alert className="app-critical-alert">
             <Icon icon={AlertTriangle} size="sm" />
             <AlertDescription>
-              <strong>Warning:</strong> This recovery key will only be shown once. 
-              We cannot recover it for you if you lose it.
+              <strong>Warning:</strong> This recovery key will only be shown
+              once. We cannot recover it for you if you lose it.
             </AlertDescription>
           </Alert>
 
           <div className="p-4 bg-muted rounded-lg border-2 border-dashed">
-            <code className="text-sm font-mono break-all">
-              {recoveryKey}
-            </code>
+            <code className="text-sm font-mono break-all">{recoveryKey}</code>
           </div>
 
           <div className="grid grid-cols-2 gap-2">
-            <Button
-              onClick={handleCopy}
-              className="w-full"
-            >
+            <Button onClick={handleCopy} className="w-full">
               {copied ? (
                 <>
                   <Icon icon={Check} size="sm" className="mr-2" />
@@ -100,12 +98,9 @@ export function RecoveryKeyDialog({
               )}
             </Button>
 
-            <Button
-              onClick={handleDownload}
-              className="w-full"
-            >
+            <Button onClick={handleDownload} className="w-full">
               <Icon icon={Download} size="sm" className="mr-2" />
-              {downloaded ? 'Downloaded' : 'Download'}
+              {downloaded ? "Downloaded" : "Download"}
             </Button>
           </div>
         </div>

@@ -2,7 +2,12 @@
 
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
-import { BriefcaseBusiness, ShieldAlert, ShieldCheck, TriangleAlert } from "lucide-react";
+import {
+  BriefcaseBusiness,
+  ShieldAlert,
+  ShieldCheck,
+  TriangleAlert,
+} from "lucide-react";
 
 import { usePersonaState } from "@/lib/persona/persona-context";
 
@@ -12,10 +17,7 @@ import {
   AppPageShell,
   type AppPageShellWidth,
 } from "@/components/app-ui/app-page-shell";
-import {
-  PageHeader,
-  SectionHeader,
-} from "@/components/app-ui/page-sections";
+import { PageHeader, SectionHeader } from "@/components/app-ui/page-sections";
 import {
   SurfaceCard,
   SurfaceInset,
@@ -55,7 +57,12 @@ export function RiaPageShell({
   nativeTest?: {
     routeId: string;
     marker: string;
-    authState: "authenticated" | "public" | "anonymous" | "redirecting" | "pending";
+    authState:
+      | "authenticated"
+      | "public"
+      | "anonymous"
+      | "redirecting"
+      | "pending";
     dataState:
       | "booting"
       | "loading"
@@ -130,8 +137,8 @@ export function RiaCompatibilityState({
       />
       <RiaSurface tone="warning" className="border-dashed">
         <p className="text-sm leading-6 text-muted-foreground">
-          This surface is running in degraded compatibility mode until the full IAM contract is
-          available in the active environment.
+          This surface is running in degraded compatibility mode until the full
+          IAM contract is available in the active environment.
         </p>
       </RiaSurface>
     </section>
@@ -149,9 +156,15 @@ export function MetricTile({
 }) {
   return (
     <SurfaceInset className="p-4">
-      <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">{label}</p>
-      <p className="mt-2 text-2xl font-semibold tracking-tight text-foreground">{value}</p>
-      {helper ? <p className="mt-1 text-xs text-muted-foreground">{helper}</p> : null}
+      <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
+        {label}
+      </p>
+      <p className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+        {value}
+      </p>
+      {helper ? (
+        <p className="mt-1 text-xs text-muted-foreground">{helper}</p>
+      ) : null}
     </SurfaceInset>
   );
 }
@@ -166,10 +179,14 @@ type RiaStatusItem = {
 };
 
 const STATUS_TONE_STYLES: Record<RiaStatusTone, string> = {
-  neutral: "border-border/60 bg-[color:var(--app-card-surface-compact)] text-foreground",
-  warning: "border-amber-500/16 bg-[color:var(--app-card-surface-compact)] text-foreground",
-  success: "border-emerald-500/16 bg-[color:var(--app-card-surface-compact)] text-foreground",
-  critical: "border-red-500/16 bg-[color:var(--app-card-surface-compact)] text-foreground",
+  neutral:
+    "border-border/60 bg-[color:var(--app-card-surface-compact)] text-foreground",
+  warning:
+    "border-amber-500/16 bg-[color:var(--app-card-surface-compact)] text-foreground",
+  success:
+    "border-emerald-500/16 bg-[color:var(--app-card-surface-compact)] text-foreground",
+  critical:
+    "border-red-500/16 bg-[color:var(--app-card-surface-compact)] text-foreground",
 };
 
 export function RiaStatusPanel({
@@ -216,7 +233,9 @@ export function RiaStatusPanel({
             ) : null}
           </div>
         </div>
-        {actions ? <div className="flex shrink-0 flex-wrap gap-2">{actions}</div> : null}
+        {actions ? (
+          <div className="flex shrink-0 flex-wrap gap-2">{actions}</div>
+        ) : null}
       </div>
 
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -225,14 +244,20 @@ export function RiaStatusPanel({
             key={`${item.label}-${item.value}`}
             className={cn(
               "rounded-[var(--app-card-radius-compact)] border px-4 py-3.5 shadow-[var(--shadow-xs)] sm:px-5",
-              STATUS_TONE_STYLES[item.tone || "neutral"]
+              STATUS_TONE_STYLES[item.tone || "neutral"],
             )}
           >
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               {item.label}
             </p>
-            <p className="mt-1.5 text-[17px] font-semibold tracking-tight text-foreground">{item.value}</p>
-            {item.helper ? <p className="mt-1 text-[11px] leading-4 text-muted-foreground">{item.helper}</p> : null}
+            <p className="mt-1.5 text-[17px] font-semibold tracking-tight text-foreground">
+              {item.value}
+            </p>
+            {item.helper ? (
+              <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
+                {item.helper}
+              </p>
+            ) : null}
           </div>
         ))}
       </div>
@@ -248,7 +273,9 @@ export function isRiaVerified(status?: string | null): boolean {
 
 export function RiaVerificationGate({ children }: { children: ReactNode }) {
   const { riaOnboardingStatus, loading } = usePersonaState();
-  const status = riaOnboardingStatus?.advisory_status || riaOnboardingStatus?.verification_status;
+  const status =
+    riaOnboardingStatus?.advisory_status ||
+    riaOnboardingStatus?.verification_status;
 
   if (loading) return null;
 
@@ -263,8 +290,8 @@ export function RiaVerificationGate({ children }: { children: ReactNode }) {
         />
         <RiaSurface tone="warning" className="border-dashed">
           <p className="text-sm leading-6 text-muted-foreground">
-            Investor data, client workspaces, and consent requests are locked until
-            regulatory verification is complete.
+            Investor data, client workspaces, and consent requests are locked
+            until regulatory verification is complete.
           </p>
         </RiaSurface>
       </section>

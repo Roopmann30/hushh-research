@@ -88,15 +88,20 @@ export function RuntimeSecretSettingsCard({
   );
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [savingKeys, setSavingKeys] = useState(() => emptyProviderState(false));
-  const [removingKeys, setRemovingKeys] = useState(() => emptyProviderState(false));
+  const [removingKeys, setRemovingKeys] = useState(() =>
+    emptyProviderState(false),
+  );
   const [savingMode, setSavingMode] = useState(false);
   const [showKeys, setShowKeys] = useState(() => emptyProviderState(false));
   const [revealedKeys, setRevealedKeys] = useState(() =>
     emptyProviderState<string | null>(null),
   );
-  const [revealingKeys, setRevealingKeys] = useState(() => emptyProviderState(false));
-  const [credentialMode, setCredentialMode] =
-    useState<RuntimeCredentialMode>("hushh_managed_vertex");
+  const [revealingKeys, setRevealingKeys] = useState(() =>
+    emptyProviderState(false),
+  );
+  const [credentialMode, setCredentialMode] = useState<RuntimeCredentialMode>(
+    "hushh_managed_vertex",
+  );
   const vaultReady = Boolean(userId && vaultKey && vaultOwnerToken);
 
   const refreshStatus = useCallback(async () => {
@@ -168,7 +173,13 @@ export function RuntimeSecretSettingsCard({
       onRequestVaultCreation();
       return;
     }
-    if (needsUnlock || !vaultReady || !userId || !vaultKey || !vaultOwnerToken) {
+    if (
+      needsUnlock ||
+      !vaultReady ||
+      !userId ||
+      !vaultKey ||
+      !vaultOwnerToken
+    ) {
       onRequestVaultUnlock();
       return;
     }
@@ -190,7 +201,9 @@ export function RuntimeSecretSettingsCard({
       setRevealedKeys((current) => ({ ...current, [provider.id]: null }));
       setShowKeys((current) => ({ ...current, [provider.id]: false }));
       setConfiguredKeys((current) => ({ ...current, [provider.id]: true }));
-      toast.success(`${provider.label} key saved to your encrypted personal data.`);
+      toast.success(
+        `${provider.label} key saved to your encrypted personal data.`,
+      );
     } catch (error) {
       const message =
         error instanceof Error
@@ -203,12 +216,20 @@ export function RuntimeSecretSettingsCard({
   };
 
   const handleModeChange = async (useManaged: boolean) => {
-    const nextMode: RuntimeCredentialMode = useManaged ? "hushh_managed_vertex" : "byok";
+    const nextMode: RuntimeCredentialMode = useManaged
+      ? "hushh_managed_vertex"
+      : "byok";
     if (needsVaultCreation) {
       onRequestVaultCreation();
       return;
     }
-    if (needsUnlock || !vaultReady || !userId || !vaultKey || !vaultOwnerToken) {
+    if (
+      needsUnlock ||
+      !vaultReady ||
+      !userId ||
+      !vaultKey ||
+      !vaultOwnerToken
+    ) {
       onRequestVaultUnlock();
       return;
     }
@@ -226,7 +247,7 @@ export function RuntimeSecretSettingsCard({
       toast.success(
         nextMode === "byok"
           ? "Your saved Gemini key is selected."
-          : "Hushh managed Gemini is selected."
+          : "Hushh managed Gemini is selected.",
       );
     } catch (error) {
       const message =
@@ -244,7 +265,13 @@ export function RuntimeSecretSettingsCard({
       onRequestVaultCreation();
       return;
     }
-    if (needsUnlock || !vaultReady || !userId || !vaultKey || !vaultOwnerToken) {
+    if (
+      needsUnlock ||
+      !vaultReady ||
+      !userId ||
+      !vaultKey ||
+      !vaultOwnerToken
+    ) {
       onRequestVaultUnlock();
       return;
     }
@@ -261,7 +288,9 @@ export function RuntimeSecretSettingsCard({
       setRevealedKeys((current) => ({ ...current, [provider.id]: null }));
       setShowKeys((current) => ({ ...current, [provider.id]: false }));
       setConfiguredKeys((current) => ({ ...current, [provider.id]: false }));
-      toast.success(`${provider.label} key removed from your encrypted personal data.`);
+      toast.success(
+        `${provider.label} key removed from your encrypted personal data.`,
+      );
     } catch (error) {
       const message =
         error instanceof Error
@@ -289,7 +318,13 @@ export function RuntimeSecretSettingsCard({
       onRequestVaultCreation();
       return;
     }
-    if (needsUnlock || !vaultReady || !userId || !vaultKey || !vaultOwnerToken) {
+    if (
+      needsUnlock ||
+      !vaultReady ||
+      !userId ||
+      !vaultKey ||
+      !vaultOwnerToken
+    ) {
       onRequestVaultUnlock();
       return;
     }
@@ -304,7 +339,9 @@ export function RuntimeSecretSettingsCard({
       });
       if (!secret) {
         setConfiguredKeys((current) => ({ ...current, [provider.id]: false }));
-        toast.error(`No saved ${provider.label} key found in your encrypted personal data.`);
+        toast.error(
+          `No saved ${provider.label} key found in your encrypted personal data.`,
+        );
         return;
       }
       setRevealedKeys((current) => ({ ...current, [provider.id]: secret }));
@@ -354,13 +391,20 @@ export function RuntimeSecretSettingsCard({
           </div>
           <Badge
             variant={
-              RUNTIME_SECRET_PROVIDERS.some((provider) => configuredKeys[provider.id])
+              RUNTIME_SECRET_PROVIDERS.some(
+                (provider) => configuredKeys[provider.id],
+              )
                 ? "secondary"
                 : "outline"
             }
             className="shrink-0"
           >
-            {RUNTIME_SECRET_PROVIDERS.filter((provider) => configuredKeys[provider.id]).length} saved
+            {
+              RUNTIME_SECRET_PROVIDERS.filter(
+                (provider) => configuredKeys[provider.id],
+              ).length
+            }{" "}
+            saved
           </Badge>
         </div>
 
@@ -406,7 +450,10 @@ export function RuntimeSecretSettingsCard({
                   <p className="truncate text-[13px] font-medium text-foreground">
                     {provider.label}
                   </p>
-                  <Badge variant={configured ? "secondary" : "outline"} className="md:mt-1">
+                  <Badge
+                    variant={configured ? "secondary" : "outline"}
+                    className="md:mt-1"
+                  >
                     {statusLabel(provider.id)}
                   </Badge>
                 </div>
@@ -459,15 +506,16 @@ export function RuntimeSecretSettingsCard({
                   <Button
                     onClick={() => void handleSave(provider)}
                     disabled={
-                      saving ||
-                      removing ||
-                      (!draftKey.trim() && vaultReady)
+                      saving || removing || (!draftKey.trim() && vaultReady)
                     }
                     className="h-10 min-w-[6.5rem]"
                   >
                     {saving ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
+                        <Loader2
+                          className="mr-2 h-4 w-4 animate-spin"
+                          aria-hidden
+                        />
                         Saving...
                       </>
                     ) : needsVaultCreation ? (
@@ -488,7 +536,10 @@ export function RuntimeSecretSettingsCard({
                   >
                     {removing ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
+                        <Loader2
+                          className="mr-2 h-4 w-4 animate-spin"
+                          aria-hidden
+                        />
                         Removing...
                       </>
                     ) : (

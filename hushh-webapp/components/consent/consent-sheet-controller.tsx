@@ -52,12 +52,13 @@ export function ConsentSheetProvider({ children }: { children: ReactNode }) {
 
   const isLegacyProfileConsentPanel =
     pathname === ROUTES.PROFILE &&
-    searchParams.get(CONSENT_LEGACY_PANEL_QUERY_KEY) === CONSENT_LEGACY_PANEL_VALUE;
+    searchParams.get(CONSENT_LEGACY_PANEL_QUERY_KEY) ===
+      CONSENT_LEGACY_PANEL_VALUE;
   const isOpen =
     searchParams.get(CONSENT_SHEET_QUERY_KEY) === CONSENT_SHEET_QUERY_VALUE ||
     isLegacyProfileConsentPanel;
   const view = normalizeConsentSheetView(
-    searchParams.get(CONSENT_SHEET_VIEW_QUERY_KEY) ?? searchParams.get("view")
+    searchParams.get(CONSENT_SHEET_VIEW_QUERY_KEY) ?? searchParams.get("view"),
   );
 
   useEffect(() => {
@@ -65,17 +66,26 @@ export function ConsentSheetProvider({ children }: { children: ReactNode }) {
     const requestId = searchParams.get("requestId") || undefined;
     const bundleId = searchParams.get("bundleId") || undefined;
     const actor: ConsentCenterActor | undefined =
-      searchParams.get("actor") === "ria" || searchParams.get("actor") === "investor"
+      searchParams.get("actor") === "ria" ||
+      searchParams.get("actor") === "investor"
         ? (searchParams.get("actor") as ConsentCenterActor)
         : undefined;
     const managerView: ConsentCenterManagerView | undefined =
-      searchParams.get("view") === "incoming" || searchParams.get("view") === "outgoing"
+      searchParams.get("view") === "incoming" ||
+      searchParams.get("view") === "outgoing"
         ? (searchParams.get("view") as ConsentCenterManagerView)
         : undefined;
-    const from = pathname === ROUTES.PROFILE ? `${ROUTES.PROFILE}?tab=privacy` : undefined;
+    const from =
+      pathname === ROUTES.PROFILE ? `${ROUTES.PROFILE}?tab=privacy` : undefined;
     router.replace(
-      buildConsentCenterHref(view, { requestId, bundleId, actor, managerView, from }),
-      { scroll: false }
+      buildConsentCenterHref(view, {
+        requestId,
+        bundleId,
+        actor,
+        managerView,
+        from,
+      }),
+      { scroll: false },
     );
   }, [isOpen, pathname, router, searchParams, view]);
 
@@ -83,11 +93,13 @@ export function ConsentSheetProvider({ children }: { children: ReactNode }) {
     (options?: { view?: ConsentSheetView }) => {
       router.push(buildConsentCenterHref(options?.view), { scroll: false });
     },
-    [router]
+    [router],
   );
 
   const closeConsentSheet = useCallback(() => {
-    const params = clearConsentSheetParams(new URLSearchParams(searchParamsString));
+    const params = clearConsentSheetParams(
+      new URLSearchParams(searchParamsString),
+    );
     router.replace(buildNextUrl(pathname, params), { scroll: false });
   }, [pathname, router, searchParamsString]);
 
@@ -98,7 +110,7 @@ export function ConsentSheetProvider({ children }: { children: ReactNode }) {
       openConsentSheet,
       closeConsentSheet,
     }),
-    [closeConsentSheet, isOpen, openConsentSheet, view]
+    [closeConsentSheet, isOpen, openConsentSheet, view],
   );
 
   return (

@@ -50,7 +50,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PageHeader, SectionHeader, ContentSurface } from "@/components/app-ui/page-sections";
+import {
+  PageHeader,
+  SectionHeader,
+  ContentSurface,
+} from "@/components/app-ui/page-sections";
 import { SurfaceInset, SurfaceStack } from "@/components/app-ui/surfaces";
 import { useConsentNotificationState } from "@/components/consent/notification-provider";
 import { Icon } from "@/lib/morphy-ux/ui";
@@ -67,7 +71,7 @@ type ConsentSurfaceView = ConsentSheetView;
 
 function resolveRequestView(
   actor: ConsentCenterActor,
-  surfaceView: ConsentSurfaceView
+  surfaceView: ConsentSurfaceView,
 ): ConsentCenterView {
   if (surfaceView === "active") return "active";
   if (surfaceView === "previous") return "history";
@@ -97,7 +101,8 @@ function statusTone(status: string) {
 
 function formatDate(value: number | string | null | undefined) {
   if (!value) return null;
-  const date = typeof value === "number" ? new Date(value) : new Date(String(value));
+  const date =
+    typeof value === "number" ? new Date(value) : new Date(String(value));
   if (Number.isNaN(date.getTime())) return null;
   return date.toLocaleString();
 }
@@ -134,7 +139,7 @@ function formatRelativeCountdown(value: number | string | null | undefined) {
 
 function resolveRequesterImage(
   imageUrl?: string | null,
-  websiteUrl?: string | null
+  websiteUrl?: string | null,
 ) {
   if (imageUrl) return imageUrl;
   if (!websiteUrl) return null;
@@ -171,16 +176,19 @@ function entryHeadline(entry: ConsentCenterEntry) {
 
 function entrySupportingCopy(entry: ConsentCenterEntry) {
   if (entry.scope_description) return entry.scope_description;
-  if (entry.kind === "invite") return "Pre-consent handshake before the investor reviews access.";
-  if (entry.kind === "outgoing_request") return "Request created from your advisor relationship flow.";
-  if (entry.kind === "incoming_request") return "Approval is required before any protected data can be accessed.";
+  if (entry.kind === "invite")
+    return "Pre-consent handshake before the investor reviews access.";
+  if (entry.kind === "outgoing_request")
+    return "Request created from your advisor relationship flow.";
+  if (entry.kind === "incoming_request")
+    return "Approval is required before any protected data can be accessed.";
   return entry.scope || "Consent workflow event";
 }
 
 function getEntriesForSurfaceView(
   center: ConsentCenterResponse | null,
   actor: ConsentCenterActor,
-  surfaceView: ConsentSurfaceView
+  surfaceView: ConsentSurfaceView,
 ) {
   if (!center) return [];
 
@@ -206,8 +214,12 @@ function getEntriesForSurfaceView(
   });
 
   return pendingEntries.sort((left, right) => {
-    const leftTime = left.issued_at ? new Date(String(left.issued_at)).getTime() : 0;
-    const rightTime = right.issued_at ? new Date(String(right.issued_at)).getTime() : 0;
+    const leftTime = left.issued_at
+      ? new Date(String(left.issued_at)).getTime()
+      : 0;
+    const rightTime = right.issued_at
+      ? new Date(String(right.issued_at)).getTime()
+      : 0;
     return rightTime - leftTime;
   });
 }
@@ -215,14 +227,17 @@ function getEntriesForSurfaceView(
 function getViewCount(
   center: ConsentCenterResponse | null,
   actor: ConsentCenterActor,
-  surfaceView: ConsentSurfaceView
+  surfaceView: ConsentSurfaceView,
 ) {
   if (!center) return 0;
   if (surfaceView === "active") return center.active_grants.length;
   return getEntriesForSurfaceView(center, actor, surfaceView).length;
 }
 
-function emptyStateCopy(actor: ConsentCenterActor, surfaceView: ConsentSurfaceView) {
+function emptyStateCopy(
+  actor: ConsentCenterActor,
+  surfaceView: ConsentSurfaceView,
+) {
   if (surfaceView === "active") {
     return "No active access grants yet.";
   }
@@ -234,7 +249,13 @@ function emptyStateCopy(actor: ConsentCenterActor, surfaceView: ConsentSurfaceVi
     : "No pending investor approvals or developer requests yet.";
 }
 
-function deliveryModeCopy(mode: "push_active" | "push_blocked" | "push_failed_fallback_active" | "inbox_only") {
+function deliveryModeCopy(
+  mode:
+    | "push_active"
+    | "push_blocked"
+    | "push_failed_fallback_active"
+    | "inbox_only",
+) {
   switch (mode) {
     case "push_blocked":
       return {
@@ -274,13 +295,17 @@ type ConsentBundleGroup = {
   expiresAt?: number | string | null;
 };
 
-function groupConsentBundles(entries: ConsentCenterEntry[]): ConsentBundleGroup[] {
+function groupConsentBundles(
+  entries: ConsentCenterEntry[],
+): ConsentBundleGroup[] {
   const bundles = new Map<string, ConsentBundleGroup>();
   for (const entry of entries) {
     const metadata =
-      entry.metadata && typeof entry.metadata === "object" ? entry.metadata : {};
+      entry.metadata && typeof entry.metadata === "object"
+        ? entry.metadata
+        : {};
     const bundleId = String(
-      metadata.bundle_id || entry.request_id || entry.id
+      metadata.bundle_id || entry.request_id || entry.id,
     ).trim();
     if (!bundleId) continue;
     const existing = bundles.get(bundleId);
@@ -291,7 +316,8 @@ function groupConsentBundles(entries: ConsentCenterEntry[]): ConsentBundleGroup[
     bundles.set(bundleId, {
       bundleId,
       bundleLabel:
-        String(metadata.bundle_label || "").trim() || "Portfolio access request",
+        String(metadata.bundle_label || "").trim() ||
+        "Portfolio access request",
       entries: [entry],
       counterpartLabel: entry.counterpart_label || "Requester",
       issuedAt: entry.issued_at,
@@ -299,8 +325,12 @@ function groupConsentBundles(entries: ConsentCenterEntry[]): ConsentBundleGroup[
     });
   }
   return [...bundles.values()].sort((left, right) => {
-    const leftTime = left.issuedAt ? new Date(String(left.issuedAt)).getTime() : 0;
-    const rightTime = right.issuedAt ? new Date(String(right.issuedAt)).getTime() : 0;
+    const leftTime = left.issuedAt
+      ? new Date(String(left.issuedAt)).getTime()
+      : 0;
+    const rightTime = right.issuedAt
+      ? new Date(String(right.issuedAt)).getTime()
+      : 0;
     return rightTime - leftTime;
   });
 }
@@ -308,10 +338,10 @@ function groupConsentBundles(entries: ConsentCenterEntry[]): ConsentBundleGroup[
 function isBundledEntry(entry: ConsentCenterEntry) {
   return Boolean(
     entry.kind === "incoming_request" &&
-      entry.metadata &&
-      typeof entry.metadata === "object" &&
-      "bundle_id" in entry.metadata &&
-      entry.metadata.bundle_id
+    entry.metadata &&
+    typeof entry.metadata === "object" &&
+    "bundle_id" in entry.metadata &&
+    entry.metadata.bundle_id,
   );
 }
 
@@ -321,7 +351,8 @@ function parseDurationHours(value: string | undefined) {
 }
 
 function toPendingConsent(entry: ConsentCenterEntry, durationHours?: number) {
-  const metadata = entry.metadata && typeof entry.metadata === "object" ? entry.metadata : {};
+  const metadata =
+    entry.metadata && typeof entry.metadata === "object" ? entry.metadata : {};
   return {
     id: entry.request_id || entry.id,
     developer: entry.counterpart_label || "requester",
@@ -342,12 +373,15 @@ function toPendingConsent(entry: ConsentCenterEntry, durationHours?: number) {
           ? new Date(String(entry.approval_timeout_at)).getTime()
           : undefined,
     expiryHours:
-      typeof metadata.expiry_hours === "number" ? metadata.expiry_hours : undefined,
+      typeof metadata.expiry_hours === "number"
+        ? metadata.expiry_hours
+        : undefined,
     durationHours,
-    bundleId:
-      String(metadata.bundle_id || "") || undefined,
+    bundleId: String(metadata.bundle_id || "") || undefined,
     requestUrl: entry.request_url || undefined,
-    reason: entry.reason || (typeof metadata.reason === "string" ? metadata.reason : undefined),
+    reason:
+      entry.reason ||
+      (typeof metadata.reason === "string" ? metadata.reason : undefined),
     isScopeUpgrade:
       entry.is_scope_upgrade || Boolean(metadata.is_scope_upgrade) || undefined,
     existingGrantedScopes:
@@ -378,9 +412,10 @@ export function ConsentCenterView({
   const { isVaultUnlocked } = useVault();
   const { activePersona, riaCapability } = usePersonaState();
   const notificationState = useConsentNotificationState();
-  const actor: ConsentCenterActor = activePersona === "ria" ? "ria" : "investor";
+  const actor: ConsentCenterActor =
+    activePersona === "ria" ? "ria" : "investor";
   const [embeddedView, setEmbeddedView] = useState<ConsentSurfaceView>(
-    normalizeConsentSheetView(initialView)
+    normalizeConsentSheetView(initialView),
   );
   const surfaceView = embedded
     ? embeddedView
@@ -411,15 +446,20 @@ export function ConsentCenterView({
   const [bundleDurationMode, setBundleDurationMode] = useState<
     Record<string, "shared" | "per-scope">
   >({});
-  const [bundleSharedDuration, setBundleSharedDuration] = useState<Record<string, string>>({});
+  const [bundleSharedDuration, setBundleSharedDuration] = useState<
+    Record<string, string>
+  >({});
   const [bundleScopeDurations, setBundleScopeDurations] = useState<
     Record<string, Record<string, string>>
   >({});
-  const [singleRequestDurations, setSingleRequestDurations] = useState<Record<string, string>>({});
-  const [expandedBundles, setExpandedBundles] = useState<Record<string, boolean>>({});
-  const [disconnectingCounterpartKey, setDisconnectingCounterpartKey] = useState<string | null>(
-    null
-  );
+  const [singleRequestDurations, setSingleRequestDurations] = useState<
+    Record<string, string>
+  >({});
+  const [expandedBundles, setExpandedBundles] = useState<
+    Record<string, boolean>
+  >({});
+  const [disconnectingCounterpartKey, setDisconnectingCounterpartKey] =
+    useState<string | null>(null);
 
   useEffect(() => {
     if (!embedded) return;
@@ -436,11 +476,12 @@ export function ConsentCenterView({
 
       const cache = CacheService.getInstance();
       const cachedSnapshot = cache.peek<ConsentCenterResponse>(
-        CACHE_KEYS.CONSENT_CENTER(user.uid, `${actor}:${requestView}`)
+        CACHE_KEYS.CONSENT_CENTER(user.uid, `${actor}:${requestView}`),
       );
       const cachedCenter = cachedSnapshot?.data ?? null;
       const hasCachedCenter = Boolean(cachedCenter);
-      const shouldSkipNetwork = Boolean(cachedSnapshot?.isFresh) && !options?.force;
+      const shouldSkipNetwork =
+        Boolean(cachedSnapshot?.isFresh) && !options?.force;
 
       if (hasCachedCenter) {
         setCenter(cachedCenter);
@@ -471,19 +512,25 @@ export function ConsentCenterView({
         setCenter(nextCenter);
       } catch (loadError) {
         setCenter(null);
-        setError(loadError instanceof Error ? loadError.message : "Failed to load consent center");
+        setError(
+          loadError instanceof Error
+            ? loadError.message
+            : "Failed to load consent center",
+        );
       } finally {
         setLoading(false);
         setRefreshing(false);
       }
     },
-    [actor, requestView, user]
+    [actor, requestView, user],
   );
 
   useEffect(() => {
     if (!embedded && authLoading && !user) return;
     if (authLoading || user) return;
-    router.replace(`${ROUTES.LOGIN}?redirect=${encodeURIComponent(ROUTES.CONSENTS)}`);
+    router.replace(
+      `${ROUTES.LOGIN}?redirect=${encodeURIComponent(ROUTES.CONSENTS)}`,
+    );
   }, [authLoading, embedded, router, user]);
 
   useEffect(() => {
@@ -501,23 +548,26 @@ export function ConsentCenterView({
 
   const visibleEntries = useMemo(
     () => getEntriesForSurfaceView(center, actor, surfaceView),
-    [actor, center, surfaceView]
+    [actor, center, surfaceView],
   );
   const visibleGroups = useMemo(
-    () => (actor === "investor" ? center?.requestor_groups?.[surfaceView] || [] : []),
-    [actor, center, surfaceView]
+    () =>
+      actor === "investor" ? center?.requestor_groups?.[surfaceView] || [] : [],
+    [actor, center, surfaceView],
   );
   const deliveryCopy = useMemo(
     () => deliveryModeCopy(notificationState.deliveryMode),
-    [notificationState.deliveryMode]
+    [notificationState.deliveryMode],
   );
 
   const pendingBundleGroups = useMemo(
     () =>
       actor === "investor" && surfaceView === "pending"
-        ? groupConsentBundles(visibleEntries.filter((entry) => isBundledEntry(entry)))
+        ? groupConsentBundles(
+            visibleEntries.filter((entry) => isBundledEntry(entry)),
+          )
         : [],
-    [actor, surfaceView, visibleEntries]
+    [actor, surfaceView, visibleEntries],
   );
 
   const listEntries = useMemo(
@@ -525,7 +575,7 @@ export function ConsentCenterView({
       actor === "investor" && surfaceView === "pending"
         ? visibleEntries.filter((entry) => !isBundledEntry(entry))
         : visibleEntries,
-    [actor, surfaceView, visibleEntries]
+    [actor, surfaceView, visibleEntries],
   );
 
   const viewOptions = useMemo<SegmentedPillOption[]>(
@@ -546,7 +596,7 @@ export function ConsentCenterView({
         icon: History,
       },
     ],
-    [actor, center]
+    [actor, center],
   );
 
   const updateView = (nextView: ConsentSurfaceView) => {
@@ -573,24 +623,30 @@ export function ConsentCenterView({
         await ConsentCenterService.disconnectRelationship({
           idToken,
           investor_user_id:
-            counterpartType === "investor" ? String(entry.counterpart_id) : undefined,
-          ria_profile_id: counterpartType === "ria" ? String(entry.counterpart_id) : undefined,
+            counterpartType === "investor"
+              ? String(entry.counterpart_id)
+              : undefined,
+          ria_profile_id:
+            counterpartType === "ria"
+              ? String(entry.counterpart_id)
+              : undefined,
         });
         toast.success("Relationship disconnected", {
-          description: "Access ended immediately. Consent history stays visible.",
+          description:
+            "Access ended immediately. Consent history stays visible.",
         });
         await loadCenter({ force: true, silent: true });
       } catch (disconnectError) {
         toast.error(
           disconnectError instanceof Error
             ? disconnectError.message
-            : "Failed to disconnect relationship"
+            : "Failed to disconnect relationship",
         );
       } finally {
         setDisconnectingCounterpartKey(null);
       }
     },
-    [loadCenter, user]
+    [loadCenter, user],
   );
 
   const renderBundleCard = (bundle: ConsentBundleGroup) => {
@@ -598,27 +654,32 @@ export function ConsentCenterView({
     const sharedDuration = bundleSharedDuration[bundle.bundleId] || "168";
     const isExpanded = expandedBundles[bundle.bundleId] ?? false;
     const bundleMetadata =
-      bundle.entries[0]?.metadata && typeof bundle.entries[0].metadata === "object"
+      bundle.entries[0]?.metadata &&
+      typeof bundle.entries[0].metadata === "object"
         ? bundle.entries[0].metadata
         : {};
     const requesterImage = resolveRequesterImage(
       bundle.entries[0]?.counterpart_image_url,
-      bundle.entries[0]?.counterpart_website_url
+      bundle.entries[0]?.counterpart_website_url,
     );
     const bundleReason =
       bundle.entries[0]?.reason ||
-      (typeof bundleMetadata.reason === "string" ? bundleMetadata.reason : undefined);
+      (typeof bundleMetadata.reason === "string"
+        ? bundleMetadata.reason
+        : undefined);
     const requestExpiry = formatRelativeCountdown(
-      bundle.entries[0]?.approval_timeout_at || bundle.entries[0]?.expires_at
+      bundle.entries[0]?.approval_timeout_at || bundle.entries[0]?.expires_at,
     );
-    const isFocused = Boolean(focusedBundleId && focusedBundleId === bundle.bundleId);
+    const isFocused = Boolean(
+      focusedBundleId && focusedBundleId === bundle.bundleId,
+    );
 
     return (
       <SurfaceInset
         key={`bundle-${bundle.bundleId}`}
         className={cn(
           "space-y-4 px-5 py-5",
-          isFocused ? "ring-2 ring-sky-500/50 bg-sky-500/5" : undefined
+          isFocused ? "ring-2 ring-sky-500/50 bg-sky-500/5" : undefined,
         )}
       >
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
@@ -637,23 +698,30 @@ export function ConsentCenterView({
                 )}
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-medium text-foreground">{bundle.counterpartLabel}</p>
+                <p className="text-sm font-medium text-foreground">
+                  {bundle.counterpartLabel}
+                </p>
                 <p className="text-xs text-muted-foreground">
                   Portfolio access request
                 </p>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <p className="text-sm font-medium text-foreground">{bundle.bundleLabel}</p>
+              <p className="text-sm font-medium text-foreground">
+                {bundle.bundleLabel}
+              </p>
               <Badge className={statusTone("pending")}>pending review</Badge>
               <Badge variant="secondary">{bundle.entries.length} scopes</Badge>
             </div>
             <p className="text-sm text-muted-foreground">
-              {bundle.counterpartLabel} is requesting portfolio-related access. Choose one
-              duration for the whole bundle or expand to set durations per scope.
+              {bundle.counterpartLabel} is requesting portfolio-related access.
+              Choose one duration for the whole bundle or expand to set
+              durations per scope.
             </p>
             {bundleReason ? (
-              <p className="text-sm text-foreground/80">Reason: {bundleReason}</p>
+              <p className="text-sm text-foreground/80">
+                Reason: {bundleReason}
+              </p>
             ) : null}
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
               {formatDate(bundle.issuedAt) ? (
@@ -734,7 +802,7 @@ export function ConsentCenterView({
             </div>
           ) : null}
 
-          {(isExpanded || durationMode === "per-scope") ? (
+          {isExpanded || durationMode === "per-scope" ? (
             <div className="space-y-3">
               {bundle.entries.map((entry) => {
                 const requestId = entry.request_id || entry.id;
@@ -774,7 +842,10 @@ export function ConsentCenterView({
                             </SelectTrigger>
                             <SelectContent>
                               {DURATION_OPTIONS.map((option) => (
-                                <SelectItem key={option.value} value={option.value}>
+                                <SelectItem
+                                  key={option.value}
+                                  value={option.value}
+                                >
                                   {option.label}
                                 </SelectItem>
                               ))}
@@ -810,11 +881,14 @@ export function ConsentCenterView({
                         : parseDurationHours(
                             bundleScopeDurations[bundle.bundleId]?.[
                               entry.request_id || entry.id
-                            ] || "168"
-                          )
-                    )
+                            ] || "168",
+                          ),
+                    ),
                   ),
-                  { bundleId: bundle.bundleId, bundleLabel: bundle.bundleLabel }
+                  {
+                    bundleId: bundle.bundleId,
+                    bundleLabel: bundle.bundleLabel,
+                  },
                 )
               }
             >
@@ -827,7 +901,10 @@ export function ConsentCenterView({
               onClick={() =>
                 void handleDenyBundle(
                   bundle.entries.map((entry) => entry.request_id || entry.id),
-                  { bundleId: bundle.bundleId, bundleLabel: bundle.bundleLabel }
+                  {
+                    bundleId: bundle.bundleId,
+                    bundleLabel: bundle.bundleLabel,
+                  },
                 )
               }
             >
@@ -840,7 +917,10 @@ export function ConsentCenterView({
   };
 
   const renderEntryRow = (entry: ConsentCenterEntry) => {
-    const metadata = entry.metadata && typeof entry.metadata === "object" ? entry.metadata : {};
+    const metadata =
+      entry.metadata && typeof entry.metadata === "object"
+        ? entry.metadata
+        : {};
     const canOpenWorkspace =
       actor === "ria" &&
       entry.counterpart_type === "investor" &&
@@ -857,27 +937,32 @@ export function ConsentCenterView({
         : null;
     const requestId = entry.request_id || entry.id;
     const isIncomingRequest = entry.kind === "incoming_request";
-    const selectedDuration = singleRequestDurations[requestId] || String(
-      typeof metadata.expiry_hours === "number" ? metadata.expiry_hours : 24
-    );
+    const selectedDuration =
+      singleRequestDurations[requestId] ||
+      String(
+        typeof metadata.expiry_hours === "number" ? metadata.expiry_hours : 24,
+      );
     const isFocused = Boolean(
       (focusedRequestId && focusedRequestId === requestId) ||
-        (focusedBundleId &&
-          typeof metadata.bundle_id === "string" &&
-          metadata.bundle_id === focusedBundleId)
+      (focusedBundleId &&
+        typeof metadata.bundle_id === "string" &&
+        metadata.bundle_id === focusedBundleId),
     );
     const requesterImage = resolveRequesterImage(
       entry.counterpart_image_url,
-      entry.counterpart_website_url
+      entry.counterpart_website_url,
     );
     const requestCountdown = formatRelativeCountdown(
-      entry.approval_timeout_at || entry.expires_at
+      entry.approval_timeout_at || entry.expires_at,
     );
     const requestedDurationLabel = formatDurationLabel(
-      typeof metadata.expiry_hours === "number" ? metadata.expiry_hours : undefined
+      typeof metadata.expiry_hours === "number"
+        ? metadata.expiry_hours
+        : undefined,
     );
     const requestReason =
-      entry.reason || (typeof metadata.reason === "string" ? metadata.reason : undefined);
+      entry.reason ||
+      (typeof metadata.reason === "string" ? metadata.reason : undefined);
     const additionalAccessSummary =
       entry.additional_access_summary ||
       (typeof metadata.additional_access_summary === "string"
@@ -892,7 +977,7 @@ export function ConsentCenterView({
         key={`${entry.kind}-${entry.id}`}
         className={cn(
           "space-y-4 rounded-[24px] border px-5 py-5 transition-colors",
-          isFocused ? "border-sky-500/50 bg-sky-500/5" : "border-border/40"
+          isFocused ? "border-sky-500/50 bg-sky-500/5" : "border-border/40",
         )}
       >
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
@@ -911,7 +996,9 @@ export function ConsentCenterView({
                 )}
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-medium text-foreground">{entryHeadline(entry)}</p>
+                <p className="text-sm font-medium text-foreground">
+                  {entryHeadline(entry)}
+                </p>
                 <p className="text-xs text-muted-foreground">
                   {entry.counterpart_type === "developer"
                     ? "External developer app"
@@ -925,25 +1012,37 @@ export function ConsentCenterView({
               <Badge className={statusTone(entry.status)}>
                 {entry.status.replace(/_/g, " ")}
               </Badge>
-              {entry.kind === "invite" ? <Badge variant="secondary">pre-consent</Badge> : null}
+              {entry.kind === "invite" ? (
+                <Badge variant="secondary">pre-consent</Badge>
+              ) : null}
             </div>
-            <p className="text-sm text-muted-foreground">{entrySupportingCopy(entry)}</p>
+            <p className="text-sm text-muted-foreground">
+              {entrySupportingCopy(entry)}
+            </p>
             {entry.scope ? (
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
                 Scope code: {entry.scope}
               </p>
             ) : null}
             {requestReason ? (
-              <p className="text-sm text-foreground/80">Reason: {requestReason}</p>
+              <p className="text-sm text-foreground/80">
+                Reason: {requestReason}
+              </p>
             ) : null}
             {additionalAccessSummary ? (
-              <p className="text-sm text-foreground/80">{additionalAccessSummary}</p>
+              <p className="text-sm text-foreground/80">
+                {additionalAccessSummary}
+              </p>
             ) : null}
             {existingGrantedScopes.length > 0 ? (
               <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
                 <span>Already granted:</span>
                 {existingGrantedScopes.map((scope) => (
-                  <Badge key={scope} variant="secondary" className="font-normal">
+                  <Badge
+                    key={scope}
+                    variant="secondary"
+                    className="font-normal"
+                  >
                     {scope}
                   </Badge>
                 ))}
@@ -960,8 +1059,12 @@ export function ConsentCenterView({
               {entry.relationship_status ? (
                 <span>Relationship: {entry.relationship_status}</span>
               ) : null}
-              {isIncomingRequest ? <span>Requested duration: {requestedDurationLabel}</span> : null}
-              {isIncomingRequest && requestCountdown ? <span>{requestCountdown}</span> : null}
+              {isIncomingRequest ? (
+                <span>Requested duration: {requestedDurationLabel}</span>
+              ) : null}
+              {isIncomingRequest && requestCountdown ? (
+                <span>{requestCountdown}</span>
+              ) : null}
             </div>
           </div>
 
@@ -992,7 +1095,10 @@ export function ConsentCenterView({
                   size="sm"
                   onClick={() =>
                     void handleApprove(
-                      toPendingConsent(entry, parseDurationHours(selectedDuration))
+                      toPendingConsent(
+                        entry,
+                        parseDurationHours(selectedDuration),
+                      ),
                     )
                   }
                 >
@@ -1038,7 +1144,7 @@ export function ConsentCenterView({
             {canOpenWorkspace ? (
               <Link
                 href={`${ROUTES.RIA_HOME}/workspace/${encodeURIComponent(
-                  String(entry.counterpart_id)
+                  String(entry.counterpart_id),
                 )}`}
                 className="inline-flex min-h-10 items-center justify-center rounded-full border border-border bg-background px-4 text-sm font-medium text-foreground"
               >
@@ -1115,8 +1221,16 @@ export function ConsentCenterView({
       {actor === "investor" && deliveryCopy ? (
         <ContentSurface
           className="space-y-3"
-          tone={notificationState.deliveryMode === "push_blocked" ? "warning" : "default"}
-          accent={notificationState.deliveryMode === "push_failed_fallback_active" ? "amber" : "none"}
+          tone={
+            notificationState.deliveryMode === "push_blocked"
+              ? "warning"
+              : "default"
+          }
+          accent={
+            notificationState.deliveryMode === "push_failed_fallback_active"
+              ? "amber"
+              : "none"
+          }
         >
           <SectionHeader
             eyebrow="Notifications"
@@ -1154,7 +1268,8 @@ export function ConsentCenterView({
                   Browser permission
                 </p>
                 <p className="mt-2 text-sm text-foreground">
-                  Confirm notifications are allowed for this origin before retrying.
+                  Confirm notifications are allowed for this origin before
+                  retrying.
                 </p>
               </SurfaceInset>
               <SurfaceInset className="p-4">
@@ -1162,7 +1277,8 @@ export function ConsentCenterView({
                   Token registration
                 </p>
                 <p className="mt-2 text-sm text-foreground">
-                  A healthy retry should create a row in <code>user_push_tokens</code>.
+                  A healthy retry should create a row in{" "}
+                  <code>user_push_tokens</code>.
                 </p>
               </SurfaceInset>
               <SurfaceInset className="p-4">
@@ -1170,8 +1286,8 @@ export function ConsentCenterView({
                   Firebase Console
                 </p>
                 <p className="mt-2 text-sm text-foreground">
-                  Check the active project&apos;s Cloud Messaging web configuration and
-                  use the project-specific VAPID key.
+                  Check the active project&apos;s Cloud Messaging web
+                  configuration and use the project-specific VAPID key.
                 </p>
               </SurfaceInset>
             </div>
@@ -1212,7 +1328,8 @@ export function ConsentCenterView({
                 Latest activity
               </p>
               <p className="mt-2 text-sm font-medium text-foreground">
-                {formatDate(center.self_activity_summary.last_activity_at) || "No recent activity"}
+                {formatDate(center.self_activity_summary.last_activity_at) ||
+                  "No recent activity"}
               </p>
             </SurfaceInset>
           </div>
@@ -1263,7 +1380,9 @@ export function ConsentCenterView({
             </div>
           ) : null}
 
-          {error ? <p className="px-5 py-6 text-sm text-red-500">{error}</p> : null}
+          {error ? (
+            <p className="px-5 py-6 text-sm text-red-500">{error}</p>
+          ) : null}
 
           {!loading && !error && !hasVisibleEntries ? (
             <div className="px-5 py-8 text-sm text-muted-foreground">
@@ -1273,60 +1392,77 @@ export function ConsentCenterView({
 
           {!loading && !error && hasVisibleEntries ? (
             <div className="divide-y divide-border/60">
-              {actor === "investor"
-                ? visibleGroups.map((group) => {
-                    const groupedBundles =
-                      surfaceView === "pending"
-                        ? groupConsentBundles(group.entries.filter((entry) => isBundledEntry(entry)))
-                        : [];
-                    const groupedEntries =
-                      surfaceView === "pending"
-                        ? group.entries.filter((entry) => !isBundledEntry(entry))
-                        : group.entries;
+              {actor === "investor" ? (
+                visibleGroups.map((group) => {
+                  const groupedBundles =
+                    surfaceView === "pending"
+                      ? groupConsentBundles(
+                          group.entries.filter((entry) =>
+                            isBundledEntry(entry),
+                          ),
+                        )
+                      : [];
+                  const groupedEntries =
+                    surfaceView === "pending"
+                      ? group.entries.filter((entry) => !isBundledEntry(entry))
+                      : group.entries;
 
-                    return (
-                      <div key={group.id} className="space-y-4 px-5 py-5">
-                        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                          <div className="min-w-0 space-y-2">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <p className="text-sm font-medium text-foreground">
-                                {group.counterpart_label || "Requester"}
-                              </p>
-                              <Badge className={statusTone(String(group.status || "pending"))}>
-                                {String(group.status || "pending").replace(/_/g, " ")}
-                              </Badge>
-                              <Badge variant="secondary">{group.request_count} request(s)</Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground">
-                              Latest request received {formatDate(group.latest_request_at) || "recently"}.
+                  return (
+                    <div key={group.id} className="space-y-4 px-5 py-5">
+                      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                        <div className="min-w-0 space-y-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="text-sm font-medium text-foreground">
+                              {group.counterpart_label || "Requester"}
                             </p>
-                            <div className="flex flex-wrap gap-2">
-                              {group.scopes.slice(0, 4).map((scope) => (
-                                <Badge key={`${group.id}-${scope}`} variant="secondary">
-                                  {scope}
-                                </Badge>
-                              ))}
-                            </div>
+                            <Badge
+                              className={statusTone(
+                                String(group.status || "pending"),
+                              )}
+                            >
+                              {String(group.status || "pending").replace(
+                                /_/g,
+                                " ",
+                              )}
+                            </Badge>
+                            <Badge variant="secondary">
+                              {group.request_count} request(s)
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            Latest request received{" "}
+                            {formatDate(group.latest_request_at) || "recently"}.
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {group.scopes.slice(0, 4).map((scope) => (
+                              <Badge
+                                key={`${group.id}-${scope}`}
+                                variant="secondary"
+                              >
+                                {scope}
+                              </Badge>
+                            ))}
                           </div>
                         </div>
-
-                        <div className="space-y-3">
-                          {groupedBundles.map(renderBundleCard)}
-                          {groupedEntries.length > 0 ? (
-                            <SurfaceInset className="divide-y divide-border/60 p-0">
-                              {groupedEntries.map(renderEntryRow)}
-                            </SurfaceInset>
-                          ) : null}
-                        </div>
                       </div>
-                    );
-                  })
-                : (
-                  <>
-                    {pendingBundleGroups.map(renderBundleCard)}
-                    {listEntries.map(renderEntryRow)}
-                  </>
-                )}
+
+                      <div className="space-y-3">
+                        {groupedBundles.map(renderBundleCard)}
+                        {groupedEntries.length > 0 ? (
+                          <SurfaceInset className="divide-y divide-border/60 p-0">
+                            {groupedEntries.map(renderEntryRow)}
+                          </SurfaceInset>
+                        ) : null}
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <>
+                  {pendingBundleGroups.map(renderBundleCard)}
+                  {listEntries.map(renderEntryRow)}
+                </>
+              )}
             </div>
           ) : null}
         </ContentSurface>
@@ -1338,16 +1474,20 @@ export function ConsentCenterView({
     return (
       <div className={cn("space-y-5", className)}>
         <div className="flex justify-end">
-            <Button
-              variant="none"
-              effect="fade"
+          <Button
+            variant="none"
+            effect="fade"
+            size="sm"
+            onClick={() => void loadCenter({ force: true, silent: true })}
+            disabled={refreshing}
+          >
+            <Icon
+              icon={RefreshCw}
               size="sm"
-              onClick={() => void loadCenter({ force: true, silent: true })}
-              disabled={refreshing}
-            >
-              <Icon icon={RefreshCw} size="sm" className={refreshing ? "mr-2 animate-spin" : "mr-2"} />
-              Refresh
-            </Button>
+              className={refreshing ? "mr-2 animate-spin" : "mr-2"}
+            />
+            Refresh
+          </Button>
         </div>
         {content}
       </div>
@@ -1383,7 +1523,11 @@ export function ConsentCenterView({
               onClick={() => void loadCenter({ force: true, silent: true })}
               disabled={refreshing}
             >
-              <Icon icon={RefreshCw} size="sm" className={refreshing ? "mr-2 animate-spin" : "mr-2"} />
+              <Icon
+                icon={RefreshCw}
+                size="sm"
+                className={refreshing ? "mr-2 animate-spin" : "mr-2"}
+              />
               Refresh
             </Button>
           }

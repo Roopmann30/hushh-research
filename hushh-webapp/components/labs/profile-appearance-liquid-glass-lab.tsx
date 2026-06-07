@@ -1,7 +1,20 @@
 "use client";
 
-import { Aperture, Box, Search, SlidersHorizontal, Sparkles, ToggleLeft } from "lucide-react";
-import { useEffect, useMemo, useState, type ComponentType, type ReactNode } from "react";
+import {
+  Aperture,
+  Box,
+  Search,
+  SlidersHorizontal,
+  Sparkles,
+  ToggleLeft,
+} from "lucide-react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type ComponentType,
+  type ReactNode,
+} from "react";
 
 import { LiquidGlassRendererModeProvider } from "@/components/labs/liquid-glass-renderer-mode";
 import { supportsLiquidGlassRuntime } from "@/lib/labs/liquid-glass-core";
@@ -26,7 +39,8 @@ type LabTab = {
 
 export default function ProfileAppearanceLiquidGlassLab() {
   const [activeTab, setActiveTab] = useState<LabTabId>("navbar");
-  const [rendererMode, setRendererMode] = useState<LiquidGlassRendererMode>("mirror");
+  const [rendererMode, setRendererMode] =
+    useState<LiquidGlassRendererMode>("mirror");
   const [referenceSupported, setReferenceSupported] = useState(false);
 
   useEffect(() => {
@@ -78,7 +92,7 @@ export default function ProfileAppearanceLiquidGlassLab() {
         render: () => <LiquidGlassContainerDemo />,
       },
     ],
-    []
+    [],
   );
 
   const active = tabs.find((tab) => tab.id === activeTab) ?? tabs[0]!;
@@ -105,8 +119,9 @@ export default function ProfileAppearanceLiquidGlassLab() {
                 Liquid Glass Trace
               </h1>
               <p className="max-w-3xl text-base leading-7 text-white/62">
-                Chrome reference stays intact. Mirror mode keeps the same geometry and motion while
-                sampling a live mirrored scene for Safari, WKWebView, and Firefox-safe glass.
+                Chrome reference stays intact. Mirror mode keeps the same
+                geometry and motion while sampling a live mirrored scene for
+                Safari, WKWebView, and Firefox-safe glass.
               </p>
             </header>
 
@@ -120,7 +135,8 @@ export default function ProfileAppearanceLiquidGlassLab() {
                   rendererMode === "reference"
                     ? "border-white/30 bg-white/14 text-white"
                     : "border-white/10 bg-white/6 text-white/62 hover:border-white/16 hover:bg-white/10 hover:text-white",
-                  !referenceSupported && "cursor-not-allowed border-white/8 bg-white/4 text-white/28 hover:border-white/8 hover:bg-white/4 hover:text-white/28"
+                  !referenceSupported &&
+                    "cursor-not-allowed border-white/8 bg-white/4 text-white/28 hover:border-white/8 hover:bg-white/4 hover:text-white/28",
                 )}
               >
                 Chrome Reference
@@ -132,13 +148,15 @@ export default function ProfileAppearanceLiquidGlassLab() {
                   "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
                   rendererMode === "mirror"
                     ? "border-white/30 bg-white/14 text-white"
-                    : "border-white/10 bg-white/6 text-white/62 hover:border-white/16 hover:bg-white/10 hover:text-white"
+                    : "border-white/10 bg-white/6 text-white/62 hover:border-white/16 hover:bg-white/10 hover:text-white",
                 )}
               >
                 Mirror Renderer
               </button>
               <span className="inline-flex items-center rounded-full border border-white/10 bg-white/6 px-3 py-2 text-xs font-medium uppercase tracking-[0.2em] text-white/45">
-                {referenceSupported ? "Reference available" : "Reference unavailable on this engine"}
+                {referenceSupported
+                  ? "Reference available"
+                  : "Reference unavailable on this engine"}
               </span>
             </div>
 
@@ -155,7 +173,7 @@ export default function ProfileAppearanceLiquidGlassLab() {
                       "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
                       selected
                         ? "border-white/30 bg-white/14 text-white"
-                        : "border-white/10 bg-white/6 text-white/62 hover:border-white/16 hover:bg-white/10 hover:text-white"
+                        : "border-white/10 bg-white/6 text-white/62 hover:border-white/16 hover:bg-white/10 hover:text-white",
                     )}
                   >
                     <Icon className="h-4 w-4" />
@@ -171,7 +189,9 @@ export default function ProfileAppearanceLiquidGlassLab() {
                   <ActiveIcon className="h-6 w-6 text-white/70" />
                   {active.label}
                 </h2>
-                <p className="max-w-3xl text-base leading-7 text-white/58">{active.description}</p>
+                <p className="max-w-3xl text-base leading-7 text-white/58">
+                  {active.description}
+                </p>
               </div>
               {active.render()}
             </section>

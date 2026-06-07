@@ -18,14 +18,19 @@ const shellActionSurfaceVariants = cva(
     defaultVariants: {
       variant: "icon",
     },
-  }
+  },
 );
 
-export const SHELL_ICON_BUTTON_CLASSNAME = shellActionSurfaceVariants({ variant: "icon" });
-export const SHELL_PILL_TRIGGER_CLASSNAME = shellActionSurfaceVariants({ variant: "pill" });
+export const SHELL_ICON_BUTTON_CLASSNAME = shellActionSurfaceVariants({
+  variant: "icon",
+});
+export const SHELL_PILL_TRIGGER_CLASSNAME = shellActionSurfaceVariants({
+  variant: "pill",
+});
 
 interface ShellActionSurfaceProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof shellActionSurfaceVariants> {
   badge?: React.ReactNode;
   badgeClassName?: string;
@@ -50,10 +55,15 @@ export const ShellActionSurface = React.forwardRef<
     type = "button",
     ...props
   },
-  ref
+  ref,
 ) {
   return (
-    <span className={cn("relative inline-flex shrink-0 overflow-visible align-middle", wrapperClassName)}>
+    <span
+      className={cn(
+        "relative inline-flex shrink-0 overflow-visible align-middle",
+        wrapperClassName,
+      )}
+    >
       <button
         ref={ref}
         type={type}
@@ -65,25 +75,29 @@ export const ShellActionSurface = React.forwardRef<
           className={cn(
             "pointer-events-none absolute inset-0 z-[1] rounded-full bg-transparent transition-[background-color]",
             "group-hover/shell-action:bg-foreground/[0.04] group-active/shell-action:bg-foreground/[0.065]",
-            "dark:group-hover/shell-action:bg-white/[0.075] dark:group-active/shell-action:bg-white/[0.12]"
+            "dark:group-hover/shell-action:bg-white/[0.075] dark:group-active/shell-action:bg-white/[0.12]",
           )}
         />
         <span
           className={cn(
             "pointer-events-none relative z-10 inline-flex min-w-0 max-w-full items-center justify-center",
             variant === "pill" && "gap-1.5 sm:gap-2",
-            contentClassName
+            contentClassName,
           )}
         >
           {children}
         </span>
-        <MaterialRipple variant="none" effect="fade" className={cn("z-10", rippleClassName)} />
+        <MaterialRipple
+          variant="none"
+          effect="fade"
+          className={cn("z-10", rippleClassName)}
+        />
       </button>
       {badge ? (
         <span
           className={cn(
             "pointer-events-none absolute right-0 top-0 z-20 translate-x-[24%] -translate-y-[22%]",
-            badgeClassName
+            badgeClassName,
           )}
         >
           {badge}

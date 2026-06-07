@@ -1,6 +1,12 @@
 "use client";
 
-import { useDeferredValue, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { Check, ChevronsUpDown, FilePenLine, X } from "lucide-react";
 
 import {
@@ -56,10 +62,15 @@ function buildHaystack<T>(option: CommandPickerOption<T>): string {
     .toLowerCase();
 }
 
-function filterCommandOptions<T>(options: CommandPickerOption<T>[], query: string) {
+function filterCommandOptions<T>(
+  options: CommandPickerOption<T>[],
+  query: string,
+) {
   const normalizedQuery = query.trim().toLowerCase();
   if (!normalizedQuery) return options;
-  return options.filter((option) => buildHaystack(option).includes(normalizedQuery));
+  return options.filter((option) =>
+    buildHaystack(option).includes(normalizedQuery),
+  );
 }
 
 // 3. Removed PopupEditorPanel as an internal component and moved it directly into PopupTextEditorField to avoid unnecessary prop drilling and re-renders.
@@ -92,12 +103,17 @@ export function CommandPickerField<T = unknown>({
   invalid?: boolean;
   allowClear?: boolean;
   displayValue?: string;
-  renderOption?: (option: CommandPickerOption<T>, selected: boolean) => ReactNode;
+  renderOption?: (
+    option: CommandPickerOption<T>,
+    selected: boolean,
+  ) => ReactNode;
   triggerClassName?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [dynamicOptions, setDynamicOptions] = useState<CommandPickerOption<T>[]>([]);
+  const [dynamicOptions, setDynamicOptions] = useState<
+    CommandPickerOption<T>[]
+  >([]);
   const [loading, setLoading] = useState(false);
   const deferredQuery = useDeferredValue(query);
 
@@ -139,7 +155,11 @@ export function CommandPickerField<T = unknown>({
     const normalizedValue = value.trim().toLowerCase();
     // 5. Consolidated the search array to prevent redundant loops
     const allOptions = loadOptions ? dynamicOptions : options;
-    return allOptions.find((option) => option.value.trim().toLowerCase() === normalizedValue) || null;
+    return (
+      allOptions.find(
+        (option) => option.value.trim().toLowerCase() === normalizedValue,
+      ) || null
+    );
   }, [dynamicOptions, loadOptions, options, value]);
 
   const triggerValue = displayValue || selectedOption?.label || value;
@@ -157,13 +177,22 @@ export function CommandPickerField<T = unknown>({
           }}
           className={cn(
             FIELD_TRIGGER_CLASSNAME,
-            invalid ? "border-rose-300 dark:border-rose-500/50" : "border-border/80",
-            triggerValue ? "bg-background text-foreground" : "bg-background text-muted-foreground",
-            triggerClassName
+            invalid
+              ? "border-rose-300 dark:border-rose-500/50"
+              : "border-border/80",
+            triggerValue
+              ? "bg-background text-foreground"
+              : "bg-background text-muted-foreground",
+            triggerClassName,
           )}
         >
-          <span className="truncate font-medium tracking-tight">{triggerValue || placeholder}</span>
-          <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground/80" aria-hidden="true" />
+          <span className="truncate font-medium tracking-tight">
+            {triggerValue || placeholder}
+          </span>
+          <ChevronsUpDown
+            className="h-4 w-4 shrink-0 text-muted-foreground/80"
+            aria-hidden="true"
+          />
         </button>
         {allowClear && value ? (
           <Button
@@ -186,7 +215,11 @@ export function CommandPickerField<T = unknown>({
           if (!nextOpen) setQuery("");
         }}
         title={typeof title === "string" ? title : "Select option"}
-        description={typeof description === "string" ? description : "Search and select an option."}
+        description={
+          typeof description === "string"
+            ? description
+            : "Search and select an option."
+        }
         className={COMMAND_SHELL_CLASSNAME}
       >
         <CommandInput
@@ -218,14 +251,21 @@ export function CommandPickerField<T = unknown>({
                   ) : (
                     <>
                       <div className="min-w-0 flex-1 space-y-1">
-                        <p className="truncate font-medium text-foreground">{option.label}</p>
+                        <p className="truncate font-medium text-foreground">
+                          {option.label}
+                        </p>
                         {option.description ? (
                           <p className="truncate text-xs text-muted-foreground">
                             {option.description}
                           </p>
                         ) : null}
                       </div>
-                      {selected ? <Check className="h-4 w-4 text-primary" aria-hidden="true" /> : null}
+                      {selected ? (
+                        <Check
+                          className="h-4 w-4 text-primary"
+                          aria-hidden="true"
+                        />
+                      ) : null}
                     </>
                   )}
                 </CommandItem>
@@ -283,8 +323,10 @@ export function PopupTextEditorField({
         onClick={() => setOpen(true)}
         className={cn(
           "group flex min-h-[76px] w-full items-start justify-between gap-3 rounded-[16px] border px-3 py-3 text-left outline-none transition focus-visible:ring-2 focus-visible:ring-ring/70",
-          invalid ? "border-rose-300 dark:border-rose-500/50" : "border-border/80 bg-background hover:border-border",
-          triggerClassName
+          invalid
+            ? "border-rose-300 dark:border-rose-500/50"
+            : "border-border/80 bg-background hover:border-border",
+          triggerClassName,
         )}
       >
         <div className="min-w-0 flex-1">
@@ -292,13 +334,16 @@ export function PopupTextEditorField({
             className={cn(
               "line-clamp-3 text-sm leading-5",
               preview ? "text-foreground" : "text-muted-foreground",
-              previewClassName
+              previewClassName,
             )}
           >
             {preview || previewPlaceholder || placeholder}
           </p>
         </div>
-        <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted/70 text-muted-foreground transition group-hover:bg-muted" aria-hidden="true">
+        <span
+          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted/70 text-muted-foreground transition group-hover:bg-muted"
+          aria-hidden="true"
+        >
           <FilePenLine className="h-4 w-4" />
         </span>
       </button>
@@ -311,11 +356,20 @@ export function PopupTextEditorField({
         }}
         modal
       >
-        <DialogContent className={cn(COMMAND_SHELL_CLASSNAME, "bg-[rgba(245,245,247,0.92)] backdrop-blur-xl dark:bg-[rgba(29,29,31,0.92)]")}>
+        <DialogContent
+          className={cn(
+            COMMAND_SHELL_CLASSNAME,
+            "bg-[rgba(245,245,247,0.92)] backdrop-blur-xl dark:bg-[rgba(29,29,31,0.92)]",
+          )}
+        >
           <DialogHeader className="border-b border-black/10 px-5 py-4 dark:border-white/10">
-            <DialogTitle className="text-base font-semibold tracking-tight">{title}</DialogTitle>
+            <DialogTitle className="text-base font-semibold tracking-tight">
+              {title}
+            </DialogTitle>
             {description ? (
-              <DialogDescription className="text-sm leading-6">{description}</DialogDescription>
+              <DialogDescription className="text-sm leading-6">
+                {description}
+              </DialogDescription>
             ) : null}
           </DialogHeader>
 
@@ -327,7 +381,7 @@ export function PopupTextEditorField({
               className={cn(
                 "min-h-[220px] resize-none rounded-[22px] border-border/80 bg-background/90 px-4 py-3 text-sm leading-6 sm:min-h-[260px]",
                 invalid ? "border-rose-300 dark:border-rose-500/50" : "",
-                textareaClassName
+                textareaClassName,
               )}
             />
           </div>

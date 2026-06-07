@@ -34,7 +34,9 @@ function normalizeRoute(value: string | null | undefined) {
 function getRedirectTarget(route: string | null | undefined) {
   if (!route) return null;
   try {
-    return new URL(route, "https://native-test.local").searchParams.get("redirect");
+    return new URL(route, "https://native-test.local").searchParams.get(
+      "redirect",
+    );
   } catch {
     return null;
   }

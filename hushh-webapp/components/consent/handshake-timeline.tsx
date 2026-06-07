@@ -36,7 +36,9 @@ interface HandshakeTimelineProps {
   className?: string;
 }
 
-async function getIdTokenFromUser(user: ReturnType<typeof useAuth>["user"]): Promise<string | null> {
+async function getIdTokenFromUser(
+  user: ReturnType<typeof useAuth>["user"],
+): Promise<string | null> {
   if (!user) return null;
   try {
     return await user.getIdToken();
@@ -79,7 +81,9 @@ function actionLabel(action: string): string {
   return labels[action] || action.replace(/_/g, " ").toLowerCase();
 }
 
-function formatTimelineDate(value: number | string | null | undefined): string | null {
+function formatTimelineDate(
+  value: number | string | null | undefined,
+): string | null {
   if (!value) return null;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
@@ -154,7 +158,12 @@ export function HandshakeTimeline({
 
   if (error) {
     return (
-      <div className={cn("rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive", className)}>
+      <div
+        className={cn(
+          "rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive",
+          className,
+        )}
+      >
         {error}
       </div>
     );
@@ -162,7 +171,12 @@ export function HandshakeTimeline({
 
   if (entries.length === 0) {
     return (
-      <div className={cn("px-4 py-6 text-center text-sm text-muted-foreground", className)}>
+      <div
+        className={cn(
+          "px-4 py-6 text-center text-sm text-muted-foreground",
+          className,
+        )}
+      >
         No consent history with {counterpartLabel || "this connection"}.
       </div>
     );
@@ -180,7 +194,7 @@ export function HandshakeTimeline({
             <span
               className={cn(
                 "absolute -left-[5px] flex h-2.5 w-2.5 rounded-full ring-4 ring-background",
-                statusDot(entry.status)
+                statusDot(entry.status),
               )}
             />
 
@@ -193,7 +207,8 @@ export function HandshakeTimeline({
                 </p>
                 {entry.scope && (
                   <p className="mt-0.5 text-xs text-muted-foreground truncate">
-                    {entry.scope_description || humanizeConsentScope(entry.scope)}
+                    {entry.scope_description ||
+                      humanizeConsentScope(entry.scope)}
                   </p>
                 )}
                 {entry.issued_at && (

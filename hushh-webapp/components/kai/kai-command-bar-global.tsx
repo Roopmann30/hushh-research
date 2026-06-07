@@ -38,7 +38,7 @@ import { ApiService } from "@/lib/services/api-service";
 function getNullableString(
   record: Record<string, unknown>,
   snakeKey: string,
-  camelKey: string
+  camelKey: string,
 ): string | null {
   const value = record[snakeKey] ?? record[camelKey];
   if (typeof value !== "string") return null;
@@ -46,8 +46,16 @@ function getNullableString(
   return trimmed || null;
 }
 
-function normalizeActionStatus(raw: unknown): VoiceActionResult["status"] | null {
-  if (raw === "succeeded" || raw === "started" || raw === "blocked" || raw === "failed" || raw === "noop") {
+function normalizeActionStatus(
+  raw: unknown,
+): VoiceActionResult["status"] | null {
+  if (
+    raw === "succeeded" ||
+    raw === "started" ||
+    raw === "blocked" ||
+    raw === "failed" ||
+    raw === "noop"
+  ) {
     return raw;
   }
   if (raw === "invalid") {
@@ -56,7 +64,9 @@ function normalizeActionStatus(raw: unknown): VoiceActionResult["status"] | null
   return null;
 }
 
-function normalizeSettledBy(raw: unknown): VoiceActionResult["settled_by"] | undefined {
+function normalizeSettledBy(
+  raw: unknown,
+): VoiceActionResult["settled_by"] | undefined {
   if (
     raw === "none" ||
     raw === "route" ||
@@ -77,10 +87,16 @@ function normalizeVoiceActionResult(raw: unknown): VoiceActionResult | null {
       ? (envelope.actionResult as Record<string, unknown>)
       : envelope;
   const status = normalizeActionStatus(candidate.status);
-  const resultSummary = getNullableString(candidate, "result_summary", "resultSummary");
+  const resultSummary = getNullableString(
+    candidate,
+    "result_summary",
+    "resultSummary",
+  );
   if (!status || !resultSummary) return null;
   const data =
-    candidate.data && typeof candidate.data === "object" && !Array.isArray(candidate.data)
+    candidate.data &&
+    typeof candidate.data === "object" &&
+    !Array.isArray(candidate.data)
       ? (candidate.data as Record<string, unknown>)
       : undefined;
   return {
@@ -88,7 +104,11 @@ function normalizeVoiceActionResult(raw: unknown): VoiceActionResult | null {
     action_id: getNullableString(candidate, "action_id", "actionId"),
     route_before: getNullableString(candidate, "route_before", "routeBefore"),
     route_after: getNullableString(candidate, "route_after", "routeAfter"),
-    screen_before: getNullableString(candidate, "screen_before", "screenBefore"),
+    screen_before: getNullableString(
+      candidate,
+      "screen_before",
+      "screenBefore",
+    ),
     screen_after: getNullableString(candidate, "screen_after", "screenAfter"),
     settled_by: normalizeSettledBy(candidate.settled_by),
     result_summary: resultSummary,
@@ -104,7 +124,9 @@ function toBoolean(value: unknown): boolean | undefined {
   return undefined;
 }
 
-function computeAnalyzeEligibilityFromHolding(holding: Record<string, unknown>): boolean {
+function computeAnalyzeEligibilityFromHolding(
+  holding: Record<string, unknown>,
+): boolean {
   const isInvestable = toBoolean(holding.is_investable) === true;
   if (!isInvestable) return false;
 
@@ -142,7 +164,8 @@ export function KaiCommandBarGlobal() {
     riaSwitchAvailable,
     switchPersona,
   } = usePersonaState();
-  const { isVaultUnlocked, vaultOwnerToken, vaultKey, tokenExpiresAt } = useVault();
+  const { isVaultUnlocked, vaultOwnerToken, vaultKey, tokenExpiresAt } =
+    useVault();
   const handleBack = useCallback(() => {
     router.back();
   }, [router]);
@@ -150,13 +173,15 @@ export function KaiCommandBarGlobal() {
   const busyOperations = useKaiSession((s) => s.busyOperations);
   const analysisParams = useKaiSession((s) => s.analysisParams);
   const appendVoiceDebugEvent = useVoiceSession((s) => s.appendDebugEvent);
-  const setPendingConfirmation = useVoiceSession((s) => s.setPendingConfirmation);
+  const setPendingConfirmation = useVoiceSession(
+    (s) => s.setPendingConfirmation,
+  );
   const { lastToolName, lastTicker, setLastVoiceTurn } = useVoiceSession();
   const cache = useMemo(() => CacheService.getInstance(), []);
   const [hasPortfolioData, setHasPortfolioData] = useState(false);
   const [ttsPlaying, setTtsPlaying] = useState(false);
   const [backgroundTaskState, setBackgroundTaskState] = useState(() =>
-    AppBackgroundTaskService.getState()
+    AppBackgroundTaskService.getState(),
   );
   const chromeState = useMemo(() => getKaiChromeState(pathname), [pathname]);
   const userId = user?.uid ?? "";
@@ -189,7 +214,7 @@ export function KaiCommandBarGlobal() {
 
     const computeHasPortfolioFromCache = (): boolean | null => {
       const cachedPortfolio = cache.get<Record<string, unknown>>(
-        CACHE_KEYS.PORTFOLIO_DATA(user.uid)
+        CACHE_KEYS.PORTFOLIO_DATA(user.uid),
       );
       if (!cachedPortfolio || typeof cachedPortfolio !== "object") {
         return null;
@@ -200,11 +225,13 @@ export function KaiCommandBarGlobal() {
         !Array.isArray(cachedPortfolio.portfolio)
           ? (cachedPortfolio.portfolio as Record<string, unknown>)
           : null;
-      const holdings = (Array.isArray(cachedPortfolio.holdings) && cachedPortfolio.holdings
-        ? cachedPortfolio.holdings
-        : Array.isArray(nestedPortfolio?.holdings)
-          ? nestedPortfolio.holdings
-        : []) as Array<Record<string, unknown>>;
+      const holdings = (
+        Array.isArray(cachedPortfolio.holdings) && cachedPortfolio.holdings
+          ? cachedPortfolio.holdings
+          : Array.isArray(nestedPortfolio?.holdings)
+            ? nestedPortfolio.holdings
+            : []
+      ) as Array<Record<string, unknown>>;
       return holdings.length > 0;
     };
 
@@ -226,7 +253,12 @@ export function KaiCommandBarGlobal() {
 
     computeHasPortfolio();
     const unsubscribe = cache.subscribe((event) => {
-      if (event.type === "set" || event.type === "invalidate" || event.type === "invalidate_user" || event.type === "clear") {
+      if (
+        event.type === "set" ||
+        event.type === "invalidate" ||
+        event.type === "invalidate_user" ||
+        event.type === "clear"
+      ) {
         computeHasPortfolio();
       }
     });
@@ -237,36 +269,40 @@ export function KaiCommandBarGlobal() {
   }, [cache, user?.uid]);
 
   const reviewScreenActive = Boolean(
-    busyOperations["portfolio_review_active"] || busyOperations["portfolio_save"]
+    busyOperations["portfolio_review_active"] ||
+    busyOperations["portfolio_save"],
   );
   const reviewDirty = Boolean(
-    busyOperations["portfolio_review_active"] && busyOperations["portfolio_review_dirty"]
+    busyOperations["portfolio_review_active"] &&
+    busyOperations["portfolio_review_dirty"],
   );
 
   const portfolioTickers = useMemo(() => {
-    if (!user?.uid) return [] as Array<{
-      symbol: string;
-      name?: string;
-      sector?: string;
-      asset_type?: string;
-      is_investable?: boolean;
-      analyze_eligible?: boolean;
-    }>;
+    if (!user?.uid)
+      return [] as Array<{
+        symbol: string;
+        name?: string;
+        sector?: string;
+        asset_type?: string;
+        is_investable?: boolean;
+        analyze_eligible?: boolean;
+      }>;
 
     const cachedPortfolio =
       cache.get<Record<string, unknown>>(CACHE_KEYS.PORTFOLIO_DATA(user.uid)) ??
-      cache.get<Record<string, unknown>>(CACHE_KEYS.DOMAIN_DATA(user.uid, "financial"));
+      cache.get<Record<string, unknown>>(
+        CACHE_KEYS.DOMAIN_DATA(user.uid, "financial"),
+      );
     const nestedPortfolio =
       cachedPortfolio?.portfolio &&
       typeof cachedPortfolio.portfolio === "object" &&
       !Array.isArray(cachedPortfolio.portfolio)
         ? (cachedPortfolio.portfolio as Record<string, unknown>)
         : null;
-    const holdings = (
-      (Array.isArray(cachedPortfolio?.holdings) && cachedPortfolio.holdings) ||
+    const holdings = ((Array.isArray(cachedPortfolio?.holdings) &&
+      cachedPortfolio.holdings) ||
       (Array.isArray(nestedPortfolio?.holdings) && nestedPortfolio.holdings) ||
-      []
-    ) as Array<Record<string, unknown>>;
+      []) as Array<Record<string, unknown>>;
 
     const deduped = new Map<
       string,
@@ -280,7 +316,9 @@ export function KaiCommandBarGlobal() {
       }
     >();
     for (const holding of holdings) {
-      const symbol = String(holding.symbol || "").trim().toUpperCase();
+      const symbol = String(holding.symbol || "")
+        .trim()
+        .toUpperCase();
       if (!symbol) continue;
       if (deduped.has(symbol)) continue;
       deduped.set(symbol, {
@@ -288,7 +326,10 @@ export function KaiCommandBarGlobal() {
         name: holding.name ? String(holding.name) : undefined,
         sector: holding.sector ? String(holding.sector) : undefined,
         asset_type: holding.asset_type ? String(holding.asset_type) : undefined,
-        is_investable: typeof holding.is_investable === "boolean" ? holding.is_investable : undefined,
+        is_investable:
+          typeof holding.is_investable === "boolean"
+            ? holding.is_investable
+            : undefined,
         analyze_eligible: computeAnalyzeEligibilityFromHolding(holding),
       });
     }
@@ -297,19 +338,27 @@ export function KaiCommandBarGlobal() {
 
   const signedIn = Boolean(user?.uid);
   const tokenAvailable = Boolean(vaultOwnerToken);
-  const tokenValid = Boolean(vaultOwnerToken) && (!tokenExpiresAt || tokenExpiresAt > Date.now());
-  const localVoiceReady = signedIn && isVaultUnlocked && tokenAvailable && tokenValid;
+  const tokenValid =
+    Boolean(vaultOwnerToken) &&
+    (!tokenExpiresAt || tokenExpiresAt > Date.now());
+  const localVoiceReady =
+    signedIn && isVaultUnlocked && tokenAvailable && tokenValid;
   const routeQuery = searchParams?.toString() || "";
-  const pathnameWithQuery = routeQuery ? `${pathname || ""}?${routeQuery}` : pathname || "";
+  const pathnameWithQuery = routeQuery
+    ? `${pathname || ""}?${routeQuery}`
+    : pathname || "";
   const routeInfo = useMemo(
     () => deriveVoiceRouteScreen(pathname || "", routeQuery),
-    [pathname, routeQuery]
+    [pathname, routeQuery],
   );
   const useRiaActionBar = useMemo(
     () => isRiaActionBarRoute(pathname),
-    [pathname]
+    [pathname],
   );
-  const voiceEligibleRoute = isVoiceEligibleRouteScreen(routeInfo.screen, chromeState.hideCommandBar);
+  const voiceEligibleRoute = isVoiceEligibleRouteScreen(
+    routeInfo.screen,
+    chromeState.hideCommandBar,
+  );
 
   useEffect(() => {
     if (!voiceEligibleRoute) {
@@ -367,8 +416,11 @@ export function KaiCommandBarGlobal() {
   }, [localVoiceReady, userId, vaultOwnerToken, voiceEligibleRoute]);
 
   const voiceCapabilityReady = voiceCapabilityState.status === "ready";
-  const voiceCapabilityEnabled = !localVoiceReady ? false : voiceCapabilityState.enabled;
-  const voiceAvailable = localVoiceReady && voiceCapabilityReady && voiceCapabilityEnabled;
+  const voiceCapabilityEnabled = !localVoiceReady
+    ? false
+    : voiceCapabilityState.enabled;
+  const voiceAvailable =
+    localVoiceReady && voiceCapabilityReady && voiceCapabilityEnabled;
   const voiceVisibilityMode: "enabled" | "disabled" | "hidden" = voiceAvailable
     ? "enabled"
     : voiceEligibleRoute
@@ -382,7 +434,8 @@ export function KaiCommandBarGlobal() {
         ? "Unlock your vault to use voice"
         : voiceCapabilityState.status === "loading"
           ? "Checking voice availability..."
-          : voiceCapabilityState.reason || "Voice is not enabled for this account yet.";
+          : voiceCapabilityState.reason ||
+            "Voice is not enabled for this account yet.";
 
   const activeAnalysisTask = useMemo(() => {
     if (!userId) return null;
@@ -397,7 +450,7 @@ export function KaiCommandBarGlobal() {
           task.userId === userId &&
           task.kind === "portfolio_import_stream" &&
           task.status === "running" &&
-          !task.dismissedAt
+          !task.dismissedAt,
       ) || null
     );
   }, [backgroundTaskState.tasks, userId]);
@@ -421,13 +474,19 @@ export function KaiCommandBarGlobal() {
       runtime: {
         analysis_active:
           Boolean(busyOperations["stock_analysis_active"]) ||
-          Boolean(activeAnalysisTask && activeAnalysisTask.status === "running"),
-        analysis_ticker: activeAnalysisTask?.ticker || analysisParams?.ticker || null,
+          Boolean(
+            activeAnalysisTask && activeAnalysisTask.status === "running",
+          ),
+        analysis_ticker:
+          activeAnalysisTask?.ticker || analysisParams?.ticker || null,
         analysis_run_id: activeAnalysisTask?.runId || null,
         import_active:
-          Boolean(busyOperations["portfolio_import_stream"]) || Boolean(runningImportTask),
+          Boolean(busyOperations["portfolio_import_stream"]) ||
+          Boolean(runningImportTask),
         import_run_id: runningImportTask?.taskId || null,
-        busy_operations: Object.keys(busyOperations).filter((name) => busyOperations[name] === true),
+        busy_operations: Object.keys(busyOperations).filter(
+          (name) => busyOperations[name] === true,
+        ),
       },
       portfolio: {
         has_portfolio_data: hasPortfolioData,
@@ -435,9 +494,11 @@ export function KaiCommandBarGlobal() {
       persona: {
         active: activePersona,
         primary_nav: primaryNavPersona,
-        available: Array.isArray(personaState?.personas) && personaState.personas.length > 0
-          ? [...personaState.personas]
-          : [activePersona],
+        available:
+          Array.isArray(personaState?.personas) &&
+          personaState.personas.length > 0
+            ? [...personaState.personas]
+            : [activePersona],
         transition_target: personaTransitionTarget || null,
         ria_switch_available: riaSwitchAvailable,
         ria_setup_available: riaSetupAvailable,
@@ -473,7 +534,7 @@ export function KaiCommandBarGlobal() {
       primaryNavPersona,
       riaSetupAvailable,
       riaSwitchAvailable,
-    ]
+    ],
   );
 
   const voiceContext = useMemo(
@@ -494,7 +555,7 @@ export function KaiCommandBarGlobal() {
       lastToolName,
       pathname,
       routeQuery,
-    ]
+    ],
   );
 
   const appRuntimeStateRef = useRef(appRuntimeState);
@@ -519,11 +580,18 @@ export function KaiCommandBarGlobal() {
         currentScreen: currentRoute.screen,
       });
       console.info(
-        `[VOICE_UI] execute_kai_command command=${command} status=${result.status}${result.reason ? ` reason=${result.reason}` : ""}`
+        `[VOICE_UI] execute_kai_command command=${command} status=${result.status}${result.reason ? ` reason=${result.reason}` : ""}`,
       );
       return result;
     },
-    [busyOperations, hasPortfolioData, reviewDirty, router, setAnalysisParams, userId]
+    [
+      busyOperations,
+      hasPortfolioData,
+      reviewDirty,
+      router,
+      setAnalysisParams,
+      userId,
+    ],
   );
 
   const finalizeActionSettlement = useCallback(
@@ -538,7 +606,9 @@ export function KaiCommandBarGlobal() {
       const normalizedActionResult = normalizeVoiceActionResult(args.outcome);
       const expectedRoute =
         normalizedActionResult?.route_after ||
-        args.groundedPlan?.execution.steps.find((step) => step.type === "navigate")?.href ||
+        args.groundedPlan?.execution.steps.find(
+          (step) => step.type === "navigate",
+        )?.href ||
         null;
       const shouldWaitForSettlement =
         normalizedActionResult &&
@@ -575,9 +645,12 @@ export function KaiCommandBarGlobal() {
         });
         settledActionResult = {
           ...normalizedActionResult,
-          route_after: settlement.route_after ?? normalizedActionResult.route_after,
-          screen_after: settlement.screen_after ?? normalizedActionResult.screen_after,
-          settled_by: settlement.settled_by ?? normalizedActionResult.settled_by,
+          route_after:
+            settlement.route_after ?? normalizedActionResult.route_after,
+          screen_after:
+            settlement.screen_after ?? normalizedActionResult.screen_after,
+          settled_by:
+            settlement.settled_by ?? normalizedActionResult.settled_by,
           data:
             normalizedActionResult.data || settlement.data
               ? {
@@ -590,8 +663,10 @@ export function KaiCommandBarGlobal() {
 
       if (args.outcome.shortTermMemoryWrite) {
         setLastVoiceTurn({
-          transcript: args.groundedPlan?.actionId || args.actionId || "palette_action",
-          toolName: args.outcome.toolName ?? settledActionResult?.tool_name ?? null,
+          transcript:
+            args.groundedPlan?.actionId || args.actionId || "palette_action",
+          toolName:
+            args.outcome.toolName ?? settledActionResult?.tool_name ?? null,
           ticker: args.outcome.ticker ?? settledActionResult?.ticker ?? null,
           responseKind: args.outcome.responseKind,
           turnId: args.turnId || null,
@@ -603,7 +678,7 @@ export function KaiCommandBarGlobal() {
         actionResult: settledActionResult || args.outcome.actionResult,
       };
     },
-    [appendVoiceDebugEvent, setLastVoiceTurn]
+    [appendVoiceDebugEvent, setLastVoiceTurn],
   );
 
   const runGatewayAction = useCallback(
@@ -614,7 +689,8 @@ export function KaiCommandBarGlobal() {
       }
       const routeBefore = appRuntimeStateRef.current.route;
       const voiceToolCall: VoiceToolCall | null =
-        action.execution_target.status === "wired" && action.execution_target.path === "voice_tool"
+        action.execution_target.status === "wired" &&
+        action.execution_target.path === "voice_tool"
           ? ({
               tool_name: action.execution_target.target,
               args: action.execution_target.params || {},
@@ -632,23 +708,24 @@ export function KaiCommandBarGlobal() {
                             ? { symbol: slots.symbol.trim().toUpperCase() }
                             : {}),
                         }
-                      : (action.execution_target.params as Record<string, unknown> | undefined),
+                      : (action.execution_target.params as
+                          | Record<string, unknown>
+                          | undefined),
                 },
               } as VoiceToolCall)
             : null;
-      const response: VoiceResponse =
-        voiceToolCall
-          ? {
-              kind: "execute",
-              message: `Executing ${action.label}.`,
-              speak: true,
-              tool_call: voiceToolCall,
-            }
-          : {
-              kind: "speak_only",
-              message: `Opening ${action.label}.`,
-              speak: true,
-            };
+      const response: VoiceResponse = voiceToolCall
+        ? {
+            kind: "execute",
+            message: `Executing ${action.label}.`,
+            speak: true,
+            tool_call: voiceToolCall,
+          }
+        : {
+            kind: "speak_only",
+            message: `Opening ${action.label}.`,
+            speak: true,
+          };
 
       const groundedPlan = resolveGroundedVoicePlan({
         transcript:
@@ -720,7 +797,7 @@ export function KaiCommandBarGlobal() {
       vaultKey,
       vaultOwnerToken,
       voiceContext,
-    ]
+    ],
   );
 
   if (!mounted || loading || !user || reviewScreenActive) {
@@ -765,10 +842,7 @@ export function KaiCommandBarGlobal() {
           handleBack,
           switchPersona,
           executeKaiCommand: (toolCall) =>
-            runKaiCommand(
-              toolCall.args.command,
-              toolCall.args.params
-            ),
+            runKaiCommand(toolCall.args.command, toolCall.args.params),
           setAnalysisParams,
           emitTelemetry: (event, telemetryPayload) => {
             appendVoiceDebugEvent({
@@ -786,7 +860,8 @@ export function KaiCommandBarGlobal() {
         });
         return finalizeActionSettlement({
           turnId: payload.turnId,
-          actionId: payload.plan.action_id || payload.groundedPlan?.actionId || null,
+          actionId:
+            payload.plan.action_id || payload.groundedPlan?.actionId || null,
           planMode: payload.plan.mode,
           groundedPlan: payload.groundedPlan,
           outcome,

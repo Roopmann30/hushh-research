@@ -32,7 +32,8 @@ interface VaultMethodPromptProps {
 }
 
 function readableMethod(method: VaultMethod): string {
-  if (method === "generated_default_native_biometric") return "device biometric";
+  if (method === "generated_default_native_biometric")
+    return "device biometric";
   if (method === "generated_default_native_passkey_prf") return "passkey";
   if (method === "generated_default_web_prf") return "passkey";
   return "passphrase";
@@ -50,12 +51,14 @@ export function VaultMethodPrompt({ enabled }: VaultMethodPromptProps) {
     () =>
       resolvePasskeyRpId({
         isNative: Capacitor.isNativePlatform(),
-        hostname: typeof window !== "undefined" ? window.location.hostname : null,
+        hostname:
+          typeof window !== "undefined" ? window.location.hostname : null,
       }),
-    []
+    [],
   );
 
-  const canEvaluate = enabled && !loading && !!user?.uid && isVaultUnlocked && !!vaultKey;
+  const canEvaluate =
+    enabled && !loading && !!user?.uid && isVaultUnlocked && !!vaultKey;
 
   useEffect(() => {
     let cancelled = false;
@@ -73,10 +76,7 @@ export function VaultMethodPrompt({ enabled }: VaultMethodPromptProps) {
         // Avoid stacking prompts on top of the first-time /kai nav tour.
         if (pathname === "/kai") {
           const navTourState = await KaiNavTourLocalService.load(user.uid);
-          if (
-            !navTourState?.completed_at &&
-            !navTourState?.skipped_at
-          ) {
+          if (!navTourState?.completed_at && !navTourState?.skipped_at) {
             setOpen(false);
             setTargetMethod(null);
             return;
@@ -104,12 +104,15 @@ export function VaultMethodPrompt({ enabled }: VaultMethodPromptProps) {
         }
 
         const hasRecommendedWrapper =
-          VaultService.getWrapperByMethod(vaultState, capability.recommendedMethod) !== null;
+          VaultService.getWrapperByMethod(
+            vaultState,
+            capability.recommendedMethod,
+          ) !== null;
         if (hasRecommendedWrapper) {
           await VaultMethodPromptLocalService.dismiss(
             user.uid,
             capability.recommendedMethod,
-            currentRpId
+            currentRpId,
           );
           setOpen(false);
           setTargetMethod(capability.recommendedMethod as VaultMethod);
@@ -148,7 +151,8 @@ export function VaultMethodPrompt({ enabled }: VaultMethodPromptProps) {
   }, [targetMethod]);
 
   const description = useMemo(() => {
-    if (!targetMethod) return "Switch from passphrase unlock to a faster secure method.";
+    if (!targetMethod)
+      return "Switch from passphrase unlock to a faster secure method.";
     if (targetMethod === "generated_default_native_biometric") {
       return "Use device biometric authentication first. Passphrase and recovery key remain available.";
     }
@@ -161,7 +165,11 @@ export function VaultMethodPrompt({ enabled }: VaultMethodPromptProps) {
       return;
     }
 
-    await VaultMethodPromptLocalService.dismiss(user.uid, targetMethod, currentRpId);
+    await VaultMethodPromptLocalService.dismiss(
+      user.uid,
+      targetMethod,
+      currentRpId,
+    );
     setOpen(false);
   }
 
@@ -179,16 +187,18 @@ export function VaultMethodPrompt({ enabled }: VaultMethodPromptProps) {
       await VaultMethodPromptLocalService.dismiss(
         user.uid,
         result.method,
-        currentRpId
+        currentRpId,
       );
-      toast.success(`Vault unlock updated to ${readableMethod(result.method)}.`);
+      toast.success(
+        `Vault unlock updated to ${readableMethod(result.method)}.`,
+      );
       setOpen(false);
     } catch (error) {
       console.error("[VaultMethodPrompt] Failed to switch method:", error);
       toast.error(
         error instanceof Error
           ? error.message
-          : "Failed to update unlock method."
+          : "Failed to update unlock method.",
       );
     } finally {
       setBusy(false);

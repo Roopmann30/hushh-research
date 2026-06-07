@@ -33,7 +33,10 @@ const LEGAL_DOCS: Record<
   },
 };
 
-export function AuthLegalDialog({ docType, onOpenChange }: AuthLegalDialogProps) {
+export function AuthLegalDialog({
+  docType,
+  onOpenChange,
+}: AuthLegalDialogProps) {
   const isOpen = docType !== null;
   const content = docType ? LEGAL_DOCS[docType] : null;
 

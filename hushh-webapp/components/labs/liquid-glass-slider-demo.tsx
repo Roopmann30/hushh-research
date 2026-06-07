@@ -1,13 +1,23 @@
 "use client";
 
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import {
   LiquidGlassSceneProvider,
   LiquidGlassSceneRoot,
   useSceneMetrics,
 } from "@/components/labs/liquid-glass-scene";
-import { paintLabBackdrop, roundedRectPath } from "@/lib/labs/liquid-glass-scene-paint";
+import {
+  paintLabBackdrop,
+  roundedRectPath,
+} from "@/lib/labs/liquid-glass-scene-paint";
 import { useLiquidGlassRendererMode } from "@/components/labs/liquid-glass-renderer-mode";
 import { useSpringValue } from "@/lib/labs/liquid-glass-core";
 
@@ -70,40 +80,55 @@ export function LiquidGlassSliderDemo() {
       backgroundRepeat: "repeat, repeat, no-repeat",
       backgroundAttachment: "scroll",
     }),
-    []
+    [],
   );
 
   return (
     <LiquidGlassSceneProvider sceneStyle={sceneStyle}>
       <section className="space-y-5">
-      <div className="relative -ml-4 w-[calc(100%+32px)] overflow-hidden rounded-xl border border-black/10 px-8 py-12 text-black/5 dark:border-white/10 dark:text-white/5">
-        <LiquidGlassSceneRoot className="absolute inset-0">
-          <div className="absolute inset-x-10 top-10 grid grid-cols-3 gap-4">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <div
-                key={index}
-                className="h-24 rounded-[2rem] border border-white/10 bg-black/16"
-                style={{ opacity: 0.42 + index * 0.06 }}
-              />
-            ))}
-          </div>
-          <div className="absolute inset-x-10 bottom-10 grid grid-cols-5 gap-3">
-            {Array.from({ length: 10 }).map((_, index) => (
-              <div
-                key={index}
-                className="h-14 rounded-[1.5rem] border border-white/8 bg-white/8"
-                style={{ opacity: 0.24 + (index % 5) * 0.06 }}
-              />
-            ))}
-          </div>
-        </LiquidGlassSceneRoot>
+        <div className="relative -ml-4 w-[calc(100%+32px)] overflow-hidden rounded-xl border border-black/10 px-8 py-12 text-black/5 dark:border-white/10 dark:text-white/5">
+          <LiquidGlassSceneRoot className="absolute inset-0">
+            <div className="absolute inset-x-10 top-10 grid grid-cols-3 gap-4">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="h-24 rounded-[2rem] border border-white/10 bg-black/16"
+                  style={{ opacity: 0.42 + index * 0.06 }}
+                />
+              ))}
+            </div>
+            <div className="absolute inset-x-10 bottom-10 grid grid-cols-5 gap-3">
+              {Array.from({ length: 10 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="h-14 rounded-[1.5rem] border border-white/8 bg-white/8"
+                  style={{ opacity: 0.24 + (index % 5) * 0.06 }}
+                />
+              ))}
+            </div>
+          </LiquidGlassSceneRoot>
 
-        <div className="relative z-10 flex flex-col gap-10">
-          <SliderField label="Full Width (Large)" value={largeValue} onValueChange={setLargeValue} size="large" />
-          <SliderField label="Medium Container (Medium)" value={mediumValue} onValueChange={setMediumValue} size="medium" />
-          <SliderField label="Small Container (Small)" value={smallValue} onValueChange={setSmallValue} size="small" />
+          <div className="relative z-10 flex flex-col gap-10">
+            <SliderField
+              label="Full Width (Large)"
+              value={largeValue}
+              onValueChange={setLargeValue}
+              size="large"
+            />
+            <SliderField
+              label="Medium Container (Medium)"
+              value={mediumValue}
+              onValueChange={setMediumValue}
+              size="medium"
+            />
+            <SliderField
+              label="Small Container (Small)"
+              value={smallValue}
+              onValueChange={setSmallValue}
+              size="small"
+            />
+          </div>
         </div>
-      </div>
       </section>
     </LiquidGlassSceneProvider>
   );
@@ -123,10 +148,18 @@ function SliderField({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium uppercase tracking-[0.22em] text-black/50 dark:text-white/50">{label}</span>
-        <span className="text-xs font-mono text-black/60 dark:text-white/60">{value.toFixed(0)}</span>
+        <span className="text-xs font-medium uppercase tracking-[0.22em] text-black/50 dark:text-white/50">
+          {label}
+        </span>
+        <span className="text-xs font-mono text-black/60 dark:text-white/60">
+          {value.toFixed(0)}
+        </span>
       </div>
-      <LiquidGlassSlider value={value} onValueChange={onValueChange} size={size} />
+      <LiquidGlassSlider
+        value={value}
+        onValueChange={onValueChange}
+        size={size}
+      />
     </div>
   );
 }
@@ -196,7 +229,10 @@ function LiquidGlassSlider({
       motionTimeoutRef.current = setTimeout(() => setMotionActive(false), 70);
       const deltaX = event.clientX - startXRef.current;
       const maxThumbX = Math.max(0, containerWidth - dimensions.thumbWidth);
-      const newThumbX = Math.max(0, Math.min(maxThumbX, startThumbXRef.current + deltaX));
+      const newThumbX = Math.max(
+        0,
+        Math.min(maxThumbX, startThumbXRef.current + deltaX),
+      );
       setThumbX(newThumbX);
       const normalizedValue = newThumbX / Math.max(1, maxThumbX);
       const nextValue = min + normalizedValue * (max - min);
@@ -215,7 +251,15 @@ function LiquidGlassSlider({
       window.removeEventListener("pointermove", handleMove);
       window.removeEventListener("pointerup", handleUp);
     };
-  }, [containerWidth, dimensions.thumbWidth, disabled, dragging, max, min, onValueChange]);
+  }, [
+    containerWidth,
+    dimensions.thumbWidth,
+    disabled,
+    dragging,
+    max,
+    min,
+    onValueChange,
+  ]);
 
   useEffect(() => {
     return () => {
@@ -226,7 +270,11 @@ function LiquidGlassSlider({
   const pressMultiplier = dragging ? 0.9 : 0.4;
   const scaleSpring = dragging ? SCALE_DRAG : SCALE_REST;
   const backgroundOpacity = dragging ? 0.1 : 1;
-  const visualState = dragging ? (motionActive ? "dragging" : "held") : "active";
+  const visualState = dragging
+    ? motionActive
+      ? "dragging"
+      : "held"
+    : "active";
   const springThumbX = useSpringValue(thumbX, {
     stiffness: 140,
     damping: 18,
@@ -255,10 +303,13 @@ function LiquidGlassSlider({
       dimensions.thumbRadius,
       dimensions.thumbWidth,
       pressMultiplier,
-    ]
+    ],
   );
   const paintMirrorScene = useCallback(
-    (ctx: CanvasRenderingContext2D, env: { width: number; height: number; scale: number; padding?: number }) => {
+    (
+      ctx: CanvasRenderingContext2D,
+      env: { width: number; height: number; scale: number; padding?: number },
+    ) => {
       paintLabBackdrop(ctx, {
         width: env.width,
         height: env.height,
@@ -276,7 +327,10 @@ function LiquidGlassSlider({
         trackTop: (dimensions.thumbHeight - dimensions.sliderHeight) / 2,
         sliderWidth: containerWidth,
         sliderHeight: dimensions.sliderHeight,
-        fillWidth: Math.max(0, springThumbX + dimensions.thumbWidth / 2 - trackLeftInset),
+        fillWidth: Math.max(
+          0,
+          springThumbX + dimensions.thumbWidth / 2 - trackLeftInset,
+        ),
       });
       ctx.restore();
     },
@@ -291,7 +345,7 @@ function LiquidGlassSlider({
       metrics.height,
       springThumbX,
       trackLeftInset,
-    ]
+    ],
   );
 
   return (
@@ -301,7 +355,9 @@ function LiquidGlassSlider({
       style={{ height: dimensions.thumbHeight }}
     >
       <div
-        className={disabled ? "absolute cursor-not-allowed" : "absolute cursor-pointer"}
+        className={
+          disabled ? "absolute cursor-not-allowed" : "absolute cursor-pointer"
+        }
         style={{
           height: dimensions.sliderHeight,
           top: (dimensions.thumbHeight - dimensions.sliderHeight) / 2,
@@ -319,7 +375,10 @@ function LiquidGlassSlider({
           <div
             style={{
               height: dimensions.sliderHeight,
-              width: Math.max(0, springThumbX + dimensions.thumbWidth / 2 - trackLeftInset),
+              width: Math.max(
+                0,
+                springThumbX + dimensions.thumbWidth / 2 - trackLeftInset,
+              ),
               borderRadius: dimensions.sliderHeight / 2,
               backgroundColor: "#0377F7",
               boxShadow: "inset 0 1px 0 rgba(255,255,255,0.18)",
@@ -398,15 +457,27 @@ function paintSliderSubstrate(
     sliderWidth: number;
     sliderHeight: number;
     fillWidth: number;
-  }
+  },
 ) {
   const trackWidth = Math.max(0, sliderWidth - trackLeftInset * 2);
   const radius = sliderHeight / 2;
-  const gradient = ctx.createLinearGradient(0, trackTop, 0, trackTop + sliderHeight);
+  const gradient = ctx.createLinearGradient(
+    0,
+    trackTop,
+    0,
+    trackTop + sliderHeight,
+  );
   gradient.addColorStop(0, "rgba(255,255,255,0.08)");
   gradient.addColorStop(0.34, "rgba(255,255,255,0.02)");
   gradient.addColorStop(1, "rgba(20,23,30,0.12)");
-  roundedRectPath(ctx, trackLeftInset, trackTop, trackWidth, sliderHeight, radius);
+  roundedRectPath(
+    ctx,
+    trackLeftInset,
+    trackTop,
+    trackWidth,
+    sliderHeight,
+    radius,
+  );
   ctx.fillStyle = gradient;
   ctx.fill();
   ctx.strokeStyle = "rgba(255,255,255,0.09)";
@@ -414,17 +485,45 @@ function paintSliderSubstrate(
   ctx.stroke();
 
   ctx.save();
-  roundedRectPath(ctx, trackLeftInset, trackTop, trackWidth, sliderHeight, radius);
+  roundedRectPath(
+    ctx,
+    trackLeftInset,
+    trackTop,
+    trackWidth,
+    sliderHeight,
+    radius,
+  );
   ctx.clip();
-  roundedRectPath(ctx, trackLeftInset, trackTop, fillWidth, sliderHeight, radius);
+  roundedRectPath(
+    ctx,
+    trackLeftInset,
+    trackTop,
+    fillWidth,
+    sliderHeight,
+    radius,
+  );
   ctx.fillStyle = "#0377F7";
   ctx.fill();
-  roundedRectPath(ctx, trackLeftInset, trackTop, fillWidth, sliderHeight * 0.52, radius);
+  roundedRectPath(
+    ctx,
+    trackLeftInset,
+    trackTop,
+    fillWidth,
+    sliderHeight * 0.52,
+    radius,
+  );
   ctx.fillStyle = "rgba(255,255,255,0.18)";
   ctx.fill();
   ctx.restore();
 
-  roundedRectPath(ctx, trackLeftInset + 1, trackTop + 1, trackWidth - 2, sliderHeight * 0.42, radius - 1);
+  roundedRectPath(
+    ctx,
+    trackLeftInset + 1,
+    trackTop + 1,
+    trackWidth - 2,
+    sliderHeight * 0.42,
+    radius - 1,
+  );
   ctx.fillStyle = "rgba(255,255,255,0.075)";
   ctx.fill();
 }

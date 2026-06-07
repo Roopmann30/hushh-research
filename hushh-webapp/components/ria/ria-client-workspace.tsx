@@ -3,10 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Loader2,
-  Unplug,
-} from "lucide-react";
+import { Loader2, Unplug } from "lucide-react";
 
 import { PopupTextEditorField } from "@/components/app-ui/command-fields";
 import {
@@ -80,7 +77,9 @@ function branchBadgeClass(status: RiaAccountBranch["status"]) {
 }
 
 function asRecord(value: unknown): Record<string, unknown> {
-  return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+  return value && typeof value === "object"
+    ? (value as Record<string, unknown>)
+    : {};
 }
 
 function asPercent(value: unknown) {
@@ -106,7 +105,10 @@ function scalarSummaryRows(financial: Record<string, unknown>) {
     ["Equities", asPercent(allocation.equities)],
     ["Bonds", asPercent(allocation.bonds)],
   ] as const;
-  return keys.filter(([, value]) => value !== null && value !== undefined && String(value).trim() !== "");
+  return keys.filter(
+    ([, value]) =>
+      value !== null && value !== undefined && String(value).trim() !== "",
+  );
 }
 
 const ALLOCATION_COLORS: Record<string, string> = {
@@ -116,7 +118,11 @@ const ALLOCATION_COLORS: Record<string, string> = {
   other: "#94a3b8",
 };
 
-function AllocationBar({ allocation }: { allocation: Record<string, unknown> }) {
+function AllocationBar({
+  allocation,
+}: {
+  allocation: Record<string, unknown>;
+}) {
   const segments = ["equities", "bonds", "cash", "other"]
     .map((key) => ({ key, value: Number(allocation[key]) || 0 }))
     .filter((segment) => segment.value > 0);
@@ -130,7 +136,8 @@ function AllocationBar({ allocation }: { allocation: Record<string, unknown> }) 
             className="h-full transition-all"
             style={{
               width: `${Math.round(segment.value * 100)}%`,
-              backgroundColor: ALLOCATION_COLORS[segment.key] || ALLOCATION_COLORS.other,
+              backgroundColor:
+                ALLOCATION_COLORS[segment.key] || ALLOCATION_COLORS.other,
             }}
           />
         ))}
@@ -140,10 +147,15 @@ function AllocationBar({ allocation }: { allocation: Record<string, unknown> }) 
           <span key={segment.key} className="inline-flex items-center gap-1.5">
             <span
               className="inline-block h-2 w-2 rounded-full"
-              style={{ backgroundColor: ALLOCATION_COLORS[segment.key] || ALLOCATION_COLORS.other }}
+              style={{
+                backgroundColor:
+                  ALLOCATION_COLORS[segment.key] || ALLOCATION_COLORS.other,
+              }}
             />
             <span className="capitalize">{segment.key}</span>
-            <span className="font-medium text-foreground">{Math.round(segment.value * 100)}%</span>
+            <span className="font-medium text-foreground">
+              {Math.round(segment.value * 100)}%
+            </span>
           </span>
         ))}
       </div>
@@ -153,13 +165,13 @@ function AllocationBar({ allocation }: { allocation: Record<string, unknown> }) 
 
 function defaultScopesForTemplate(
   detail: RiaClientDetail,
-  template: RiaRequestScopeTemplate | null
+  template: RiaRequestScopeTemplate | null,
 ) {
   if (!template) return [];
   const available = new Set(
     detail.available_scope_metadata
       .filter((scope) => scope.available !== false)
-      .map((scope) => scope.scope)
+      .map((scope) => scope.scope),
   );
   return template.scopes
     .map((scope) => scope.scope)
@@ -168,11 +180,11 @@ function defaultScopesForTemplate(
 
 function visibleScopesForTemplate(
   detail: RiaClientDetail,
-  template: RiaRequestScopeTemplate | null
+  template: RiaRequestScopeTemplate | null,
 ): RiaAvailableScopeMetadata[] {
   if (!template) return [];
   const availableByScope = new Map(
-    detail.available_scope_metadata.map((scope) => [scope.scope, scope])
+    detail.available_scope_metadata.map((scope) => [scope.scope, scope]),
   );
   return template.scopes
     .map((scope) => availableByScope.get(scope.scope) || null)
@@ -181,13 +193,13 @@ function visibleScopesForTemplate(
 
 function defaultAccountIdsForTemplate(
   detail: RiaClientDetail,
-  template: RiaRequestScopeTemplate | null
+  template: RiaRequestScopeTemplate | null,
 ) {
   if (!template?.requires_account_selection) return [];
   const branchIds = detail.account_branches.map((branch) => branch.branch_id);
   if (detail.kai_specialized_bundle?.selected_account_ids?.length) {
-    return detail.kai_specialized_bundle.selected_account_ids.filter((branchId) =>
-      branchIds.includes(branchId)
+    return detail.kai_specialized_bundle.selected_account_ids.filter(
+      (branchId) => branchIds.includes(branchId),
     );
   }
   return branchIds;
@@ -205,7 +217,9 @@ function explorerDomainSummary(domainKey: string, summary: unknown) {
       .join(" • ");
   }
   const keys = Object.keys(record);
-  return keys.length > 0 ? `${keys.length} summary fields indexed` : "Summary unavailable";
+  return keys.length > 0
+    ? `${keys.length} summary fields indexed`
+    : "Summary unavailable";
 }
 
 function formatDomainLabel(value: string) {
@@ -275,12 +289,14 @@ export function RiaClientWorkspace({
   }, [initialTab]);
 
   const activeTemplate =
-    detail?.requestable_scope_templates.find((template) => template.template_id === selectedTemplateId) ||
+    detail?.requestable_scope_templates.find(
+      (template) => template.template_id === selectedTemplateId,
+    ) ||
     detail?.requestable_scope_templates[0] ||
     null;
   const availableScopeOptions = useMemo(
     () => (detail ? visibleScopesForTemplate(detail, activeTemplate) : []),
-    [activeTemplate, detail]
+    [activeTemplate, detail],
   );
   const consentManagerHref = buildRiaConsentManagerHref("pending", {
     from: buildRiaClientWorkspaceRoute(clientId, {
@@ -292,12 +308,16 @@ export function RiaClientWorkspace({
   useEffect(() => {
     if (!detail) return;
     const defaultTemplate =
-      detail.requestable_scope_templates.find((template) => template.template_id === selectedTemplateId) ||
+      detail.requestable_scope_templates.find(
+        (template) => template.template_id === selectedTemplateId,
+      ) ||
       detail.requestable_scope_templates[0] ||
       null;
     setSelectedTemplateId(defaultTemplate?.template_id || "");
     setSelectedScopes(defaultScopesForTemplate(detail, defaultTemplate));
-    setSelectedAccountIds(defaultAccountIdsForTemplate(detail, defaultTemplate));
+    setSelectedAccountIds(
+      defaultAccountIdsForTemplate(detail, defaultTemplate),
+    );
   }, [detail, selectedTemplateId]);
 
   async function handleDisconnect() {
@@ -310,11 +330,16 @@ export function RiaClientWorkspace({
         investor_user_id: detail.investor_user_id,
       });
       toast.success("Relationship disconnected", {
-        description: "Access ended immediately. History stays available if you reconnect.",
+        description:
+          "Access ended immediately. History stays available if you reconnect.",
       });
       router.push(ROUTES.RIA_CLIENTS);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to disconnect relationship");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to disconnect relationship",
+      );
     } finally {
       setDisconnecting(false);
     }
@@ -326,7 +351,10 @@ export function RiaClientWorkspace({
       toast.error("Select at least one access area to request.");
       return;
     }
-    if (activeTemplate.requires_account_selection && selectedAccountIds.length === 0) {
+    if (
+      activeTemplate.requires_account_selection &&
+      selectedAccountIds.length === 0
+    ) {
       toast.error("Select at least one account for this request.");
       return;
     }
@@ -338,7 +366,9 @@ export function RiaClientWorkspace({
         subject_user_id: detail.investor_user_id,
         scope_template_id: activeTemplate.template_id,
         selected_scopes: selectedScopes,
-        selected_account_ids: activeTemplate.requires_account_selection ? selectedAccountIds : [],
+        selected_account_ids: activeTemplate.requires_account_selection
+          ? selectedAccountIds
+          : [],
         reason: requestReason.trim() || undefined,
       });
       toast.success("Access request sent", {
@@ -347,24 +377,36 @@ export function RiaClientWorkspace({
       setRequestReason("");
       await refreshWorkspace();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to send access request");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to send access request",
+      );
     } finally {
       setRequestingAccess(false);
     }
   }
 
-  const activeBundle = detail?.kai_specialized_bundle || workspace?.kai_specialized_bundle || null;
+  const activeBundle =
+    detail?.kai_specialized_bundle || workspace?.kai_specialized_bundle || null;
   const activeAccountBranches =
-    detail?.account_branches || workspace?.account_branches || EMPTY_ACCOUNT_BRANCHES;
-  const financialSummary = asRecord(asRecord(workspace?.domain_summaries || detail?.domain_summaries).financial);
+    detail?.account_branches ||
+    workspace?.account_branches ||
+    EMPTY_ACCOUNT_BRANCHES;
+  const financialSummary = asRecord(
+    asRecord(workspace?.domain_summaries || detail?.domain_summaries).financial,
+  );
   const summaryRows = scalarSummaryRows(financialSummary);
-  const approvedAccountCount = activeAccountBranches.filter((branch) => branch.status === "approved").length;
+  const approvedAccountCount = activeAccountBranches.filter(
+    (branch) => branch.status === "approved",
+  ).length;
   const voiceSurfaceMetadata = useMemo(
     () => ({
       screenId: "ria_client_workspace",
       title: "RIA Client Workspace",
       purpose: "Advisor workspace for one connected investor.",
-      primaryEntity: detail?.investor_display_name || detail?.investor_email || clientId,
+      primaryEntity:
+        detail?.investor_display_name || detail?.investor_email || clientId,
       sections: [
         {
           id: "ria_client_workspace_tabs",
@@ -408,7 +450,8 @@ export function RiaClientWorkspace({
           id: "ria_client_workspace_send_request",
           label: "Send request",
           type: "button",
-          state: activeTab === "access" && !isTestProfile ? "available" : "hidden",
+          state:
+            activeTab === "access" && !isTestProfile ? "available" : "hidden",
           actionId: "ria.client_workspace.request_access",
         },
         {
@@ -422,23 +465,39 @@ export function RiaClientWorkspace({
           id: "ria_client_workspace_disconnect",
           label: "Disconnect",
           type: "button",
-          state: detail && !detail.is_self_relationship && !isTestProfile ? "available" : "hidden",
+          state:
+            detail && !detail.is_self_relationship && !isTestProfile
+              ? "available"
+              : "hidden",
           actionId: "ria.client_workspace.disconnect_relationship",
         },
         ...activeAccountBranches.slice(0, 8).map((branch, index) => ({
           id: `ria_client_workspace_account_row_${index + 1}`,
-          label: branch.name || branch.official_name || branch.account_id || "Account",
+          label:
+            branch.name ||
+            branch.official_name ||
+            branch.account_id ||
+            "Account",
           type: "button",
           actionId: "ria.client_workspace.open_account_detail",
           description: branch.status || null,
         })),
       ],
       activeTab,
-      visibleModules: ["Workspace tabs", "Client summary", "Access", "Portfolio", "Data"],
-      selectedEntity: detail?.investor_display_name || detail?.investor_email || clientId,
+      visibleModules: [
+        "Workspace tabs",
+        "Client summary",
+        "Access",
+        "Portfolio",
+        "Data",
+      ],
+      selectedEntity:
+        detail?.investor_display_name || detail?.investor_email || clientId,
       selectedObjects: activeAccountBranches
         .slice(0, 8)
-        .map((branch) => branch.name || branch.official_name || branch.account_id)
+        .map(
+          (branch) => branch.name || branch.official_name || branch.account_id,
+        )
         .filter((value): value is string => Boolean(value)),
       busyOperations: [
         ...(requestingAccess ? ["ria_client_requesting_access"] : []),
@@ -462,7 +521,7 @@ export function RiaClientWorkspace({
       disconnecting,
       isTestProfile,
       requestingAccess,
-    ]
+    ],
   );
   usePublishVoiceSurfaceMetadata(voiceSurfaceMetadata);
 
@@ -514,7 +573,11 @@ export function RiaClientWorkspace({
             onClick={() => void handleDisconnect()}
             disabled={disconnecting}
           >
-            {disconnecting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Unplug className="mr-2 h-4 w-4" />}
+            {disconnecting ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Unplug className="mr-2 h-4 w-4" />
+            )}
             Disconnect
           </Button>
         ) : null
@@ -556,7 +619,7 @@ export function RiaClientWorkspace({
                 }),
                 {
                   scroll: false,
-                }
+                },
               );
             }}
             options={[
@@ -571,14 +634,22 @@ export function RiaClientWorkspace({
             <div className="grid gap-4 xl:grid-cols-[0.92fr_1.08fr]">
               <RiaSurface className="space-y-3 p-4 sm:p-5">
                 <div className="space-y-1">
-                  <p className="text-sm font-semibold tracking-tight text-foreground">At a glance</p>
+                  <p className="text-sm font-semibold tracking-tight text-foreground">
+                    At a glance
+                  </p>
                   <p className="text-sm leading-6 text-muted-foreground">
                     The current relationship state and what is ready right now.
                   </p>
                 </div>
                 <SettingsGroup embedded>
-                  <SettingsRow title="Relationship" description={formatStatusLabel(detail.relationship_status)} />
-                  <SettingsRow title="Portfolio" description={portfolioViewHelper(activeBundle?.status)} />
+                  <SettingsRow
+                    title="Relationship"
+                    description={formatStatusLabel(detail.relationship_status)}
+                  />
+                  <SettingsRow
+                    title="Portfolio"
+                    description={portfolioViewHelper(activeBundle?.status)}
+                  />
                   <SettingsRow
                     title="Accounts ready"
                     description={
@@ -589,14 +660,19 @@ export function RiaClientWorkspace({
                   />
                   <SettingsRow
                     title="Next step"
-                    description={detail.next_action || "Everything is ready for the next review."}
+                    description={
+                      detail.next_action ||
+                      "Everything is ready for the next review."
+                    }
                   />
                 </SettingsGroup>
               </RiaSurface>
 
               <RiaSurface className="space-y-3 p-4 sm:p-5">
                 <div className="space-y-1">
-                  <p className="text-sm font-semibold tracking-tight text-foreground">Accounts</p>
+                  <p className="text-sm font-semibold tracking-tight text-foreground">
+                    Accounts
+                  </p>
                   <p className="text-sm leading-6 text-muted-foreground">
                     Open an account to view the client summary for that account.
                   </p>
@@ -623,9 +699,13 @@ export function RiaClientWorkspace({
                         }
                         onClick={() =>
                           router.push(
-                            buildRiaClientAccountRoute(clientId, branch.branch_id, {
-                              testProfile: isTestProfile,
-                            })
+                            buildRiaClientAccountRoute(
+                              clientId,
+                              branch.branch_id,
+                              {
+                                testProfile: isTestProfile,
+                              },
+                            ),
                           )
                         }
                         chevron
@@ -639,16 +719,23 @@ export function RiaClientWorkspace({
 
           {activeTab === "access" ? (
             <div className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
-              <RiaSurface className="space-y-3 p-4 sm:p-5" data-testid="ria-client-workspace-access">
+              <RiaSurface
+                className="space-y-3 p-4 sm:p-5"
+                data-testid="ria-client-workspace-access"
+              >
                 <div className="space-y-1">
-                  <p className="text-sm font-semibold tracking-tight text-foreground">Current sharing</p>
+                  <p className="text-sm font-semibold tracking-tight text-foreground">
+                    Current sharing
+                  </p>
                   <p className="text-sm leading-6 text-muted-foreground">
                     What the client already shares with you today.
                   </p>
                 </div>
                 <SettingsGroup embedded>
                   {detail.granted_scopes.length === 0 ? (
-                    <div className="px-4 py-4 text-sm text-muted-foreground">No active sharing yet.</div>
+                    <div className="px-4 py-4 text-sm text-muted-foreground">
+                      No active sharing yet.
+                    </div>
                   ) : (
                     detail.granted_scopes.map((scope) => (
                       <SettingsRow
@@ -683,9 +770,13 @@ export function RiaClientWorkspace({
                       }
                       onClick={() =>
                         router.push(
-                          buildRiaClientAccountRoute(clientId, branch.branch_id, {
-                            testProfile: isTestProfile,
-                          })
+                          buildRiaClientAccountRoute(
+                            clientId,
+                            branch.branch_id,
+                            {
+                              testProfile: isTestProfile,
+                            },
+                          ),
                         )
                       }
                       chevron
@@ -696,8 +787,13 @@ export function RiaClientWorkspace({
 
               <RiaSurface className="space-y-4 p-4 sm:p-5">
                 <div className="space-y-1">
-                  <p className="text-sm font-semibold tracking-tight text-foreground">Request more</p>
-                  <p className="text-sm leading-6 text-muted-foreground">Choose what you need, then send it to the client for approval.</p>
+                  <p className="text-sm font-semibold tracking-tight text-foreground">
+                    Request more
+                  </p>
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    Choose what you need, then send it to the client for
+                    approval.
+                  </p>
                 </div>
                 {detail.requestable_scope_templates.length === 0 ? (
                   <p className="text-sm text-muted-foreground">
@@ -709,13 +805,25 @@ export function RiaClientWorkspace({
                       {detail.requestable_scope_templates.map((template) => (
                         <Button
                           key={template.template_id}
-                          variant={selectedTemplateId === template.template_id ? "blue-gradient" : "none"}
-                          effect={selectedTemplateId === template.template_id ? "fill" : "fade"}
+                          variant={
+                            selectedTemplateId === template.template_id
+                              ? "blue-gradient"
+                              : "none"
+                          }
+                          effect={
+                            selectedTemplateId === template.template_id
+                              ? "fill"
+                              : "fade"
+                          }
                           size="sm"
                           onClick={() => {
                             setSelectedTemplateId(template.template_id);
-                            setSelectedScopes(defaultScopesForTemplate(detail, template));
-                            setSelectedAccountIds(defaultAccountIdsForTemplate(detail, template));
+                            setSelectedScopes(
+                              defaultScopesForTemplate(detail, template),
+                            );
+                            setSelectedAccountIds(
+                              defaultAccountIdsForTemplate(detail, template),
+                            );
                           }}
                         >
                           {requestTemplateLabel(template)}
@@ -739,14 +847,20 @@ export function RiaClientWorkspace({
                                   setSelectedScopes((current) =>
                                     shouldCheck
                                       ? [...new Set([...current, scope.scope])]
-                                      : current.filter((value) => value !== scope.scope)
+                                      : current.filter(
+                                          (value) => value !== scope.scope,
+                                        ),
                                   );
                                 }}
                                 className="mt-1"
                               />
                               <div className="space-y-1">
-                                <p className="text-sm font-medium text-foreground">{scope.label}</p>
-                                <p className="text-xs leading-5 text-muted-foreground">{scope.description}</p>
+                                <p className="text-sm font-medium text-foreground">
+                                  {scope.label}
+                                </p>
+                                <p className="text-xs leading-5 text-muted-foreground">
+                                  {scope.description}
+                                </p>
                               </div>
                             </label>
                           );
@@ -758,11 +872,14 @@ export function RiaClientWorkspace({
                       <SettingsGroup embedded title="Choose accounts">
                         {activeAccountBranches.length === 0 ? (
                           <div className="px-4 py-4 text-sm text-muted-foreground">
-                            No linked accounts are available for account-level approval yet.
+                            No linked accounts are available for account-level
+                            approval yet.
                           </div>
                         ) : (
                           activeAccountBranches.map((branch) => {
-                            const checked = selectedAccountIds.includes(branch.branch_id);
+                            const checked = selectedAccountIds.includes(
+                              branch.branch_id,
+                            );
                             return (
                               <label
                                 key={branch.branch_id}
@@ -774,8 +891,16 @@ export function RiaClientWorkspace({
                                     const shouldCheck = Boolean(next);
                                     setSelectedAccountIds((current) =>
                                       shouldCheck
-                                        ? [...new Set([...current, branch.branch_id])]
-                                        : current.filter((value) => value !== branch.branch_id)
+                                        ? [
+                                            ...new Set([
+                                              ...current,
+                                              branch.branch_id,
+                                            ]),
+                                          ]
+                                        : current.filter(
+                                            (value) =>
+                                              value !== branch.branch_id,
+                                          ),
                                     );
                                   }}
                                   className="mt-1"
@@ -786,12 +911,20 @@ export function RiaClientWorkspace({
                                       {branch.name}
                                       {branch.mask ? ` ••${branch.mask}` : ""}
                                     </p>
-                                    <Badge className={branchBadgeClass(branch.status)}>
+                                    <Badge
+                                      className={branchBadgeClass(
+                                        branch.status,
+                                      )}
+                                    >
                                       {formatStatusLabel(branch.status)}
                                     </Badge>
                                   </div>
                                   <p className="text-xs text-muted-foreground">
-                                    {[branch.institution_name, branch.type, branch.subtype]
+                                    {[
+                                      branch.institution_name,
+                                      branch.type,
+                                      branch.subtype,
+                                    ]
                                       .filter(Boolean)
                                       .join(" • ") || "Linked account"}
                                   </p>
@@ -819,9 +952,15 @@ export function RiaClientWorkspace({
                         effect="fill"
                         data-voice-control-id="ria_client_workspace_send_request"
                         onClick={() => void handleRequestAccess()}
-                        disabled={requestingAccess || availableScopeOptions.length === 0 || isTestProfile}
+                        disabled={
+                          requestingAccess ||
+                          availableScopeOptions.length === 0 ||
+                          isTestProfile
+                        }
                       >
-                        {requestingAccess ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        {requestingAccess ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : null}
                         Send request
                       </Button>
                       <Button asChild variant="none" effect="fade">
@@ -843,22 +982,32 @@ export function RiaClientWorkspace({
             <div className="space-y-4" data-testid="ria-client-workspace-kai">
               {!workspace?.workspace_ready ? (
                 <RiaSurface className="p-4 sm:p-5">
-                  <p className="text-sm font-medium text-foreground">Portfolio is locked</p>
+                  <p className="text-sm font-medium text-foreground">
+                    Portfolio is locked
+                  </p>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    Approval is still pending, or the portfolio summary is still getting ready.
+                    Approval is still pending, or the portfolio summary is still
+                    getting ready.
                   </p>
                 </RiaSurface>
               ) : (
                 <RiaSurface className="space-y-4 p-4 sm:p-5">
                   <div className="space-y-1">
-                    <p className="text-sm font-semibold tracking-tight text-foreground">Portfolio</p>
+                    <p className="text-sm font-semibold tracking-tight text-foreground">
+                      Portfolio
+                    </p>
                     <p className="text-sm leading-6 text-muted-foreground">
                       A simple read that mirrors the client view.
                     </p>
                   </div>
 
-                  {Object.keys(asRecord(financialSummary.asset_allocation_pct)).length > 0 ? (
-                    <AllocationBar allocation={asRecord(financialSummary.asset_allocation_pct)} />
+                  {Object.keys(asRecord(financialSummary.asset_allocation_pct))
+                    .length > 0 ? (
+                    <AllocationBar
+                      allocation={asRecord(
+                        financialSummary.asset_allocation_pct,
+                      )}
+                    />
                   ) : null}
 
                   {summaryRows.length > 0 ? (
@@ -868,8 +1017,12 @@ export function RiaClientWorkspace({
                           key={label}
                           className="rounded-[var(--radius-md)] bg-[color:var(--app-card-surface-compact)] p-4 shadow-[var(--app-card-shadow-standard)]"
                         >
-                          <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">{label}</p>
-                          <p className="mt-2 text-lg font-semibold text-foreground">{String(value)}</p>
+                          <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                            {label}
+                          </p>
+                          <p className="mt-2 text-lg font-semibold text-foreground">
+                            {String(value)}
+                          </p>
                         </div>
                       ))}
                     </div>
@@ -887,7 +1040,11 @@ export function RiaClientWorkspace({
                           key={branch.branch_id}
                           title={`${branch.name}${branch.mask ? ` ••${branch.mask}` : ""}`}
                           description={
-                            [branch.institution_name, branch.type, branch.subtype]
+                            [
+                              branch.institution_name,
+                              branch.type,
+                              branch.subtype,
+                            ]
                               .filter(Boolean)
                               .join(" • ") || "Linked account"
                           }
@@ -900,19 +1057,27 @@ export function RiaClientWorkspace({
           ) : null}
 
           {activeTab === "explorer" ? (
-            <div className="space-y-4" data-testid="ria-client-workspace-explorer">
+            <div
+              className="space-y-4"
+              data-testid="ria-client-workspace-explorer"
+            >
               {!workspace?.workspace_ready ? (
                 <RiaSurface className="p-4 sm:p-5">
-                  <p className="text-sm font-medium text-foreground">Data is locked</p>
+                  <p className="text-sm font-medium text-foreground">
+                    Data is locked
+                  </p>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    Approval is still pending, or the client data is still getting ready.
+                    Approval is still pending, or the client data is still
+                    getting ready.
                   </p>
                 </RiaSurface>
               ) : (
                 <div className="grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
                   <RiaSurface className="space-y-3 p-4 sm:p-5">
                     <div className="space-y-1">
-                      <p className="text-sm font-semibold tracking-tight text-foreground">Available data</p>
+                      <p className="text-sm font-semibold tracking-tight text-foreground">
+                        Available data
+                      </p>
                       <p className="text-sm leading-6 text-muted-foreground">
                         The data groups that are ready to explore.
                       </p>
@@ -927,8 +1092,15 @@ export function RiaClientWorkspace({
                           <SettingsRow
                             key={domain}
                             title={formatDomainLabel(domain)}
-                            description={explorerDomainSummary(domain, workspace.domain_summaries?.[domain])}
-                            trailing={<span className="text-xs text-muted-foreground">{workspace.total_attributes}</span>}
+                            description={explorerDomainSummary(
+                              domain,
+                              workspace.domain_summaries?.[domain],
+                            )}
+                            trailing={
+                              <span className="text-xs text-muted-foreground">
+                                {workspace.total_attributes}
+                              </span>
+                            }
                           />
                         ))
                       )}
@@ -937,7 +1109,9 @@ export function RiaClientWorkspace({
 
                   <RiaSurface className="space-y-3 p-4 sm:p-5">
                     <div className="space-y-1">
-                      <p className="text-sm font-semibold tracking-tight text-foreground">Accounts</p>
+                      <p className="text-sm font-semibold tracking-tight text-foreground">
+                        Accounts
+                      </p>
                       <p className="text-sm leading-6 text-muted-foreground">
                         Open an account for a cleaner detail view.
                       </p>
@@ -953,20 +1127,30 @@ export function RiaClientWorkspace({
                             key={branch.branch_id}
                             title={`${branch.name}${branch.mask ? ` ••${branch.mask}` : ""}`}
                             description={
-                              [branch.institution_name, branch.type, branch.subtype]
+                              [
+                                branch.institution_name,
+                                branch.type,
+                                branch.subtype,
+                              ]
                                 .filter(Boolean)
                                 .join(" • ") || "Linked account"
                             }
                             trailing={
-                              <Badge className={branchBadgeClass(branch.status)}>
+                              <Badge
+                                className={branchBadgeClass(branch.status)}
+                              >
                                 {formatStatusLabel(branch.status)}
                               </Badge>
                             }
                             onClick={() =>
                               router.push(
-                                buildRiaClientAccountRoute(clientId, branch.branch_id, {
-                                  testProfile: isTestProfile,
-                                })
+                                buildRiaClientAccountRoute(
+                                  clientId,
+                                  branch.branch_id,
+                                  {
+                                    testProfile: isTestProfile,
+                                  },
+                                ),
                               )
                             }
                             chevron

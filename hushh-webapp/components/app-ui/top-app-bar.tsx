@@ -114,9 +114,7 @@ export function TopAppBarSpacer() {
 }
 
 /* ── Helpers ───────────────────────────────────────────────────────── */
-function getTopBarTitle(
-  pathname: string,
-): {
+function getTopBarTitle(pathname: string): {
   label: string;
   icon?: LucideIcon;
   interactive: boolean;
@@ -166,7 +164,9 @@ function getTopBarTitle(
 
 function isProfileTopBarRoute(pathname: string): boolean {
   const normalized = normalizeTopBarPathname(pathname);
-  return normalized === ROUTES.PROFILE || normalized.startsWith(`${ROUTES.PROFILE}/`);
+  return (
+    normalized === ROUTES.PROFILE || normalized.startsWith(`${ROUTES.PROFILE}/`)
+  );
 }
 
 function normalizeTopBarPathname(pathname: string): string {
@@ -220,10 +220,7 @@ export function TopAppBar({ className }: TopAppBarProps) {
   const chromeState = useMemo(() => getKaiChromeState(pathname), [pathname]);
   const showOnboardingActions = chromeState.useOnboardingChrome;
   const hideChrome = !topShellMetrics.shellVisible;
-  const centerTitle = useMemo(
-    () => getTopBarTitle(pathname),
-    [pathname],
-  );
+  const centerTitle = useMemo(() => getTopBarTitle(pathname), [pathname]);
   const canShowPersonaSwitcher = useMemo(
     () => isProfileTopBarRoute(pathname),
     [pathname],

@@ -3,7 +3,16 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { Button as MorphyButton } from "@/lib/morphy-ux/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, AlertCircle, RefreshCw, X, WifiOff, ShieldAlert, Clock, CheckCircle2 } from "lucide-react";
+import {
+  Loader2,
+  AlertCircle,
+  RefreshCw,
+  X,
+  WifiOff,
+  ShieldAlert,
+  Clock,
+  CheckCircle2,
+} from "lucide-react";
 import { Icon } from "@/lib/morphy-ux/ui";
 import { setKaiVaultOwnerToken } from "@/lib/services/kai-service";
 import { type AnalysisHistoryEntry } from "@/lib/services/kai-history-service";
@@ -23,7 +32,10 @@ import { useKaiSession } from "@/lib/stores/kai-session-store";
 import { KaiProfileService } from "@/lib/services/kai-profile-service";
 import { PersonalKnowledgeModelService } from "@/lib/services/personal-knowledge-model-service";
 import { cn } from "@/lib/utils";
-import { toInvestorMessage, toInvestorStreamText } from "@/lib/copy/investor-language";
+import {
+  toInvestorMessage,
+  toInvestorStreamText,
+} from "@/lib/copy/investor-language";
 import type { PortfolioSource } from "@/lib/kai/brokerage/portfolio-sources";
 import {
   DebateRunManagerService,
@@ -76,7 +88,13 @@ export interface AgentState {
 }
 
 export interface Insight {
-  type: "claim" | "evidence" | "impact" | "bull_case_personalized" | "bear_case_personalized" | "renaissance_verdict";
+  type:
+    | "claim"
+    | "evidence"
+    | "impact"
+    | "bull_case_personalized"
+    | "bear_case_personalized"
+    | "renaissance_verdict";
   id?: string;
   agent: string;
   content: string;
@@ -107,13 +125,23 @@ const AGENTS = ["fundamental", "sentiment", "valuation"] as const;
 // Error Classification
 // ============================================================================
 
-type ErrorType = "rate_limit" | "auth_expired" | "server_error" | "connection_lost" | "unknown";
+type ErrorType =
+  | "rate_limit"
+  | "auth_expired"
+  | "server_error"
+  | "connection_lost"
+  | "unknown";
 
 function classifyError(status: number | null, message: string): ErrorType {
   if (status === 429) return "rate_limit";
   if (status === 401 || status === 403) return "auth_expired";
   if (status && status >= 500) return "server_error";
-  if (message.includes("fetch") || message.includes("network") || message.includes("abort")) return "connection_lost";
+  if (
+    message.includes("fetch") ||
+    message.includes("network") ||
+    message.includes("abort")
+  )
+    return "connection_lost";
   return "unknown";
 }
 
@@ -151,13 +179,18 @@ function toInvestorStreamErrorMessage(raw: unknown): string {
   return sanitized;
 }
 
-function getErrorDisplay(errorType: ErrorType, retryIn?: number): { icon: React.ReactNode; title: string; message: string } {
+function getErrorDisplay(
+  errorType: ErrorType,
+  retryIn?: number,
+): { icon: React.ReactNode; title: string; message: string } {
   switch (errorType) {
     case "rate_limit":
       return {
         icon: <Icon icon={Clock} size={32} className="text-amber-500" />,
         title: "Analysis Queue Is Busy",
-        message: retryIn ? `We will retry in ${retryIn}s...` : "Please try again in a moment.",
+        message: retryIn
+          ? `We will retry in ${retryIn}s...`
+          : "Please try again in a moment.",
       };
     case "auth_expired":
       return {
@@ -169,7 +202,9 @@ function getErrorDisplay(errorType: ErrorType, retryIn?: number): { icon: React.
       return {
         icon: <Icon icon={AlertCircle} size={32} className="text-red-500" />,
         title: "Service Unavailable",
-        message: retryIn ? `We will retry in ${retryIn}s...` : "Please try again shortly.",
+        message: retryIn
+          ? `We will retry in ${retryIn}s...`
+          : "Please try again shortly.",
       };
     case "connection_lost":
       return {
@@ -208,7 +243,9 @@ function optionalString(value: unknown): string | undefined {
 }
 
 function optionalNumber(value: unknown): number | undefined {
-  return typeof value === "number" && Number.isFinite(value) ? value : undefined;
+  return typeof value === "number" && Number.isFinite(value)
+    ? value
+    : undefined;
 }
 
 function optionalStringArray(value: unknown): string[] | undefined {
@@ -230,7 +267,8 @@ function isCashEquivalentRow(row: {
   name: string;
   asset_type?: string;
 }): boolean {
-  const hint = `${row.symbol} ${row.name} ${row.asset_type || ""}`.toLowerCase();
+  const hint =
+    `${row.symbol} ${row.name} ${row.asset_type || ""}`.toLowerCase();
   return (
     hint.includes("cash") ||
     hint.includes("sweep") ||
@@ -241,7 +279,10 @@ function isCashEquivalentRow(row: {
   );
 }
 
-function pickFirstNumber(source: Record<string, unknown>, keys: string[]): number | undefined {
+function pickFirstNumber(
+  source: Record<string, unknown>,
+  keys: string[],
+): number | undefined {
   for (const key of keys) {
     const value = toFiniteNumber(source[key]);
     if (value !== undefined) return value;
@@ -251,14 +292,17 @@ function pickFirstNumber(source: Record<string, unknown>, keys: string[]): numbe
 
 function extractDebatePortfolioContext(
   userId: string,
-  source?: Record<string, unknown> | null
+  source?: Record<string, unknown> | null,
 ): Record<string, unknown> | null {
   const cache = CacheService.getInstance();
   const cached =
     source ??
     cache.get<Record<string, unknown>>(CACHE_KEYS.PORTFOLIO_DATA(userId)) ??
-    cache.get<Record<string, unknown>>(CACHE_KEYS.DOMAIN_DATA(userId, "financial"));
-  if (!cached || typeof cached !== "object" || Array.isArray(cached)) return null;
+    cache.get<Record<string, unknown>>(
+      CACHE_KEYS.DOMAIN_DATA(userId, "financial"),
+    );
+  if (!cached || typeof cached !== "object" || Array.isArray(cached))
+    return null;
 
   const holdingsRaw = Array.isArray(cached.holdings)
     ? cached.holdings
@@ -270,22 +314,32 @@ function extractDebatePortfolioContext(
       : [];
 
   const holdings = holdingsRaw
-    .filter((row): row is Record<string, unknown> => Boolean(row && typeof row === "object"))
+    .filter((row): row is Record<string, unknown> =>
+      Boolean(row && typeof row === "object"),
+    )
     .slice(0, 30)
     .map((row) => ({
-      symbol: String(row.symbol ?? "").trim().toUpperCase(),
+      symbol: String(row.symbol ?? "")
+        .trim()
+        .toUpperCase(),
       name: String(row.name ?? "").trim(),
       quantity: toFiniteNumber(row.quantity),
       market_value: toFiniteNumber(row.market_value),
       position_side:
         typeof row.position_side === "string" &&
-        ["long", "short", "liability"].includes(row.position_side.trim().toLowerCase())
+        ["long", "short", "liability"].includes(
+          row.position_side.trim().toLowerCase(),
+        )
           ? row.position_side.trim().toLowerCase()
           : undefined,
       is_short_position:
-        typeof row.is_short_position === "boolean" ? row.is_short_position : undefined,
+        typeof row.is_short_position === "boolean"
+          ? row.is_short_position
+          : undefined,
       is_liability_position:
-        typeof row.is_liability_position === "boolean" ? row.is_liability_position : undefined,
+        typeof row.is_liability_position === "boolean"
+          ? row.is_liability_position
+          : undefined,
       unrealized_gain_loss_pct: toFiniteNumber(row.unrealized_gain_loss_pct),
       sector: typeof row.sector === "string" ? row.sector : undefined,
       asset_type:
@@ -294,14 +348,18 @@ function extractDebatePortfolioContext(
           : typeof row.asset_class === "string"
             ? row.asset_class
             : undefined,
-      is_investable: typeof row.is_investable === "boolean" ? row.is_investable : undefined,
+      is_investable:
+        typeof row.is_investable === "boolean" ? row.is_investable : undefined,
       is_cash_equivalent:
-        typeof row.is_cash_equivalent === "boolean" ? row.is_cash_equivalent : undefined,
+        typeof row.is_cash_equivalent === "boolean"
+          ? row.is_cash_equivalent
+          : undefined,
       is_sec_common_equity_ticker:
         typeof row.is_sec_common_equity_ticker === "boolean"
           ? row.is_sec_common_equity_ticker
           : undefined,
-      symbol_kind: typeof row.symbol_kind === "string" ? row.symbol_kind : undefined,
+      symbol_kind:
+        typeof row.symbol_kind === "string" ? row.symbol_kind : undefined,
       security_listing_status:
         typeof row.security_listing_status === "string"
           ? row.security_listing_status
@@ -314,7 +372,9 @@ function extractDebatePortfolioContext(
     .filter((row) => row.symbol.length > 0 || row.name.length > 0);
 
   const nonCashHoldings = holdings.filter((row) => !isCashEquivalentRow(row));
-  const investableHoldings = nonCashHoldings.filter((row) => TICKER_SYMBOL_REGEX.test(row.symbol));
+  const investableHoldings = nonCashHoldings.filter((row) =>
+    TICKER_SYMBOL_REGEX.test(row.symbol),
+  );
   const excludedPositions = nonCashHoldings
     .filter((row) => !TICKER_SYMBOL_REGEX.test(row.symbol))
     .slice(0, 20)
@@ -324,19 +384,26 @@ function extractDebatePortfolioContext(
     }));
   const cashPositionsCount = holdings.length - nonCashHoldings.length;
   const tickerCoveragePct =
-    nonCashHoldings.length > 0 ? investableHoldings.length / nonCashHoldings.length : 0;
+    nonCashHoldings.length > 0
+      ? investableHoldings.length / nonCashHoldings.length
+      : 0;
   const sectorCoveragePct =
     nonCashHoldings.length > 0
-      ? nonCashHoldings.filter((row) => Boolean(row.sector && row.sector.trim())).length / nonCashHoldings.length
+      ? nonCashHoldings.filter((row) =>
+          Boolean(row.sector && row.sector.trim()),
+        ).length / nonCashHoldings.length
       : 0;
   const gainLossCoveragePct =
     nonCashHoldings.length > 0
-      ? nonCashHoldings.filter((row) => typeof row.unrealized_gain_loss_pct === "number").length /
-        nonCashHoldings.length
+      ? nonCashHoldings.filter(
+          (row) => typeof row.unrealized_gain_loss_pct === "number",
+        ).length / nonCashHoldings.length
       : 0;
   const topPositions = holdings
     .slice()
-    .sort((a, b) => Math.abs(b.market_value || 0) - Math.abs(a.market_value || 0))
+    .sort(
+      (a, b) => Math.abs(b.market_value || 0) - Math.abs(a.market_value || 0),
+    )
     .slice(0, 8)
     .map((row) => ({
       symbol: row.symbol || row.name || "UNKNOWN",
@@ -346,7 +413,9 @@ function extractDebatePortfolioContext(
       asset_type: row.asset_type ?? null,
     }));
   const accountSummary =
-    cached.account_summary && typeof cached.account_summary === "object" && !Array.isArray(cached.account_summary)
+    cached.account_summary &&
+    typeof cached.account_summary === "object" &&
+    !Array.isArray(cached.account_summary)
       ? (cached.account_summary as Record<string, unknown>)
       : {};
   const statementSignals = {
@@ -355,7 +424,9 @@ function extractDebatePortfolioContext(
       "total_change",
       "change_in_value",
     ]),
-    total_income_period: pickFirstNumber(accountSummary, ["total_income_period"]),
+    total_income_period: pickFirstNumber(accountSummary, [
+      "total_income_period",
+    ]),
     total_income_ytd: pickFirstNumber(accountSummary, ["total_income_ytd"]),
     total_fees: pickFirstNumber(accountSummary, ["total_fees"]),
     net_deposits_period: pickFirstNumber(accountSummary, [
@@ -368,7 +439,8 @@ function extractDebatePortfolioContext(
   return {
     holdings,
     holdings_count: holdings.length,
-    account_summary: Object.keys(accountSummary).length > 0 ? accountSummary : undefined,
+    account_summary:
+      Object.keys(accountSummary).length > 0 ? accountSummary : undefined,
     asset_allocation:
       cached.asset_allocation && typeof cached.asset_allocation === "object"
         ? cached.asset_allocation
@@ -404,7 +476,10 @@ function extractDebatePortfolioContext(
       statement_signals: statementSignals,
       eligible_symbols: investableHoldings
         .map((row) => row.symbol)
-        .filter((symbol, index, arr) => symbol.length > 0 && arr.indexOf(symbol) === index)
+        .filter(
+          (symbol, index, arr) =>
+            symbol.length > 0 && arr.indexOf(symbol) === index,
+        )
         .slice(0, 20),
       top_positions: topPositions,
       excluded_positions: excludedPositions,
@@ -412,19 +487,30 @@ function extractDebatePortfolioContext(
   };
 }
 
-function hasRequiredDebateContext(context: Record<string, unknown> | null): boolean {
+function hasRequiredDebateContext(
+  context: Record<string, unknown> | null,
+): boolean {
   if (!context) return false;
   const holdings = context.holdings;
   const debateContext = context.debate_context;
   if (!Array.isArray(holdings) || holdings.length === 0) return false;
-  if (!debateContext || typeof debateContext !== "object" || Array.isArray(debateContext)) return false;
+  if (
+    !debateContext ||
+    typeof debateContext !== "object" ||
+    Array.isArray(debateContext)
+  )
+    return false;
   const debate = debateContext as Record<string, unknown>;
   const snapshot = debate.portfolio_snapshot;
   const coverage = debate.coverage;
   const hasSnapshot =
-    Boolean(snapshot) && typeof snapshot === "object" && !Array.isArray(snapshot);
+    Boolean(snapshot) &&
+    typeof snapshot === "object" &&
+    !Array.isArray(snapshot);
   const hasCoverage =
-    Boolean(coverage) && typeof coverage === "object" && !Array.isArray(coverage);
+    Boolean(coverage) &&
+    typeof coverage === "object" &&
+    !Array.isArray(coverage);
   return hasSnapshot && hasCoverage;
 }
 
@@ -445,8 +531,14 @@ interface DebateStreamViewProps {
   pickSourceLabel?: string;
   pickSourceKind?: string;
   onClose: () => void;
-  onDecisionReady?: (entry: AnalysisHistoryEntry, meta: { runId: string | null }) => void;
-  onDecisionPersisted?: (entry: AnalysisHistoryEntry, meta: { runId: string }) => void;
+  onDecisionReady?: (
+    entry: AnalysisHistoryEntry,
+    meta: { runId: string | null },
+  ) => void;
+  onDecisionPersisted?: (
+    entry: AnalysisHistoryEntry,
+    meta: { runId: string },
+  ) => void;
   showHeader?: boolean;
 }
 
@@ -464,9 +556,9 @@ type HeaderMarketQuote = {
   source: string;
 };
 
-function toDecisionMarketSnapshot(quote: HeaderMarketQuote | null): NonNullable<
-  NonNullable<DecisionResult["raw_card"]>["market_snapshot"]
-> {
+function toDecisionMarketSnapshot(
+  quote: HeaderMarketQuote | null,
+): NonNullable<NonNullable<DecisionResult["raw_card"]>["market_snapshot"]> {
   return {
     last_price: quote?.last_price ?? null,
     change_pct: quote?.change_pct ?? null,
@@ -486,9 +578,13 @@ function toMarketNumber(value: unknown): number | null {
   return null;
 }
 
-function extractMarketSnapshotFromDecision(data: StreamPayload): MarketSnapshot {
+function extractMarketSnapshotFromDecision(
+  data: StreamPayload,
+): MarketSnapshot {
   const rawCard =
-    data.raw_card && typeof data.raw_card === "object" ? (data.raw_card as Record<string, unknown>) : {};
+    data.raw_card && typeof data.raw_card === "object"
+      ? (data.raw_card as Record<string, unknown>)
+      : {};
   const keyMetrics =
     rawCard.key_metrics && typeof rawCard.key_metrics === "object"
       ? (rawCard.key_metrics as Record<string, unknown>)
@@ -504,21 +600,37 @@ function extractMarketSnapshotFromDecision(data: StreamPayload): MarketSnapshot 
 
   const candidates: Array<{ value: unknown; source: string }> = [
     { value: rawCard.current_price, source: "raw_card.current_price" },
-    { value: valuationMetrics.current_price, source: "raw_card.key_metrics.valuation.current_price" },
-    { value: valuationMetrics.price, source: "raw_card.key_metrics.valuation.price" },
-    { value: priceTargets.current_price, source: "raw_card.price_targets.current_price" },
+    {
+      value: valuationMetrics.current_price,
+      source: "raw_card.key_metrics.valuation.current_price",
+    },
+    {
+      value: valuationMetrics.price,
+      source: "raw_card.key_metrics.valuation.price",
+    },
+    {
+      value: priceTargets.current_price,
+      source: "raw_card.price_targets.current_price",
+    },
     { value: priceTargets.current, source: "raw_card.price_targets.current" },
-    { value: priceTargets.market_price, source: "raw_card.price_targets.market_price" },
+    {
+      value: priceTargets.market_price,
+      source: "raw_card.price_targets.market_price",
+    },
   ];
   for (const candidate of candidates) {
     const parsed = toMarketNumber(candidate.value);
     if (parsed !== null) {
       return {
         last_price: parsed,
-        change_pct: toMarketNumber(rawCard.day_change_pct ?? rawCard.change_pct ?? data.day_change_pct),
+        change_pct: toMarketNumber(
+          rawCard.day_change_pct ?? rawCard.change_pct ?? data.day_change_pct,
+        ),
         observed_at:
-          (typeof rawCard.analysis_updated_at === "string" && rawCard.analysis_updated_at) ||
-          (typeof data.analysis_updated_at === "string" && data.analysis_updated_at) ||
+          (typeof rawCard.analysis_updated_at === "string" &&
+            rawCard.analysis_updated_at) ||
+          (typeof data.analysis_updated_at === "string" &&
+            data.analysis_updated_at) ||
           new Date().toISOString(),
         source: candidate.source,
       };
@@ -529,8 +641,10 @@ function extractMarketSnapshotFromDecision(data: StreamPayload): MarketSnapshot 
     last_price: null,
     change_pct: null,
     observed_at:
-      (typeof rawCard.analysis_updated_at === "string" && rawCard.analysis_updated_at) ||
-      (typeof data.analysis_updated_at === "string" && data.analysis_updated_at) ||
+      (typeof rawCard.analysis_updated_at === "string" &&
+        rawCard.analysis_updated_at) ||
+      (typeof data.analysis_updated_at === "string" &&
+        data.analysis_updated_at) ||
       null,
     source: "unavailable",
   };
@@ -544,9 +658,13 @@ function toEpoch(value: string | null | undefined): number {
 
 function pickPreferredHeaderQuote(
   current: HeaderMarketQuote | null,
-  candidate: HeaderMarketQuote | null
+  candidate: HeaderMarketQuote | null,
 ): HeaderMarketQuote | null {
-  if (!candidate || candidate.last_price === null || candidate.last_price <= 0) {
+  if (
+    !candidate ||
+    candidate.last_price === null ||
+    candidate.last_price <= 0
+  ) {
     return current;
   }
   if (!current || current.last_price === null || current.last_price <= 0) {
@@ -556,7 +674,8 @@ function pickPreferredHeaderQuote(
   const candidateEpoch = toEpoch(candidate.observed_at);
   if (candidateEpoch > currentEpoch) return candidate;
   if (candidateEpoch === currentEpoch) {
-    if (current.change_pct === null && candidate.change_pct !== null) return candidate;
+    if (current.change_pct === null && candidate.change_pct !== null)
+      return candidate;
     if (candidate.last_price !== current.last_price) return candidate;
   }
   return current;
@@ -591,7 +710,7 @@ function collectHeaderQuoteCandidate(params: {
 
 function extractHeaderQuoteFromKaiHome(
   payload: KaiHomeInsightsV2 | null | undefined,
-  ticker: string
+  ticker: string,
 ): HeaderMarketQuote | null {
   if (!payload || typeof payload !== "object") return null;
   const normalizedTicker = String(ticker || "")
@@ -599,7 +718,8 @@ function extractHeaderQuoteFromKaiHome(
     .toUpperCase();
   if (!normalizedTicker) return null;
 
-  const generatedAt = typeof payload.generated_at === "string" ? payload.generated_at : null;
+  const generatedAt =
+    typeof payload.generated_at === "string" ? payload.generated_at : null;
   let best: HeaderMarketQuote | null = null;
 
   const watchlist = Array.isArray(payload.watchlist) ? payload.watchlist : [];
@@ -616,7 +736,9 @@ function extractHeaderQuoteFromKaiHome(
     best = pickPreferredHeaderQuote(best, candidate);
   }
 
-  const spotlights = Array.isArray(payload.spotlights) ? payload.spotlights : [];
+  const spotlights = Array.isArray(payload.spotlights)
+    ? payload.spotlights
+    : [];
   for (const row of spotlights) {
     const candidate = collectHeaderQuoteCandidate({
       ticker: normalizedTicker,
@@ -651,7 +773,10 @@ function extractHeaderQuoteFromKaiHome(
   return best;
 }
 
-function getCachedHeaderQuote(userId: string, ticker: string): HeaderMarketQuote | null {
+function getCachedHeaderQuote(
+  userId: string,
+  ticker: string,
+): HeaderMarketQuote | null {
   const cache = CacheService.getInstance();
   const prefix = `kai_market_home_${userId}_`;
   let best: HeaderMarketQuote | null = null;
@@ -693,8 +818,11 @@ export function DebateStreamView({
 }: DebateStreamViewProps) {
   const setBusyOperation = useKaiSession((s) => s.setBusyOperation);
   const normalizedTicker = useMemo(
-    () => String(ticker || "").trim().toUpperCase(),
-    [ticker]
+    () =>
+      String(ticker || "")
+        .trim()
+        .toUpperCase(),
+    [ticker],
   );
   // State
   const [loading, setLoading] = useState(true);
@@ -707,10 +835,10 @@ export function DebateStreamView({
   const [activeRound, setActiveRound] = useState<1 | 2>(1);
   const activeRoundRef = useRef<1 | 2>(1);
   const [round1States, setRound1States] = useState<Record<string, AgentState>>(
-    JSON.parse(JSON.stringify(INITIAL_ROUND_STATE))
+    JSON.parse(JSON.stringify(INITIAL_ROUND_STATE)),
   );
   const [round2States, setRound2States] = useState<Record<string, AgentState>>(
-    JSON.parse(JSON.stringify(INITIAL_ROUND_STATE))
+    JSON.parse(JSON.stringify(INITIAL_ROUND_STATE)),
   );
 
   // Live Insights State
@@ -718,17 +846,22 @@ export function DebateStreamView({
   const insightsRef = useRef<Insight[]>([]); // Ref for stream safety
 
   // Refs for robust state tracking inside async stream
-  const round1StatesRef = useRef<Record<string, AgentState>>(JSON.parse(JSON.stringify(INITIAL_ROUND_STATE)));
-  const round2StatesRef = useRef<Record<string, AgentState>>(JSON.parse(JSON.stringify(INITIAL_ROUND_STATE)));
+  const round1StatesRef = useRef<Record<string, AgentState>>(
+    JSON.parse(JSON.stringify(INITIAL_ROUND_STATE)),
+  );
+  const round2StatesRef = useRef<Record<string, AgentState>>(
+    JSON.parse(JSON.stringify(INITIAL_ROUND_STATE)),
+  );
 
   // UI Control
   const [activeAgent, setActiveAgent] = useState("fundamental");
-  const [collapsedRounds, setCollapsedRounds] = useState<Record<number, boolean>>(
-    getInitialRoundCollapseState()
-  );
+  const [collapsedRounds, setCollapsedRounds] = useState<
+    Record<number, boolean>
+  >(getInitialRoundCollapseState());
 
   const [decision, setDecision] = useState<DecisionResult | null>(null);
-  const [headerMarketQuote, setHeaderMarketQuote] = useState<HeaderMarketQuote | null>(null);
+  const [headerMarketQuote, setHeaderMarketQuote] =
+    useState<HeaderMarketQuote | null>(null);
   const [headerQuoteLoading, setHeaderQuoteLoading] = useState(false);
   const headerPrice = headerMarketQuote?.last_price ?? null;
   const headerChangePct = headerMarketQuote?.change_pct ?? null;
@@ -772,12 +905,15 @@ export function DebateStreamView({
     }
     // If no agent is active, check if all are complete
     const allComplete = AGENTS.every((a) => states[a]?.stage === "complete");
-    if (allComplete && activeRound === 1) return "Round 1 complete — transitioning…";
+    if (allComplete && activeRound === 1)
+      return "Round 1 complete — transitioning…";
     if (allComplete && activeRound === 2) return "Forming consensus…";
     return `Round ${activeRound} — Analyzing…`;
   }, [round1States, round2States, activeRound, decision]);
 
-  const [currentRunId, setCurrentRunId] = useState<string | null>(runId ?? null);
+  const [currentRunId, setCurrentRunId] = useState<string | null>(
+    runId ?? null,
+  );
   const [managerTask, setManagerTask] = useState<DebateRunTask | null>(null);
   const [reloadNonce, setReloadNonce] = useState(0);
   const processedSeqRef = useRef(0);
@@ -785,24 +921,27 @@ export function DebateStreamView({
   const finalizingNotifiedRef = useRef(false);
   const persistedNotifiedRef = useRef(false);
   // Helper to update specific agent state in current round
-  const updateAgentState = useCallback((round: 1 | 2, agent: string, update: Partial<AgentState>) => {
-    // Update Ref (Source of Truth for Stream)
-    const ref = round === 1 ? round1StatesRef : round2StatesRef;
-    if (ref.current[agent]) {
-       ref.current[agent] = { ...ref.current[agent], ...update };
-    }
+  const updateAgentState = useCallback(
+    (round: 1 | 2, agent: string, update: Partial<AgentState>) => {
+      // Update Ref (Source of Truth for Stream)
+      const ref = round === 1 ? round1StatesRef : round2StatesRef;
+      if (ref.current[agent]) {
+        ref.current[agent] = { ...ref.current[agent], ...update };
+      }
 
-    // Update React State
-    const setter = round === 1 ? setRound1States : setRound2States;
-    setter((prev) => {
-      const currentState = prev[agent];
-      if (!currentState) return prev;
-      return {
-        ...prev,
-        [agent]: { ...currentState, ...update },
-      };
-    });
-  }, []);
+      // Update React State
+      const setter = round === 1 ? setRound1States : setRound2States;
+      setter((prev) => {
+        const currentState = prev[agent];
+        if (!currentState) return prev;
+        return {
+          ...prev,
+          [agent]: { ...currentState, ...update },
+        };
+      });
+    },
+    [],
+  );
 
   // Handle close - explicit cancel only.
   const handleClose = useCallback(async () => {
@@ -819,7 +958,14 @@ export function DebateStreamView({
     }
     setBusyOperation("stock_analysis_stream", false);
     onClose();
-  }, [currentRunId, managerTask?.status, onClose, setBusyOperation, userId, vaultOwnerToken]);
+  }, [
+    currentRunId,
+    managerTask?.status,
+    onClose,
+    setBusyOperation,
+    userId,
+    vaultOwnerToken,
+  ]);
 
   useEffect(() => {
     if (retryCountdown === null || retryCountdown <= 0) return;
@@ -853,7 +999,7 @@ export function DebateStreamView({
                   market_snapshot: toDecisionMarketSnapshot(cached),
                 },
               }
-            : prev
+            : prev,
         );
       }
     }
@@ -885,7 +1031,7 @@ export function DebateStreamView({
                       market_snapshot: toDecisionMarketSnapshot(nextQuote),
                     },
                   }
-                : currentDecision
+                : currentDecision,
             );
             return nextQuote;
           });
@@ -931,8 +1077,10 @@ export function DebateStreamView({
   const resolveRoundForEnvelope = useCallback((data: StreamPayload): 1 | 2 => {
     if (data.round === 2 || data.round === "2") return 2;
     if (data.round === 1 || data.round === "1") return 1;
-    const phase = typeof data.phase === "string" ? data.phase.toLowerCase() : "";
-    if (phase === "debate" || phase === "round2" || phase === "decision") return 2;
+    const phase =
+      typeof data.phase === "string" ? data.phase.toLowerCase() : "";
+    if (phase === "debate" || phase === "round2" || phase === "decision")
+      return 2;
     if (phase === "analysis" || phase === "round1") return 1;
     return activeRoundRef.current;
   }, []);
@@ -967,7 +1115,7 @@ export function DebateStreamView({
                 : extractRetrySeconds(statusMessage, 2);
             setRetryCountdown(retrySeconds);
             setKaiThinking(
-              `Analysis service is busy. Retrying this step in ${retrySeconds}s…`
+              `Analysis service is busy. Retrying this step in ${retrySeconds}s…`,
             );
             break;
           }
@@ -980,8 +1128,8 @@ export function DebateStreamView({
           setKaiThinking(
             sanitizeStatusMessage(
               (typeof data.message === "string" && data.message) ||
-                (typeof data.text === "string" ? data.text : "")
-            )
+                (typeof data.text === "string" ? data.text : ""),
+            ),
           );
           const r = resolveRoundForEnvelope(data);
           if (r === 2 && activeRoundRef.current !== 2) {
@@ -1007,12 +1155,18 @@ export function DebateStreamView({
             activeRoundRef.current = 2;
             setActiveRound(2);
           }
-          updateAgentState(r, (data.agent || "").toString(), { stage: "active" });
+          updateAgentState(r, (data.agent || "").toString(), {
+            stage: "active",
+          });
           break;
         }
         case "agent_token": {
-          const ag = (data.agent || data.agent_name || "").toString().toLowerCase();
-          const txt = toInvestorStreamText((data.text || data.token || "").toString());
+          const ag = (data.agent || data.agent_name || "")
+            .toString()
+            .toLowerCase();
+          const txt = toInvestorStreamText(
+            (data.text || data.token || "").toString(),
+          );
           if (!ag || !txt) break;
           const r = resolveRoundForEnvelope(data);
           if (r === 2 && activeRoundRef.current !== 2) {
@@ -1070,7 +1224,9 @@ export function DebateStreamView({
           if (
             r === 2 &&
             !decisionNotifiedRef.current &&
-            AGENTS.every((agent) => round2StatesRef.current[agent]?.stage === "complete")
+            AGENTS.every(
+              (agent) => round2StatesRef.current[agent]?.stage === "complete",
+            )
           ) {
             setKaiThinking("Preparing your final recommendation...");
             if (!finalizingNotifiedRef.current) {
@@ -1098,12 +1254,17 @@ export function DebateStreamView({
             agent: (data.agent || "kai").toString(),
             content: (data.content || "").toString(),
             id: data.id ? data.id.toString() : undefined,
-            classification: data.classification ? data.classification.toString() : undefined,
-            confidence: typeof data.confidence === "number" ? data.confidence : undefined,
+            classification: data.classification
+              ? data.classification.toString()
+              : undefined,
+            confidence:
+              typeof data.confidence === "number" ? data.confidence : undefined,
             source: data.source ? data.source.toString() : undefined,
             magnitude: data.magnitude ? data.magnitude.toString() : undefined,
             score: typeof data.score === "number" ? data.score : undefined,
-            target_claim_id: data.target_claim_id ? data.target_claim_id.toString() : undefined,
+            target_claim_id: data.target_claim_id
+              ? data.target_claim_id.toString()
+              : undefined,
             timestamp: new Date().toISOString(),
           };
 
@@ -1115,7 +1276,11 @@ export function DebateStreamView({
           finalizingNotifiedRef.current = false;
           const degradedAgents = Array.isArray(data.degraded_agents)
             ? data.degraded_agents
-                .map((item) => String(item || "").trim().toLowerCase())
+                .map((item) =>
+                  String(item || "")
+                    .trim()
+                    .toLowerCase(),
+                )
                 .filter((item) => item.length > 0)
             : [];
           const backendShort =
@@ -1123,36 +1288,44 @@ export function DebateStreamView({
               ? data.short_recommendation.trim()
               : "";
           const rawCardShort =
-            typeof (data.raw_card as Record<string, unknown> | undefined)?.short_recommendation ===
-            "string"
-              ? String((data.raw_card as Record<string, unknown>).short_recommendation).trim()
+            typeof (data.raw_card as Record<string, unknown> | undefined)
+              ?.short_recommendation === "string"
+              ? String(
+                  (data.raw_card as Record<string, unknown>)
+                    .short_recommendation,
+                ).trim()
               : "";
           const fallbackShort =
-            typeof data.final_statement === "string" && data.final_statement.trim().length > 0
+            typeof data.final_statement === "string" &&
+            data.final_statement.trim().length > 0
               ? data.final_statement.trim().slice(0, 280)
               : "Final recommendation synthesized from the completed debate.";
 
           const marketSnapshot = extractMarketSnapshotFromDecision(data);
           const cachedMarketSnapshot = getLatestMarketSnapshotFromCache(
             userId,
-            String(data.ticker || ticker).toUpperCase()
+            String(data.ticker || ticker).toUpperCase(),
           );
           const resolvedMarketSnapshot =
-            pickPreferredMarketSnapshot(marketSnapshot, cachedMarketSnapshot) || marketSnapshot;
+            pickPreferredMarketSnapshot(marketSnapshot, cachedMarketSnapshot) ||
+            marketSnapshot;
           const incomingRawCard: Record<string, unknown> =
             data.raw_card && typeof data.raw_card === "object"
               ? ((data.raw_card as DecisionResult["raw_card"]) ?? {})
               : {};
           const fallbackPickSource =
-            typeof data.pick_source === "string" && data.pick_source.trim().length > 0
+            typeof data.pick_source === "string" &&
+            data.pick_source.trim().length > 0
               ? data.pick_source.trim()
               : pickSource;
           const fallbackPickSourceLabel =
-            typeof data.pick_source_label === "string" && data.pick_source_label.trim().length > 0
+            typeof data.pick_source_label === "string" &&
+            data.pick_source_label.trim().length > 0
               ? data.pick_source_label.trim()
               : pickSourceLabel;
           const fallbackPickSourceKind =
-            typeof data.pick_source_kind === "string" && data.pick_source_kind.trim().length > 0
+            typeof data.pick_source_kind === "string" &&
+            data.pick_source_kind.trim().length > 0
               ? data.pick_source_kind.trim()
               : pickSourceKind;
           const normalizedDecision: DecisionResult = {
@@ -1164,27 +1337,39 @@ export function DebateStreamView({
             short_recommendation: backendShort || rawCardShort || fallbackShort,
             analysis_degraded:
               Boolean(data.analysis_degraded) ||
-              Boolean((data.raw_card as Record<string, unknown> | undefined)?.analysis_degraded),
+              Boolean(
+                (data.raw_card as Record<string, unknown> | undefined)
+                  ?.analysis_degraded,
+              ),
             degraded_agents: degradedAgents,
             stream_id:
               typeof data.stream_id === "string"
                 ? data.stream_id
-                : typeof (data.raw_card as Record<string, unknown> | undefined)?.stream_diagnostics === "object"
+                : typeof (data.raw_card as Record<string, unknown> | undefined)
+                      ?.stream_diagnostics === "object"
                   ? String(
-                      ((data.raw_card as Record<string, unknown>).stream_diagnostics as Record<string, unknown>)
-                        .stream_id || ""
+                      (
+                        (data.raw_card as Record<string, unknown>)
+                          .stream_diagnostics as Record<string, unknown>
+                      ).stream_id || "",
                     )
                   : undefined,
             llm_calls_count:
-              typeof data.llm_calls_count === "number" ? data.llm_calls_count : undefined,
+              typeof data.llm_calls_count === "number"
+                ? data.llm_calls_count
+                : undefined,
             provider_calls_count:
-              typeof data.provider_calls_count === "number" ? data.provider_calls_count : undefined,
+              typeof data.provider_calls_count === "number"
+                ? data.provider_calls_count
+                : undefined,
             retry_counts:
               data.retry_counts && typeof data.retry_counts === "object"
                 ? (data.retry_counts as Record<string, number>)
                 : undefined,
             analysis_mode:
-              typeof data.analysis_mode === "string" ? data.analysis_mode : undefined,
+              typeof data.analysis_mode === "string"
+                ? data.analysis_mode
+                : undefined,
             agent_votes:
               data.agent_votes && typeof data.agent_votes === "object"
                 ? (data.agent_votes as Record<string, string>)
@@ -1197,9 +1382,13 @@ export function DebateStreamView({
                 ? data.fundamental_summary
                 : undefined,
             sentiment_summary:
-              typeof data.sentiment_summary === "string" ? data.sentiment_summary : undefined,
+              typeof data.sentiment_summary === "string"
+                ? data.sentiment_summary
+                : undefined,
             valuation_summary:
-              typeof data.valuation_summary === "string" ? data.valuation_summary : undefined,
+              typeof data.valuation_summary === "string"
+                ? data.valuation_summary
+                : undefined,
             raw_card: {
               ...incomingRawCard,
               market_snapshot: resolvedMarketSnapshot,
@@ -1277,7 +1466,7 @@ export function DebateStreamView({
       ticker,
       updateAgentState,
       userId,
-    ]
+    ],
   );
 
   useEffect(() => {
@@ -1328,7 +1517,10 @@ export function DebateStreamView({
             financial_profile: profile,
           };
         } catch (profileError) {
-          console.warn("[DebateStreamView] Failed to load Kai profile context:", profileError);
+          console.warn(
+            "[DebateStreamView] Failed to load Kai profile context:",
+            profileError,
+          );
         }
       }
 
@@ -1355,13 +1547,15 @@ export function DebateStreamView({
               vaultOwnerToken,
             }));
           const hydratedContext =
-            extractDebatePortfolioContext(userId, financialDomain ?? undefined) ??
-            portfolioContext;
+            extractDebatePortfolioContext(
+              userId,
+              financialDomain ?? undefined,
+            ) ?? portfolioContext;
           portfolioContext = hydratedContext;
         } catch (blobError) {
           console.warn(
             "[DebateStreamView] Failed to hydrate debate context from the financial PKM domain:",
-            blobError
+            blobError,
           );
         }
       }
@@ -1371,8 +1565,10 @@ export function DebateStreamView({
           portfolioSource ||
           (portfolioContext.source_metadata &&
           typeof portfolioContext.source_metadata === "object" &&
-          typeof (portfolioContext.source_metadata as Record<string, unknown>).source_type === "string"
-            ? ((portfolioContext.source_metadata as Record<string, unknown>).source_type as PortfolioSource)
+          typeof (portfolioContext.source_metadata as Record<string, unknown>)
+            .source_type === "string"
+            ? ((portfolioContext.source_metadata as Record<string, unknown>)
+                .source_type as PortfolioSource)
             : undefined);
         context = {
           ...(context || {}),
@@ -1410,7 +1606,9 @@ export function DebateStreamView({
             } else {
               const fallbackTask = DebateRunManagerService.getTask(runId);
               resolvedTask =
-                fallbackTask && fallbackTask.userId === userId ? fallbackTask : null;
+                fallbackTask && fallbackTask.userId === userId
+                  ? fallbackTask
+                  : null;
             }
           }
         } else {
@@ -1456,17 +1654,21 @@ export function DebateStreamView({
         setManagerTask(resolvedTask);
 
         unsubscribeState = DebateRunManagerService.subscribe((state) => {
-          const nextTask = state.tasks.find((item) => item.runId === resolvedTask!.runId) || null;
+          const nextTask =
+            state.tasks.find((item) => item.runId === resolvedTask!.runId) ||
+            null;
           setManagerTask(nextTask);
         });
 
-        const unsubscribeHistory = DebateRunManagerService.subscribeHistory((entry, task) => {
-          if (task.runId !== resolvedTask!.runId) return;
-          if (task.persistenceState !== "saved") return;
-          if (persistedNotifiedRef.current) return;
-          persistedNotifiedRef.current = true;
-          onDecisionPersisted?.(entry, { runId: resolvedTask!.runId });
-        });
+        const unsubscribeHistory = DebateRunManagerService.subscribeHistory(
+          (entry, task) => {
+            if (task.runId !== resolvedTask!.runId) return;
+            if (task.persistenceState !== "saved") return;
+            if (persistedNotifiedRef.current) return;
+            persistedNotifiedRef.current = true;
+            onDecisionPersisted?.(entry, { runId: resolvedTask!.runId });
+          },
+        );
 
         unsubscribeRun = DebateRunManagerService.subscribeRunEvents(
           resolvedTask.runId,
@@ -1475,7 +1677,7 @@ export function DebateStreamView({
             processedSeqRef.current = envelope.seq;
             applyEnvelope(envelope);
           },
-          { replay: true }
+          { replay: true },
         );
         const originalUnsubscribeRun = unsubscribeRun;
         unsubscribeRun = () => {
@@ -1484,7 +1686,10 @@ export function DebateStreamView({
         };
       } catch (streamError) {
         if (cancelled) return;
-        setError((streamError as Error).message || "Unable to start analysis right now.");
+        setError(
+          (streamError as Error).message ||
+            "Unable to start analysis right now.",
+        );
         setErrorType("unknown");
       } finally {
         if (!cancelled) {
@@ -1521,7 +1726,10 @@ export function DebateStreamView({
   ]);
 
   useEffect(() => {
-    setBusyOperation("stock_analysis_stream", managerTask?.status === "running");
+    setBusyOperation(
+      "stock_analysis_stream",
+      managerTask?.status === "running",
+    );
     return () => {
       setBusyOperation("stock_analysis_stream", false);
     };
@@ -1537,44 +1745,50 @@ export function DebateStreamView({
         <div className="max-w-md w-full">
           <MorphyCard showRipple={false}>
             <MorphyCardContent className="p-8 flex flex-col items-center space-y-4">
-            <div className="p-4 rounded-full bg-muted/30">{display.icon}</div>
-            <h3 className="text-lg font-semibold text-center">{display.title}</h3>
-            <p className="text-sm text-muted-foreground text-center">{error}</p>
-            {retryCountdown !== null && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Icon icon={Loader2} size="sm" className="animate-spin" />
-                <span>Trying again in {retryCountdown}s...</span>
-              </div>
-            )}
-            <div className="flex gap-2 pt-2">
-              <MorphyButton
-                variant="none"
-                effect="fade"
-                size="sm"
-                showRipple={false}
-                onClick={onClose}
-              >
-                Close
-              </MorphyButton>
-              {errorType !== "auth_expired" && (
+              <div className="p-4 rounded-full bg-muted/30">{display.icon}</div>
+              <h3 className="text-lg font-semibold text-center">
+                {display.title}
+              </h3>
+              <p className="text-sm text-muted-foreground text-center">
+                {error}
+              </p>
+              {retryCountdown !== null && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Icon icon={Loader2} size="sm" className="animate-spin" />
+                  <span>Trying again in {retryCountdown}s...</span>
+                </div>
+              )}
+              <div className="flex gap-2 pt-2">
                 <MorphyButton
+                  variant="none"
+                  effect="fade"
                   size="sm"
-                  onClick={() => {
-                    resetState();
-                    setCurrentRunId(null);
-                    setManagerTask(null);
-                    setReloadNonce((prev) => prev + 1);
-                  }}
+                  showRipple={false}
+                  onClick={onClose}
                 >
-                  <Icon icon={RefreshCw} size="sm" className="mr-2" /> Try again
+                  Close
                 </MorphyButton>
-              )}
-              {errorType === "auth_expired" && (
-                <MorphyButton size="sm" onClick={onClose}>
-                  <Icon icon={ShieldAlert} size="sm" className="mr-2" /> Re-authenticate
-                </MorphyButton>
-              )}
-            </div>
+                {errorType !== "auth_expired" && (
+                  <MorphyButton
+                    size="sm"
+                    onClick={() => {
+                      resetState();
+                      setCurrentRunId(null);
+                      setManagerTask(null);
+                      setReloadNonce((prev) => prev + 1);
+                    }}
+                  >
+                    <Icon icon={RefreshCw} size="sm" className="mr-2" /> Try
+                    again
+                  </MorphyButton>
+                )}
+                {errorType === "auth_expired" && (
+                  <MorphyButton size="sm" onClick={onClose}>
+                    <Icon icon={ShieldAlert} size="sm" className="mr-2" />{" "}
+                    Re-authenticate
+                  </MorphyButton>
+                )}
+              </div>
             </MorphyCardContent>
           </MorphyCard>
         </div>
@@ -1603,7 +1817,7 @@ export function DebateStreamView({
                     "rounded px-1.5 py-0.5 text-xs font-semibold tabular-nums",
                     headerChangePct >= 0
                       ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                      : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+                      : "bg-rose-500/10 text-rose-600 dark:text-rose-400",
                   )}
                 >
                   {headerChangePct >= 0 ? "+" : ""}
@@ -1618,17 +1832,26 @@ export function DebateStreamView({
             <div>
               {decision ? (
                 <Badge className="text-[10px] bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 font-semibold">
-                  <Icon icon={CheckCircle2} size={12} className="mr-1" /> Complete
+                  <Icon icon={CheckCircle2} size={12} className="mr-1" />{" "}
+                  Complete
                 </Badge>
               ) : loading && kaiThinking ? (
                 <Badge
                   variant="outline"
                   className="max-w-[260px] truncate text-[10px] bg-primary/10 text-primary border-primary/30 font-medium"
                 >
-                  <Icon icon={Loader2} size={12} className="mr-1 animate-spin" /> {kaiThinking}
+                  <Icon
+                    icon={Loader2}
+                    size={12}
+                    className="mr-1 animate-spin"
+                  />{" "}
+                  {kaiThinking}
                 </Badge>
               ) : retryCountdown !== null ? (
-                <Badge variant="outline" className="text-[10px] bg-amber-500/10 text-amber-600 border-amber-500/30">
+                <Badge
+                  variant="outline"
+                  className="text-[10px] bg-amber-500/10 text-amber-600 border-amber-500/30"
+                >
                   Try again in {retryCountdown}s
                 </Badge>
               ) : null}
@@ -1658,12 +1881,16 @@ export function DebateStreamView({
                         activeRound > round
                           ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
                           : activeRound === round
-                          ? "bg-primary/15 text-primary"
-                          : "bg-muted text-muted-foreground"
+                            ? "bg-primary/15 text-primary"
+                            : "bg-muted text-muted-foreground",
                       )}
                     >
                       {activeRound > round ? (
-                        <Icon icon={CheckCircle2} size={10} className="mr-0.5" />
+                        <Icon
+                          icon={CheckCircle2}
+                          size={10}
+                          className="mr-0.5"
+                        />
                       ) : null}
                       R{round}
                     </span>
@@ -1673,14 +1900,21 @@ export function DebateStreamView({
                   {Math.round(overallProgress)}%
                 </span>
               </div>
-              <Progress value={overallProgress} className="h-1.5 rounded-full" />
-              <p className="mt-1 text-center text-[10px] text-muted-foreground">{progressLabel}</p>
+              <Progress
+                value={overallProgress}
+                className="h-1.5 rounded-full"
+              />
+              <p className="mt-1 text-center text-[10px] text-muted-foreground">
+                {progressLabel}
+              </p>
             </div>
           ) : null}
         </div>
       ) : null}
 
-      <ScrollArea className={cn("flex-1 px-2 pb-4 sm:px-3", !showHeader && "pt-0")}>
+      <ScrollArea
+        className={cn("flex-1 px-2 pb-4 sm:px-3", !showHeader && "pt-0")}
+      >
         <div className="mx-auto w-full max-w-3xl space-y-4 px-0 pb-8">
           {decision ? (
             <MorphyCard>
@@ -1689,7 +1923,8 @@ export function DebateStreamView({
                   Analysis complete.
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Use Summary or Detailed View tabs to review the recommendation outputs.
+                  Use Summary or Detailed View tabs to review the recommendation
+                  outputs.
                 </p>
               </MorphyCardContent>
             </MorphyCard>
@@ -1701,7 +1936,9 @@ export function DebateStreamView({
               title="Initial Deep Analysis"
               description="Agents analyze raw data independently."
               isCollapsed={collapsedRounds[1] || false}
-              onToggleCollapse={() => setCollapsedRounds((prev) => ({ ...prev, 1: !prev[1] }))}
+              onToggleCollapse={() =>
+                setCollapsedRounds((prev) => ({ ...prev, 1: !prev[1] }))
+              }
               activeAgent={activeRound === 1 ? activeAgent : undefined}
               agentStates={round1States}
               onTabChange={setActiveAgent}
@@ -1709,13 +1946,16 @@ export function DebateStreamView({
           ) : null}
 
           {!decision &&
-          (activeRound >= 2 || AGENTS.some((agent) => round2States[agent]?.stage !== "idle")) ? (
+          (activeRound >= 2 ||
+            AGENTS.some((agent) => round2States[agent]?.stage !== "idle")) ? (
             <RoundTabsCard
               roundNumber={2}
               title="Strategic Debate"
               description="Agents challenge and refine positions."
               isCollapsed={collapsedRounds[2] || false}
-              onToggleCollapse={() => setCollapsedRounds((prev) => ({ ...prev, 2: !prev[2] }))}
+              onToggleCollapse={() =>
+                setCollapsedRounds((prev) => ({ ...prev, 2: !prev[2] }))
+              }
               activeAgent={activeRound === 2 ? activeAgent : undefined}
               agentStates={round2States}
               onTabChange={setActiveAgent}
@@ -1729,7 +1969,9 @@ export function DebateStreamView({
                 title="Initial Deep Analysis"
                 description="Agents analyze raw data independently."
                 isCollapsed={collapsedRounds[1] ?? true}
-                onToggleCollapse={() => setCollapsedRounds((prev) => ({ ...prev, 1: !prev[1] }))}
+                onToggleCollapse={() =>
+                  setCollapsedRounds((prev) => ({ ...prev, 1: !prev[1] }))
+                }
                 activeAgent={undefined}
                 agentStates={round1States}
                 onTabChange={setActiveAgent}
@@ -1739,7 +1981,9 @@ export function DebateStreamView({
                 title="Strategic Debate"
                 description="Agents challenge and refine positions."
                 isCollapsed={collapsedRounds[2] ?? true}
-                onToggleCollapse={() => setCollapsedRounds((prev) => ({ ...prev, 2: !prev[2] }))}
+                onToggleCollapse={() =>
+                  setCollapsedRounds((prev) => ({ ...prev, 2: !prev[2] }))
+                }
                 activeAgent={undefined}
                 agentStates={round2States}
                 onTabChange={setActiveAgent}

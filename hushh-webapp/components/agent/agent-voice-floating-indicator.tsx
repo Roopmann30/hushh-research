@@ -44,8 +44,9 @@ export function AgentVoiceFloatingIndicator({
       onClick={onClick}
       className={cn(
         "fixed right-4 z-[470] flex h-11 items-center gap-2 rounded-full border border-primary/40 bg-background/95 px-4 text-sm font-medium text-foreground shadow-lg backdrop-blur-md transition-transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary/40",
-        status === "error" && "border-destructive/50 text-destructive focus:ring-destructive/40",
-        className
+        status === "error" &&
+          "border-destructive/50 text-destructive focus:ring-destructive/40",
+        className,
       )}
       style={{
         bottom:
@@ -57,7 +58,7 @@ export function AgentVoiceFloatingIndicator({
       <span
         className={cn(
           "flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-primary",
-          status === "error" && "bg-destructive/10 text-destructive"
+          status === "error" && "bg-destructive/10 text-destructive",
         )}
       >
         {icon}

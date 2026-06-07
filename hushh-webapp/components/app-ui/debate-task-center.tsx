@@ -50,7 +50,9 @@ function statusLabel(task: DebateRunTask): string {
 
 function statusIcon(task: DebateRunTask) {
   if (task.status === "running") {
-    return <Icon icon={Loader2} size="sm" className="animate-spin text-sky-500" />;
+    return (
+      <Icon icon={Loader2} size="sm" className="animate-spin text-sky-500" />
+    );
   }
   if (task.status === "completed") {
     return <Icon icon={CheckCircle2} size="sm" className="text-emerald-500" />;
@@ -70,7 +72,9 @@ function appTaskStatusLabel(task: AppBackgroundTask): string {
 
 function appTaskStatusIcon(task: AppBackgroundTask) {
   if (task.status === "running") {
-    return <Icon icon={Loader2} size="sm" className="animate-spin text-sky-500" />;
+    return (
+      <Icon icon={Loader2} size="sm" className="animate-spin text-sky-500" />
+    );
   }
   if (task.status === "completed") {
     return <Icon icon={CheckCircle2} size="sm" className="text-emerald-500" />;
@@ -108,15 +112,24 @@ function appTaskTimingSummary(task: AppBackgroundTask): string | null {
   if (!timings) {
     return null;
   }
-  const totalMs = typeof timings.totalMs === "number" ? Math.round(timings.totalMs) : null;
+  const totalMs =
+    typeof timings.totalMs === "number" ? Math.round(timings.totalMs) : null;
   const manifestMs =
-    typeof timings.manifestReadMs === "number" ? Math.round(timings.manifestReadMs) : null;
+    typeof timings.manifestReadMs === "number"
+      ? Math.round(timings.manifestReadMs)
+      : null;
   const decryptMs =
-    typeof timings.decryptLoadMs === "number" ? Math.round(timings.decryptLoadMs) : null;
+    typeof timings.decryptLoadMs === "number"
+      ? Math.round(timings.decryptLoadMs)
+      : null;
   const transformMs =
-    typeof timings.transformMs === "number" ? Math.round(timings.transformMs) : null;
+    typeof timings.transformMs === "number"
+      ? Math.round(timings.transformMs)
+      : null;
   const validationMs =
-    typeof timings.validationMs === "number" ? Math.round(timings.validationMs) : null;
+    typeof timings.validationMs === "number"
+      ? Math.round(timings.validationMs)
+      : null;
   if (
     totalMs === null &&
     manifestMs === null &&
@@ -142,7 +155,10 @@ function shouldShowBackgroundTaskDiagnostics(): boolean {
 
 interface DebateTaskCenterProps {
   triggerClassName?: string;
-  renderTrigger?: (state: { activeCount: number; badgeCount: number }) => ReactElement;
+  renderTrigger?: (state: {
+    activeCount: number;
+    badgeCount: number;
+  }) => ReactElement;
 }
 
 const DEFAULT_TRIGGER_CLASSNAME =
@@ -171,12 +187,19 @@ type NotificationItem =
       task: AppBackgroundTask;
     };
 
-export function DebateTaskCenter({ triggerClassName, renderTrigger }: DebateTaskCenterProps = {}) {
+export function DebateTaskCenter({
+  triggerClassName,
+  renderTrigger,
+}: DebateTaskCenterProps = {}) {
   const router = useRouter();
   const { userId } = useAuth();
   const { vaultOwnerToken } = useVault();
-  const [debateState, setDebateState] = useState(DebateRunManagerService.getState());
-  const [appTaskState, setAppTaskState] = useState(AppBackgroundTaskService.getState());
+  const [debateState, setDebateState] = useState(
+    DebateRunManagerService.getState(),
+  );
+  const [appTaskState, setAppTaskState] = useState(
+    AppBackgroundTaskService.getState(),
+  );
   const [isBusy, setIsBusy] = useState<Record<string, boolean>>({});
   const [open, setOpen] = useState(false);
   const [showPassiveActivity, setShowPassiveActivity] = useState(false);
@@ -192,24 +215,28 @@ export function DebateTaskCenter({ triggerClassName, renderTrigger }: DebateTask
 
   const debateTasks = useMemo(() => {
     if (!userId) return [];
-    return debateState.tasks.filter((task) => task.userId === userId && !task.dismissedAt);
+    return debateState.tasks.filter(
+      (task) => task.userId === userId && !task.dismissedAt,
+    );
   }, [debateState.tasks, userId]);
 
   const appTasks = useMemo(() => {
     if (!userId) return [];
-    return appTaskState.tasks.filter((task) => task.userId === userId && !task.dismissedAt);
+    return appTaskState.tasks.filter(
+      (task) => task.userId === userId && !task.dismissedAt,
+    );
   }, [appTaskState.tasks, userId]);
   const visibleAppTasks = useMemo(
     () => appTasks.filter((task) => isAppBackgroundTaskVisible(task)),
-    [appTasks]
+    [appTasks],
   );
   const primaryAppTasks = useMemo(
     () => visibleAppTasks.filter((task) => task.visibility !== "passive"),
-    [visibleAppTasks]
+    [visibleAppTasks],
   );
   const passiveAppTasks = useMemo(
     () => visibleAppTasks.filter((task) => task.visibility === "passive"),
-    [visibleAppTasks]
+    [visibleAppTasks],
   );
 
   const notifications = useMemo<NotificationItem[]>(() => {
@@ -225,7 +252,9 @@ export function DebateTaskCenter({ triggerClassName, renderTrigger }: DebateTask
       sortAt: Date.parse(task.updatedAt || task.startedAt),
       task,
     }));
-    return [...debateNotifications, ...appNotifications].sort((a, b) => b.sortAt - a.sortAt);
+    return [...debateNotifications, ...appNotifications].sort(
+      (a, b) => b.sortAt - a.sortAt,
+    );
   }, [primaryAppTasks, debateTasks]);
 
   const activeCount =
@@ -242,7 +271,8 @@ export function DebateTaskCenter({ triggerClassName, renderTrigger }: DebateTask
   }, [debateTasks]);
 
   const openAnalysis = (focusRunId?: string | null) => {
-    const normalizedRunId = typeof focusRunId === "string" ? focusRunId.trim() : "";
+    const normalizedRunId =
+      typeof focusRunId === "string" ? focusRunId.trim() : "";
     if (normalizedRunId) {
       const params = new URLSearchParams();
       params.set("focus", "active");
@@ -391,7 +421,9 @@ export function DebateTaskCenter({ triggerClassName, renderTrigger }: DebateTask
                 })
               }
               aria-label={
-                task.kind === "plaid_refresh" ? "Cancel refresh" : "Cancel import"
+                task.kind === "plaid_refresh"
+                  ? "Cancel refresh"
+                  : "Cancel import"
               }
             >
               <Icon icon={X} size="xs" />
@@ -447,11 +479,18 @@ export function DebateTaskCenter({ triggerClassName, renderTrigger }: DebateTask
 
         <div className={TOP_SHELL_DROPDOWN_BODY_CLASSNAME}>
           {notifications.length === 0 && passiveAppTasks.length === 0 ? (
-            <div role="status" className="px-2 py-6 text-sm text-muted-foreground">
+            <div
+              role="status"
+              className="px-2 py-6 text-sm text-muted-foreground"
+            >
               No notifications yet.
             </div>
           ) : (
-            <div role="list" aria-label="Notifications" className="divide-y divide-border/45">
+            <div
+              role="list"
+              aria-label="Notifications"
+              className="divide-y divide-border/45"
+            >
               {notifications.map((item) =>
                 item.kind === "debate" ? (
                   <div key={item.id} role="listitem" className="px-3 py-3">
@@ -459,20 +498,26 @@ export function DebateTaskCenter({ triggerClassName, renderTrigger }: DebateTask
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
                           {statusIcon(item.task)}
-                          <span className="text-sm font-semibold">{item.task.ticker}</span>
+                          <span className="text-sm font-semibold">
+                            {item.task.ticker}
+                          </span>
                           <span className="text-xs text-muted-foreground">
                             {statusLabel(item.task)}
                           </span>
                         </div>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          Started {new Date(item.task.startedAt).toLocaleTimeString()}
+                          Started{" "}
+                          {new Date(item.task.startedAt).toLocaleTimeString()}
                         </p>
                         {item.task.persistenceState === "pending" ? (
-                          <p className="mt-1 text-xs text-amber-500">Saving to history…</p>
+                          <p className="mt-1 text-xs text-amber-500">
+                            Saving to history…
+                          </p>
                         ) : null}
                         {item.task.persistenceState === "failed" ? (
                           <p className="mt-1 text-xs text-rose-500">
-                            {item.task.persistenceError || "History save failed."}
+                            {item.task.persistenceError ||
+                              "History save failed."}
                           </p>
                         ) : null}
                       </div>
@@ -493,7 +538,10 @@ export function DebateTaskCenter({ triggerClassName, renderTrigger }: DebateTask
                             effect="fade"
                             size="icon"
                             className="h-8 w-8"
-                            disabled={!vaultOwnerToken || Boolean(isBusy[item.task.runId])}
+                            disabled={
+                              !vaultOwnerToken ||
+                              Boolean(isBusy[item.task.runId])
+                            }
                             onClick={() =>
                               runAction(item.task.runId, async () => {
                                 if (!vaultOwnerToken) return;
@@ -517,7 +565,9 @@ export function DebateTaskCenter({ triggerClassName, renderTrigger }: DebateTask
                             disabled={Boolean(isBusy[item.task.runId])}
                             onClick={() =>
                               runAction(item.task.runId, async () => {
-                                await DebateRunManagerService.retryTaskPersistence(item.task.runId);
+                                await DebateRunManagerService.retryTaskPersistence(
+                                  item.task.runId,
+                                );
                               })
                             }
                             aria-label="Retry save"
@@ -531,7 +581,11 @@ export function DebateTaskCenter({ triggerClassName, renderTrigger }: DebateTask
                             effect="fade"
                             size="icon"
                             className="h-8 w-8"
-                            onClick={() => DebateRunManagerService.dismissTask(item.task.runId)}
+                            onClick={() =>
+                              DebateRunManagerService.dismissTask(
+                                item.task.runId,
+                              )
+                            }
                             aria-label="Dismiss task"
                           >
                             <Icon icon={X} size="xs" />
@@ -542,7 +596,7 @@ export function DebateTaskCenter({ triggerClassName, renderTrigger }: DebateTask
                   </div>
                 ) : (
                   renderAppTask(item.task, "listitem")
-                )
+                ),
               )}
               {passiveAppTasks.length > 0 ? (
                 <div className="px-3 py-2.5">
@@ -552,9 +606,12 @@ export function DebateTaskCenter({ triggerClassName, renderTrigger }: DebateTask
                     onClick={() => setShowPassiveActivity((value) => !value)}
                   >
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-foreground">Background activity</p>
+                      <p className="text-sm font-semibold text-foreground">
+                        Background activity
+                      </p>
                       <p className="text-xs text-muted-foreground">
-                        Routine updates stay here unless something needs your attention.
+                        Routine updates stay here unless something needs your
+                        attention.
                       </p>
                     </div>
                     <div className="flex items-center gap-2 text-muted-foreground">
@@ -564,7 +621,7 @@ export function DebateTaskCenter({ triggerClassName, renderTrigger }: DebateTask
                       <ChevronDown
                         className={cn(
                           "h-4 w-4 transition-transform",
-                          showPassiveActivity && "rotate-180"
+                          showPassiveActivity && "rotate-180",
                         )}
                       />
                     </div>

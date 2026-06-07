@@ -12,7 +12,7 @@ export function LiquidGlassContainerDemo() {
       <div
         className={cn(
           "relative -ml-4 flex h-96 w-[calc(100%+32px)] items-center justify-center overflow-hidden rounded-xl border border-black/10 text-black/5 dark:border-white/10 dark:text-white/5",
-          useImageBg ? "animate-bg-pan" : ""
+          useImageBg ? "animate-bg-pan" : "",
         )}
         style={
           useImageBg
@@ -48,12 +48,22 @@ export function LiquidGlassContainerDemo() {
             <LiquidGlassContainerPanel>
               <div className="flex h-full flex-col text-white">
                 <h3 className="text-lg font-bold">Glass Card</h3>
-                <p className="text-sm opacity-80">Responsive container with blurred edge treatment.</p>
-                <p className="text-sm opacity-80">Content remains independent from the glass shell.</p>
-                <p className="text-sm opacity-80">This mirrors the Vue demo structure without leaking into app chrome.</p>
+                <p className="text-sm opacity-80">
+                  Responsive container with blurred edge treatment.
+                </p>
+                <p className="text-sm opacity-80">
+                  Content remains independent from the glass shell.
+                </p>
+                <p className="text-sm opacity-80">
+                  This mirrors the Vue demo structure without leaking into app
+                  chrome.
+                </p>
                 <div className="mt-4 flex h-[4.5rem] w-full items-center justify-between rounded-[1.5rem] border border-white/10 bg-black/55 p-3">
                   {Array.from({ length: 5 }).map((_, index) => (
-                    <div key={index} className="h-12 w-12 rounded-xl bg-white/10" />
+                    <div
+                      key={index}
+                      className="h-12 w-12 rounded-xl bg-white/10"
+                    />
                   ))}
                 </div>
               </div>
@@ -73,7 +83,11 @@ export function LiquidGlassContainerDemo() {
             onChange={(event) => setUseImageBg(event.target.checked)}
             className="accent-blue-600"
           />
-          <span className={useImageBg ? "text-white/90" : "text-black/90 dark:text-white/90"}>
+          <span
+            className={
+              useImageBg ? "text-white/90" : "text-black/90 dark:text-white/90"
+            }
+          >
             Use image background
           </span>
         </label>
@@ -82,7 +96,11 @@ export function LiquidGlassContainerDemo() {
   );
 }
 
-function LiquidGlassContainerPanel({ children }: { children: React.ReactNode }) {
+function LiquidGlassContainerPanel({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <div
       className="relative h-full w-full overflow-hidden rounded-[3rem]"
@@ -97,7 +115,9 @@ function LiquidGlassContainerPanel({ children }: { children: React.ReactNode }) 
       <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-white/18 to-transparent" />
       <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-black/12 to-transparent" />
       <div className="absolute inset-[40px] rounded-[2rem] backdrop-blur-[3px]" />
-      <div className="absolute inset-0 z-[1] h-full w-full overflow-auto p-5">{children}</div>
+      <div className="absolute inset-0 z-[1] h-full w-full overflow-auto p-5">
+        {children}
+      </div>
     </div>
   );
 }

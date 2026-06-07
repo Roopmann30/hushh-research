@@ -19,11 +19,7 @@ import { useVault } from "@/lib/vault/vault-context";
 import { UnlockWarmOrchestrator } from "@/lib/services/unlock-warm-orchestrator";
 import { ROUTES } from "@/lib/navigation/routes";
 
-export default function KaiLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function KaiLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user } = useAuth();
   const { vaultKey, vaultOwnerToken } = useVault();
@@ -31,8 +27,10 @@ export default function KaiLayout({
   const onImportRoute = pathname.startsWith("/kai/import");
   const onPlaidOauthReturnRoute = pathname === ROUTES.KAI_PLAID_OAUTH_RETURN;
   const onAlpacaOauthReturnRoute = pathname === ROUTES.KAI_ALPACA_OAUTH_RETURN;
-  const onOauthReturnRoute = onPlaidOauthReturnRoute || onAlpacaOauthReturnRoute;
-  const shouldEnableMethodPrompt = !onOnboardingRoute && !onImportRoute && !onOauthReturnRoute;
+  const onOauthReturnRoute =
+    onPlaidOauthReturnRoute || onAlpacaOauthReturnRoute;
+  const shouldEnableMethodPrompt =
+    !onOnboardingRoute && !onImportRoute && !onOauthReturnRoute;
 
   useEffect(() => {
     if (onOnboardingRoute || onImportRoute) return;
@@ -50,19 +48,25 @@ export default function KaiLayout({
         vaultOwnerToken,
         routePath: pathname,
       }).catch((error) => {
-        console.warn("[KaiLayout] Route-priority warm orchestration failed:", error);
+        console.warn(
+          "[KaiLayout] Route-priority warm orchestration failed:",
+          error,
+        );
       });
     };
 
     if (typeof window !== "undefined" && "requestIdleCallback" in window) {
       const requestIdle = window.requestIdleCallback as (
         callback: IdleRequestCallback,
-        options?: IdleRequestOptions
+        options?: IdleRequestOptions,
       ) => number;
       const cancelIdle = window.cancelIdleCallback as (handle: number) => void;
-      idleHandle = requestIdle(() => {
-        runWarm();
-      }, { timeout: 2500 });
+      idleHandle = requestIdle(
+        () => {
+          runWarm();
+        },
+        { timeout: 2500 },
+      );
       return () => {
         cancelled = true;
         if (idleHandle !== null) {
@@ -81,14 +85,19 @@ export default function KaiLayout({
         globalThis.clearTimeout(timeoutId);
       }
     };
-  }, [onImportRoute, onOnboardingRoute, pathname, user?.uid, vaultKey, vaultOwnerToken]);
+  }, [
+    onImportRoute,
+    onOnboardingRoute,
+    pathname,
+    user?.uid,
+    vaultKey,
+    vaultOwnerToken,
+  ]);
 
   const shell = (
     <RouteErrorBoundary fallbackRoute="/kai">
       <div className="flex min-h-screen flex-col [--morphy-glass-accent-a:rgba(148,163,184,0.08)] [--morphy-glass-accent-b:rgba(226,232,240,0.08)] dark:[--morphy-glass-accent-a:rgba(63,63,70,0.16)] dark:[--morphy-glass-accent-b:rgba(82,82,91,0.14)]">
-        <main className="flex-1 pb-0">
-          {children}
-        </main>
+        <main className="flex-1 pb-0">{children}</main>
         <VaultMethodPrompt enabled={shouldEnableMethodPrompt} />
         {onOauthReturnRoute ? null : <KaiNavTour />}
       </div>

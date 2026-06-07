@@ -6,8 +6,14 @@ import { usePathname, useRouter } from "next/navigation";
 import { getNativeTestConfig } from "@/lib/testing/native-test";
 
 let lastAppliedInitialRoute: string | null = null;
-let lastAppliedInitialRouteRequest: { route: string; appliedAt: number } | null = null;
-let lastAppliedExpectedRouteRecovery: { key: string; appliedAt: number } | null = null;
+let lastAppliedInitialRouteRequest: {
+  route: string;
+  appliedAt: number;
+} | null = null;
+let lastAppliedExpectedRouteRecovery: {
+  key: string;
+  appliedAt: number;
+} | null = null;
 
 const NATIVE_TEST_CONFIG_UPDATED_EVENT = "hushh:native-test-config-updated";
 const EXPECTED_ROUTE_RECOVERY_RETRY_MS = 5_000;
@@ -30,7 +36,10 @@ function normalizeRoute(value: string | null | undefined) {
   }
 }
 
-function sameRoute(left: string | null | undefined, right: string | null | undefined) {
+function sameRoute(
+  left: string | null | undefined,
+  right: string | null | undefined,
+) {
   return normalizeRoute(left) === normalizeRoute(right);
 }
 
@@ -130,7 +139,10 @@ export function NativeTestRouter() {
         const recoverToExpectedRoute = () => {
           if (!config.expectedRoute) return;
           lastAppliedInitialRoute = config.initialRoute;
-          lastAppliedExpectedRouteRecovery = { key: recoveryKey, appliedAt: now };
+          lastAppliedExpectedRouteRecovery = {
+            key: recoveryKey,
+            appliedAt: now,
+          };
           router.replace(config.expectedRoute, { scroll: false });
         };
 
@@ -171,7 +183,8 @@ export function NativeTestRouter() {
         }
 
         const alreadyAtExpectedRoute =
-          Boolean(config.expectedRoute) && sameRoute(currentRoute, config.expectedRoute);
+          Boolean(config.expectedRoute) &&
+          sameRoute(currentRoute, config.expectedRoute);
         const initialRouteRecentlyApplied =
           lastAppliedInitialRouteRequest?.route === config.initialRoute &&
           now - lastAppliedInitialRouteRequest.appliedAt <

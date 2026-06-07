@@ -1,13 +1,23 @@
 "use client";
 
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import {
   LiquidGlassSceneProvider,
   LiquidGlassSceneRoot,
   useSceneMetrics,
 } from "@/components/labs/liquid-glass-scene";
-import { paintLabBackdrop, roundedRectPath } from "@/lib/labs/liquid-glass-scene-paint";
+import {
+  paintLabBackdrop,
+  roundedRectPath,
+} from "@/lib/labs/liquid-glass-scene-paint";
 import { useLiquidGlassRendererMode } from "@/components/labs/liquid-glass-renderer-mode";
 import { useSpringValue } from "@/lib/labs/liquid-glass-core";
 
@@ -82,41 +92,61 @@ export function LiquidGlassSwitchDemo() {
       backgroundRepeat: "repeat, repeat, no-repeat",
       backgroundAttachment: "scroll",
     }),
-    []
+    [],
   );
 
   return (
     <LiquidGlassSceneProvider sceneStyle={sceneStyle}>
       <section className="space-y-5">
-      <div className="relative -ml-4 flex h-[36rem] w-[calc(100%+32px)] items-center justify-center overflow-hidden rounded-xl border border-black/10 text-black/5 dark:border-white/10 dark:text-white/5">
-        <LiquidGlassSceneRoot className="absolute inset-0">
-          <div className="absolute inset-x-14 top-12 grid grid-cols-4 gap-6">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div
-                key={index}
-                className="h-24 rounded-[2rem] border border-white/10 bg-black/16"
-                style={{ opacity: 0.42 + index * 0.06 }}
-              />
-            ))}
-          </div>
-          <div className="absolute inset-x-10 bottom-12 grid grid-cols-2 gap-6 md:grid-cols-4">
-            {Array.from({ length: 8 }).map((_, index) => (
-              <div
-                key={index}
-                className="h-16 rounded-[1.6rem] border border-white/8 bg-white/8"
-                style={{ opacity: 0.28 + (index % 4) * 0.08 }}
-              />
-            ))}
-          </div>
-        </LiquidGlassSceneRoot>
+        <div className="relative -ml-4 flex h-[36rem] w-[calc(100%+32px)] items-center justify-center overflow-hidden rounded-xl border border-black/10 text-black/5 dark:border-white/10 dark:text-white/5">
+          <LiquidGlassSceneRoot className="absolute inset-0">
+            <div className="absolute inset-x-14 top-12 grid grid-cols-4 gap-6">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="h-24 rounded-[2rem] border border-white/10 bg-black/16"
+                  style={{ opacity: 0.42 + index * 0.06 }}
+                />
+              ))}
+            </div>
+            <div className="absolute inset-x-10 bottom-12 grid grid-cols-2 gap-6 md:grid-cols-4">
+              {Array.from({ length: 8 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="h-16 rounded-[1.6rem] border border-white/8 bg-white/8"
+                  style={{ opacity: 0.28 + (index % 4) * 0.08 }}
+                />
+              ))}
+            </div>
+          </LiquidGlassSceneRoot>
 
-        <div className="relative z-10 grid grid-cols-2 gap-x-20 gap-y-10 md:grid-cols-4">
-          <SwitchCluster label="XS" checked={xs} onCheckedChange={setXs} size="xs" />
-          <SwitchCluster label="Small" checked={small} onCheckedChange={setSmall} size="small" />
-          <SwitchCluster label="Medium" checked={medium} onCheckedChange={setMedium} size="medium" />
-          <SwitchCluster label="Large" checked={large} onCheckedChange={setLarge} size="large" />
+          <div className="relative z-10 grid grid-cols-2 gap-x-20 gap-y-10 md:grid-cols-4">
+            <SwitchCluster
+              label="XS"
+              checked={xs}
+              onCheckedChange={setXs}
+              size="xs"
+            />
+            <SwitchCluster
+              label="Small"
+              checked={small}
+              onCheckedChange={setSmall}
+              size="small"
+            />
+            <SwitchCluster
+              label="Medium"
+              checked={medium}
+              onCheckedChange={setMedium}
+              size="medium"
+            />
+            <SwitchCluster
+              label="Large"
+              checked={large}
+              onCheckedChange={setLarge}
+              size="large"
+            />
+          </div>
         </div>
-      </div>
       </section>
     </LiquidGlassSceneProvider>
   );
@@ -135,8 +165,14 @@ function SwitchCluster({
 }) {
   return (
     <div className="flex flex-col items-center gap-3">
-      <span className="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">{label}</span>
-      <LiquidGlassSwitch checked={checked} onCheckedChange={onCheckedChange} size={size} />
+      <span className="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
+        {label}
+      </span>
+      <LiquidGlassSwitch
+        checked={checked}
+        onCheckedChange={onCheckedChange}
+        size={size}
+      />
       <span className="text-[10px] font-medium uppercase tracking-[0.24em] text-white/44">
         {checked ? "On" : "Off"}
       </span>
@@ -188,7 +224,13 @@ function LiquidGlassSwitch({
   const activeThumbScale = pointerDown ? thumbActiveScale : thumbRestScale;
   const backgroundOpacity = pointerDown ? 0.1 : 1;
   const scaleRatio = pointerDown ? 0.9 : 0.4;
-  const visualState = pointerDown ? (motionActive ? "dragging" : "held") : checked ? "active" : "idle";
+  const visualState = pointerDown
+    ? motionActive
+      ? "dragging"
+      : "held"
+    : checked
+      ? "active"
+      : "idle";
   const thumbFilterOptions = useMemo(
     () => ({
       width: thumbWidth,
@@ -211,7 +253,7 @@ function LiquidGlassSwitch({
       thumbHeight,
       thumbRadius,
       thumbWidth,
-    ]
+    ],
   );
 
   const springRatio = useSpringValue(xDragRatio, {
@@ -222,7 +264,8 @@ function LiquidGlassSwitch({
   });
 
   const thumbX = springRatio * travel;
-  const thumbMarginLeft = -thumbRestOffset + (sliderHeight - thumbHeight * thumbRestScale) / 2;
+  const thumbMarginLeft =
+    -thumbRestOffset + (sliderHeight - thumbHeight * thumbRestScale) / 2;
   const backgroundColor = useMemo(() => {
     const ratio = xDragRatio;
     const r = Math.round(148 + (59 - 148) * ratio);
@@ -281,7 +324,10 @@ function LiquidGlassSwitch({
   const lensLeft = thumbMarginLeft + thumbX;
   const lensTop = (sliderHeight - thumbHeight) / 2;
   const paintMirrorScene = useCallback(
-    (ctx: CanvasRenderingContext2D, env: { width: number; height: number; scale: number; padding?: number }) => {
+    (
+      ctx: CanvasRenderingContext2D,
+      env: { width: number; height: number; scale: number; padding?: number },
+    ) => {
       paintLabBackdrop(ctx, {
         width: env.width,
         height: env.height,
@@ -302,11 +348,27 @@ function LiquidGlassSwitch({
       });
       ctx.restore();
     },
-    [backgroundColor, lensLeft, lensTop, metrics.x, metrics.y, metrics.width, metrics.height, sliderHeight, sliderWidth, xDragRatio]
+    [
+      backgroundColor,
+      lensLeft,
+      lensTop,
+      metrics.x,
+      metrics.y,
+      metrics.width,
+      metrics.height,
+      sliderHeight,
+      sliderWidth,
+      xDragRatio,
+    ],
   );
 
   return (
-    <div ref={containerRef} className={disabled ? "cursor-not-allowed opacity-50" : "select-none touch-none"}>
+    <div
+      ref={containerRef}
+      className={
+        disabled ? "cursor-not-allowed opacity-50" : "select-none touch-none"
+      }
+    >
       <div
         className="relative"
         style={{
@@ -407,7 +469,7 @@ function paintSwitchSubstrate(
     height: number;
     fillRatio: number;
     fillColor: string;
-  }
+  },
 ) {
   const radius = height / 2;
   const gradient = ctx.createLinearGradient(0, 0, 0, height);
@@ -427,7 +489,14 @@ function paintSwitchSubstrate(
   roundedRectPath(ctx, 0, 0, Math.max(18, width * fillRatio), height, radius);
   ctx.fillStyle = fillColor;
   ctx.fill();
-  roundedRectPath(ctx, 1, 1, Math.max(16, width * fillRatio - 2), height * 0.48, radius - 1);
+  roundedRectPath(
+    ctx,
+    1,
+    1,
+    Math.max(16, width * fillRatio - 2),
+    height * 0.48,
+    radius - 1,
+  );
   ctx.fillStyle = "rgba(255,255,255,0.16)";
   ctx.fill();
   ctx.restore();

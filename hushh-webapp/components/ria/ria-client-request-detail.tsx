@@ -64,7 +64,9 @@ export function RiaClientRequestDetail({
     forceTestProfile,
   });
 
-  const request = detail?.request_history.find((entry) => entry.request_id === requestId) || null;
+  const request =
+    detail?.request_history.find((entry) => entry.request_id === requestId) ||
+    null;
   const voiceSurfaceMetadata = useMemo(
     () => ({
       screenId: "ria_client_request_detail",
@@ -93,7 +95,13 @@ export function RiaClientRequestDetail({
         request_action: request?.action || null,
       },
     }),
-    [clientId, request?.action, request?.request_id, request?.scope_metadata?.label, requestId]
+    [
+      clientId,
+      request?.action,
+      request?.request_id,
+      request?.scope_metadata?.label,
+      requestId,
+    ],
   );
   usePublishVoiceSurfaceMetadata(voiceSurfaceMetadata);
 
@@ -131,7 +139,13 @@ export function RiaClientRequestDetail({
         routeId: "/ria/clients/[userId]/requests/[requestId]",
         marker: "native-route-ria-client-request-detail",
         authState: user ? "authenticated" : "pending",
-        dataState: loading ? "loading" : request ? "loaded" : detailError ? "error" : "empty-valid",
+        dataState: loading
+          ? "loading"
+          : request
+            ? "loaded"
+            : detailError
+              ? "error"
+              : "empty-valid",
         errorCode: detailError ? "ria_client_request_detail" : null,
         errorMessage: detailError,
       }}
@@ -180,10 +194,19 @@ export function RiaClientRequestDetail({
       {request ? (
         <>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <MetricTile label="Action" value={formatStatusLabel(request.action)} />
-            <MetricTile label="Bundle" value={request.bundle_label || "Direct request"} />
+            <MetricTile
+              label="Action"
+              value={formatStatusLabel(request.action)}
+            />
+            <MetricTile
+              label="Bundle"
+              value={request.bundle_label || "Direct request"}
+            />
             <MetricTile label="Issued" value={formatDate(request.issued_at)} />
-            <MetricTile label="Expires" value={formatDate(request.expires_at)} />
+            <MetricTile
+              label="Expires"
+              value={formatDate(request.expires_at)}
+            />
           </div>
 
           <div className="grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
@@ -207,7 +230,11 @@ export function RiaClientRequestDetail({
                 />
                 <SettingsRow
                   title="Scope"
-                  description={request.scope_metadata?.description || request.scope || "Unavailable"}
+                  description={
+                    request.scope_metadata?.description ||
+                    request.scope ||
+                    "Unavailable"
+                  }
                 />
                 <SettingsRow
                   title="Bundle"
@@ -231,7 +258,11 @@ export function RiaClientRequestDetail({
               <SettingsGroup embedded>
                 <SettingsRow
                   title="Client"
-                  description={detail?.investor_display_name || detail?.investor_email || clientId}
+                  description={
+                    detail?.investor_display_name ||
+                    detail?.investor_email ||
+                    clientId
+                  }
                 />
                 <SettingsRow
                   title="Relationship status"
@@ -243,7 +274,11 @@ export function RiaClientRequestDetail({
                 />
                 <SettingsRow
                   title="Approved accounts"
-                  description={String(detail?.account_branches.filter((branch) => branch.status === "approved").length || 0)}
+                  description={String(
+                    detail?.account_branches.filter(
+                      (branch) => branch.status === "approved",
+                    ).length || 0,
+                  )}
                 />
               </SettingsGroup>
             </section>

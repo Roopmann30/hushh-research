@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Progress as ProgressPrimitive } from "radix-ui"
+import * as React from "react";
+import { Progress as ProgressPrimitive } from "radix-ui";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 function Progress({
   className,
@@ -11,19 +11,19 @@ function Progress({
   value,
   ...props
 }: React.ComponentProps<typeof ProgressPrimitive.Root> & {
-  indicatorClassName?: string
+  indicatorClassName?: string;
 }) {
   const safeValue =
     typeof value === "number" && Number.isFinite(value)
       ? Math.max(0, Math.min(100, value))
-      : undefined
+      : undefined;
 
   return (
     <ProgressPrimitive.Root
       data-slot="progress"
       className={cn(
         "bg-primary/20 relative h-2 w-full overflow-hidden rounded-full",
-        className
+        className,
       )}
       value={safeValue}
       {...props}
@@ -34,7 +34,7 @@ function Progress({
         style={{ width: `${safeValue ?? 0}%` }}
       />
     </ProgressPrimitive.Root>
-  )
+  );
 }
 
-export { Progress }
+export { Progress };

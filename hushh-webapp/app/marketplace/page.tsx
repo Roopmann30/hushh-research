@@ -17,7 +17,11 @@ import {
   X,
 } from "lucide-react";
 
-import { AppPageContentRegion, AppPageHeaderRegion, AppPageShell } from "@/components/app-ui/app-page-shell";
+import {
+  AppPageContentRegion,
+  AppPageHeaderRegion,
+  AppPageShell,
+} from "@/components/app-ui/app-page-shell";
 import { PageHeader } from "@/components/app-ui/page-sections";
 import { SettingsDetailPanel } from "@/components/profile/settings-ui";
 import {
@@ -42,7 +46,10 @@ import {
   marketplaceInvestorUserId,
 } from "@/lib/marketplace/investor-discovery";
 import { usePersonaState } from "@/lib/persona/persona-context";
-import { buildMarketplaceConnectionsRoute, buildRiaClientWorkspaceRoute } from "@/lib/navigation/routes";
+import {
+  buildMarketplaceConnectionsRoute,
+  buildRiaClientWorkspaceRoute,
+} from "@/lib/navigation/routes";
 import {
   ConsentCenterService,
   type ConsentCenterEntry,
@@ -96,7 +103,7 @@ function connectionBadgeLabel(status?: string | null) {
 
 function isConnectableAdvisor(status?: string | null) {
   return ["active", "verified", "finra_verified"].includes(
-    String(status || "").toLowerCase()
+    String(status || "").toLowerCase(),
   );
 }
 
@@ -124,11 +131,16 @@ function ProfileAvatar({
         kind === "ria"
           ? "border-sky-500/15 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.18),transparent_58%),linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.92))]"
           : "border-emerald-500/15 bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.16),transparent_58%),linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.92))]",
-        className
+        className,
       )}
     >
       <div className="flex flex-col items-center justify-center gap-1">
-        <Icon className={cn("h-4 w-4", kind === "ria" ? "text-sky-700" : "text-emerald-700")} />
+        <Icon
+          className={cn(
+            "h-4 w-4",
+            kind === "ria" ? "text-sky-700" : "text-emerald-700",
+          )}
+        />
         <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/72">
           {initials || (kind === "ria" ? "RIA" : "INV")}
         </span>
@@ -140,7 +152,10 @@ function ProfileAvatar({
 function toSelectedProfile(item: DiscoveryCard): SelectedProfile {
   return item.kind === "ria"
     ? { kind: "ria", id: (item.profile as MarketplaceRia).id }
-    : { kind: "investor", id: marketplaceInvestorCardId(item.profile as MarketplaceInvestor) };
+    : {
+        kind: "investor",
+        id: marketplaceInvestorCardId(item.profile as MarketplaceInvestor),
+      };
 }
 
 function discoveryCardUserId(item: DiscoveryCard): string | null {
@@ -148,7 +163,9 @@ function discoveryCardUserId(item: DiscoveryCard): string | null {
   return marketplaceInvestorUserId(item.profile as MarketplaceInvestor);
 }
 
-function formatEvidenceAddress(address?: Record<string, unknown> | null): string | null {
+function formatEvidenceAddress(
+  address?: Record<string, unknown> | null,
+): string | null {
   if (!address) return null;
   const parts = [
     address.street1,
@@ -162,8 +179,11 @@ function formatEvidenceAddress(address?: Record<string, unknown> | null): string
   return parts.length > 0 ? parts.join(", ") : null;
 }
 
-function formatEvidenceForms(forms?: Array<{ form?: string | null; last_filed_at?: string | null }>): string {
-  if (!Array.isArray(forms) || forms.length === 0) return "Official SEC filing evidence";
+function formatEvidenceForms(
+  forms?: Array<{ form?: string | null; last_filed_at?: string | null }>,
+): string {
+  if (!Array.isArray(forms) || forms.length === 0)
+    return "Official SEC filing evidence";
   return forms
     .map((form) => {
       const label = String(form.form || "SEC filing").trim();
@@ -182,7 +202,9 @@ export default function MarketplacePage() {
   const allowKaiTestInvestor = canShowKaiTestProfile();
   const kaiTestUserId = getKaiTestUserId();
   const currentPersona =
-    personaState?.active_persona || personaState?.last_active_persona || "investor";
+    personaState?.active_persona ||
+    personaState?.last_active_persona ||
+    "investor";
   const directoryKind = currentPersona === "ria" ? "investors" : "rias";
   const searchPlaceholder = "Search people by name, advisor, or investor";
 
@@ -191,25 +213,39 @@ export default function MarketplacePage() {
   const [searchOpen, setSearchOpen] = useState(true);
   const [loading, setLoading] = useState(false);
   const [hasLoadedDirectory, setHasLoadedDirectory] = useState(false);
-  const [actionLoadingUserId, setActionLoadingUserId] = useState<string | null>(null);
+  const [actionLoadingUserId, setActionLoadingUserId] = useState<string | null>(
+    null,
+  );
   const [rias, setRias] = useState<MarketplaceRia[]>([]);
   const [investors, setInvestors] = useState<MarketplaceInvestor[]>([]);
   const [investorDeckMeta, setInvestorDeckMeta] =
     useState<MarketplaceInvestorDeckResponse | null>(null);
   const [relationships, setRelationships] = useState<RiaClientAccess[]>([]);
-  const [advisorConnections, setAdvisorConnections] = useState<ConsentCenterEntry[]>([]);
+  const [advisorConnections, setAdvisorConnections] = useState<
+    ConsentCenterEntry[]
+  >([]);
   const [iamUnavailable, setIamUnavailable] = useState(false);
-  const [selectedProfile, setSelectedProfile] = useState<SelectedProfile | null>(null);
-  const [selectedRiaProfile, setSelectedRiaProfile] = useState<MarketplaceRia | null>(null);
+  const [selectedProfile, setSelectedProfile] =
+    useState<SelectedProfile | null>(null);
+  const [selectedRiaProfile, setSelectedRiaProfile] =
+    useState<MarketplaceRia | null>(null);
   const [selectedRiaLoading, setSelectedRiaLoading] = useState(false);
   const [selectedRiaError, setSelectedRiaError] = useState<string | null>(null);
   const [passedRiaIds, setPassedRiaIds] = useState<string[]>([]);
   const [passedInvestorIds, setPassedInvestorIds] = useState<string[]>([]);
-  const [shortlistedInvestorIds, setShortlistedInvestorIds] = useState<string[]>([]);
-  const [contactMatches, setContactMatches] = useState<MarketplaceContactMatch[]>([]);
+  const [shortlistedInvestorIds, setShortlistedInvestorIds] = useState<
+    string[]
+  >([]);
+  const [contactMatches, setContactMatches] = useState<
+    MarketplaceContactMatch[]
+  >([]);
   const [contactMatchLoading, setContactMatchLoading] = useState(false);
-  const [contactMatchError, setContactMatchError] = useState<string | null>(null);
-  const [contactScanSummary, setContactScanSummary] = useState<string | null>(null);
+  const [contactMatchError, setContactMatchError] = useState<string | null>(
+    null,
+  );
+  const [contactScanSummary, setContactScanSummary] = useState<string | null>(
+    null,
+  );
   const [deckRefreshNonce, setDeckRefreshNonce] = useState(0);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const dragStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -221,7 +257,8 @@ export default function MarketplacePage() {
         id: "demo-ria-hudson",
         kind: "ria",
         title: "Hudson Advisory Group",
-        headline: "New York wealth planning for founders, executives, and families.",
+        headline:
+          "New York wealth planning for founders, executives, and families.",
         summary:
           "Demo advisor profile for UI review. Use it to evaluate the Connect experience and compare card density, not to start a live connection.",
         metaLine: "New York · Multi-family wealth planning",
@@ -231,7 +268,8 @@ export default function MarketplacePage() {
           id: "demo-ria-hudson",
           user_id: "demo_ria_hudson",
           display_name: "Hudson Advisory Group",
-          headline: "New York wealth planning for founders, executives, and families.",
+          headline:
+            "New York wealth planning for founders, executives, and families.",
           strategy_summary:
             "Tax-aware planning, concentrated equity risk management, and long-term family allocation design.",
           verification_status: "active",
@@ -254,7 +292,8 @@ export default function MarketplacePage() {
         id: "demo-ria-pacific",
         kind: "ria",
         title: "Pacific Crest Private Wealth",
-        headline: "West Coast advisory team focused on liquidity events and durable income plans.",
+        headline:
+          "West Coast advisory team focused on liquidity events and durable income plans.",
         summary:
           "Demo advisor profile for non-production browsing. Helpful for testing long names, richer summaries, and sheet presentation.",
         metaLine: "San Francisco · Executive planning",
@@ -264,7 +303,8 @@ export default function MarketplacePage() {
           id: "demo-ria-pacific",
           user_id: "demo_ria_pacific",
           display_name: "Pacific Crest Private Wealth",
-          headline: "West Coast advisory team focused on liquidity events and durable income plans.",
+          headline:
+            "West Coast advisory team focused on liquidity events and durable income plans.",
           strategy_summary:
             "Concentrated stock transitions, retirement income planning, and downside-aware portfolio structuring.",
           verification_status: "active",
@@ -287,8 +327,18 @@ export default function MarketplacePage() {
   }, [allowTestProfiles, directoryKind]);
 
   const injectedKaiTestInvestor = useMemo<DiscoveryCard | null>(() => {
-    if (!allowKaiTestInvestor || !kaiTestUserId || directoryKind !== "investors") return null;
-    if (investors.some((investor) => marketplaceInvestorUserId(investor) === kaiTestUserId)) return null;
+    if (
+      !allowKaiTestInvestor ||
+      !kaiTestUserId ||
+      directoryKind !== "investors"
+    )
+      return null;
+    if (
+      investors.some(
+        (investor) => marketplaceInvestorUserId(investor) === kaiTestUserId,
+      )
+    )
+      return null;
     const investor = buildKaiTestMarketplaceInvestor(kaiTestUserId);
     return {
       id: marketplaceInvestorCardId(investor),
@@ -335,8 +385,10 @@ export default function MarketplacePage() {
     ) => {
       if (!user || investor.is_test_profile) return null;
       const target = marketplaceInvestorActionTarget(investor);
-      if (target.source_type === "public_sec" && !target.public_profile_id) return null;
-      if (target.source_type === "hushh_user" && !target.target_user_id) return null;
+      if (target.source_type === "public_sec" && !target.public_profile_id)
+        return null;
+      if (target.source_type === "hushh_user" && !target.target_user_id)
+        return null;
       const idToken = await user.getIdToken();
       return RiaService.recordInvestorAction(idToken, {
         action,
@@ -359,14 +411,17 @@ export default function MarketplacePage() {
     async function loadPersistedInvestorActions() {
       try {
         const idToken = await activeUser.getIdToken();
-        const actions = await RiaService.listInvestorActions(idToken, { limit: 100 });
+        const actions = await RiaService.listInvestorActions(idToken, {
+          limit: 100,
+        });
         if (cancelled) return;
 
         const passed = actions
-          .filter((item) =>
-            item.status === "passed" ||
-            item.status === "shortlisted" ||
-            item.status === "connect_requested"
+          .filter(
+            (item) =>
+              item.status === "passed" ||
+              item.status === "shortlisted" ||
+              item.status === "connect_requested",
           )
           .map((item) => String(item.target_key || "").trim())
           .filter(Boolean);
@@ -375,12 +430,17 @@ export default function MarketplacePage() {
           .map((item) => String(item.target_key || "").trim())
           .filter(Boolean);
 
-        setPassedInvestorIds((current) => Array.from(new Set([...current, ...passed])));
+        setPassedInvestorIds((current) =>
+          Array.from(new Set([...current, ...passed])),
+        );
         setShortlistedInvestorIds((current) =>
           Array.from(new Set([...current, ...shortlisted])),
         );
       } catch (error) {
-        console.warn("[Marketplace] Could not load persisted investor deck actions", error);
+        console.warn(
+          "[Marketplace] Could not load persisted investor deck actions",
+          error,
+        );
       }
     }
 
@@ -404,13 +464,16 @@ export default function MarketplacePage() {
           ? current.map((item) => String(item || "").trim()).filter(Boolean)
           : [];
         if (!ids.includes(normalizedId)) {
-          window.localStorage.setItem(key, JSON.stringify([...ids, normalizedId]));
+          window.localStorage.setItem(
+            key,
+            JSON.stringify([...ids, normalizedId]),
+          );
         }
       } catch {
         window.localStorage.setItem(key, JSON.stringify([normalizedId]));
       }
     },
-    [user]
+    [user],
   );
 
   useEffect(() => {
@@ -506,29 +569,30 @@ export default function MarketplacePage() {
       setHasLoadedDirectory(false);
       setIamUnavailable(false);
       try {
-        const investorLoader = async (): Promise<MarketplaceInvestorDeckResponse> => {
-          if (user && currentPersona === "ria") {
-            const idToken = await user.getIdToken();
-            return RiaService.searchInvestorDeck(idToken, {
+        const investorLoader =
+          async (): Promise<MarketplaceInvestorDeckResponse> => {
+            if (user && currentPersona === "ria") {
+              const idToken = await user.getIdToken();
+              return RiaService.searchInvestorDeck(idToken, {
+                query,
+                limit: 32,
+                persona: "ria",
+                deck: "qualified",
+              });
+            }
+            const items = await RiaService.searchInvestors({
               query,
               limit: 32,
               persona: "ria",
               deck: "qualified",
             });
-          }
-          const items = await RiaService.searchInvestors({
-            query,
-            limit: 32,
-            persona: "ria",
-            deck: "qualified",
-          });
-          return {
-            items,
-            remaining_count: items.length,
-            handled_count: 0,
-            deck_complete: items.length === 0,
+            return {
+              items,
+              remaining_count: items.length,
+              handled_count: 0,
+              deck_complete: items.length === 0,
+            };
           };
-        };
         const [riaResult, investorResult] = await Promise.allSettled([
           RiaService.searchRias({
             query,
@@ -551,9 +615,11 @@ export default function MarketplacePage() {
             setInvestorDeckMeta(null);
           }
           const failures = [riaResult, investorResult].filter(
-            (result) => result.status === "rejected"
+            (result) => result.status === "rejected",
           ) as PromiseRejectedResult[];
-          setIamUnavailable(failures.some((result) => isIAMSchemaNotReadyError(result.reason)));
+          setIamUnavailable(
+            failures.some((result) => isIAMSchemaNotReadyError(result.reason)),
+          );
         }
       } catch (error) {
         if (!cancelled) {
@@ -588,7 +654,7 @@ export default function MarketplacePage() {
       }
 
       const injected = injectedTestCards.find(
-        (item) => item.kind === "ria" && item.id === selectedProfile.id
+        (item) => item.kind === "ria" && item.id === selectedProfile.id,
       );
       if (injected) {
         setSelectedRiaProfile(injected.profile as MarketplaceRia);
@@ -608,7 +674,9 @@ export default function MarketplacePage() {
         if (!cancelled) {
           setSelectedRiaProfile(null);
           setSelectedRiaError(
-            error instanceof Error ? error.message : "Could not load advisor profile."
+            error instanceof Error
+              ? error.message
+              : "Could not load advisor profile.",
           );
         }
       } finally {
@@ -649,7 +717,10 @@ export default function MarketplacePage() {
       .filter((item) => item.kind === "investor")
       .map((item) => item.profile as MarketplaceInvestor);
     return new Map(
-      [...investors, ...contactInvestors].map((item) => [marketplaceInvestorCardId(item), item])
+      [...investors, ...contactInvestors].map((item) => [
+        marketplaceInvestorCardId(item),
+        item,
+      ]),
     );
   }, [contactMatches, investors]);
 
@@ -657,7 +728,7 @@ export default function MarketplacePage() {
     return rias.map((ria) => {
       const connection = advisorConnectionMap.get(ria.user_id);
       const connectionState = connectionBadgeLabel(
-        connection?.relationship_status || connection?.status
+        connection?.relationship_status || connection?.status,
       );
       const canConnect =
         currentPersona === "investor" &&
@@ -692,7 +763,7 @@ export default function MarketplacePage() {
       const curationLabel = marketplaceInvestorCurationLabel(investor);
       const relationship = userId ? relationshipMap.get(userId) : null;
       const connectionState = connectionBadgeLabel(
-        relationship?.relationship_status || relationship?.status
+        relationship?.relationship_status || relationship?.status,
       );
       const canConnect =
         currentPersona === "ria" &&
@@ -708,11 +779,14 @@ export default function MarketplacePage() {
           investor.strategy_summary ||
           investor.location_hint ||
           "Qualified discovery lead backed by public evidence.",
-        metaLine: [curationLabel, sourceLabel, investor.location_hint]
-          .filter(Boolean)
-          .join(" · ") || "Qualified discovery profile",
+        metaLine:
+          [curationLabel, sourceLabel, investor.location_hint]
+            .filter(Boolean)
+            .join(" · ") || "Qualified discovery profile",
         canConnect,
-        isTestProfile: Boolean(investor.is_test_profile || (userId && isKaiTestProfileUser(userId))),
+        isTestProfile: Boolean(
+          investor.is_test_profile || (userId && isKaiTestProfileUser(userId)),
+        ),
         profile: investor,
       };
     });
@@ -724,7 +798,13 @@ export default function MarketplacePage() {
       return [...base, ...injectedTestCards];
     }
     return injectedKaiTestInvestor ? [injectedKaiTestInvestor, ...base] : base;
-  }, [advisorCards, directoryKind, injectedKaiTestInvestor, injectedTestCards, investorCards]);
+  }, [
+    advisorCards,
+    directoryKind,
+    injectedKaiTestInvestor,
+    injectedTestCards,
+    investorCards,
+  ]);
   const searchCards = useMemo<DiscoveryCard[]>(() => {
     return [
       ...advisorCards,
@@ -766,7 +846,7 @@ export default function MarketplacePage() {
     : null;
   const selectedInvestorIsTest = Boolean(
     selectedInvestor?.is_test_profile ||
-      (selectedInvestorUserId && isKaiTestProfileUser(selectedInvestorUserId))
+    (selectedInvestorUserId && isKaiTestProfileUser(selectedInvestorUserId)),
   );
   const selectedInvestorSourceLabel = selectedInvestor
     ? marketplaceInvestorSourceLabel(selectedInvestor)
@@ -779,27 +859,36 @@ export default function MarketplacePage() {
     : false;
   const selectedInvestorEvidence = selectedInvestor?.evidence || null;
   const selectedInvestorAddress = formatEvidenceAddress(
-    selectedInvestorEvidence?.business_address
+    selectedInvestorEvidence?.business_address,
   );
-  const selectedInvestorEvidenceLinks = Array.isArray(selectedInvestorEvidence?.source_urls)
+  const selectedInvestorEvidenceLinks = Array.isArray(
+    selectedInvestorEvidence?.source_urls,
+  )
     ? selectedInvestorEvidence.source_urls
         .filter((url): url is string => Boolean(url))
         .slice(0, 3)
     : [];
-  const selectedInvestorFormsLabel = formatEvidenceForms(selectedInvestorEvidence?.forms);
+  const selectedInvestorFormsLabel = formatEvidenceForms(
+    selectedInvestorEvidence?.forms,
+  );
   const selectedInvestorCurationLabel = selectedInvestor
     ? marketplaceInvestorCurationLabel(selectedInvestor)
     : null;
   const selectedInvestorIsShortlisted = selectedInvestor
-    ? shortlistedInvestorIds.includes(marketplaceInvestorCardId(selectedInvestor))
+    ? shortlistedInvestorIds.includes(
+        marketplaceInvestorCardId(selectedInvestor),
+      )
     : false;
   const selectedInjectedRia =
     selectedProfile?.kind === "ria"
-      ? ((injectedTestCards.find((item) => item.kind === "ria" && item.id === selectedProfile.id)
-          ?.profile as MarketplaceRia | undefined) || null)
+      ? (injectedTestCards.find(
+          (item) => item.kind === "ria" && item.id === selectedProfile.id,
+        )?.profile as MarketplaceRia | undefined) || null
       : null;
   const selectedAdvisor =
-    selectedProfile?.kind === "ria" ? selectedInjectedRia || selectedRiaProfile : null;
+    selectedProfile?.kind === "ria"
+      ? selectedInjectedRia || selectedRiaProfile
+      : null;
   const selectedAdvisorFirmNames = Array.isArray(selectedAdvisor?.firms)
     ? selectedAdvisor.firms
         .map((firm) => String(firm?.legal_name || "").trim())
@@ -813,7 +902,8 @@ export default function MarketplacePage() {
   const matchContacts = useCallback(async () => {
     if (!user) {
       toast.error("Sign in required", {
-        description: "Connect needs your signed-in account before matching contacts.",
+        description:
+          "Connect needs your signed-in account before matching contacts.",
       });
       return;
     }
@@ -828,12 +918,15 @@ export default function MarketplacePage() {
       }
       const idToken = await user.getIdToken();
       const matches = await RiaService.matchMarketplaceContacts(idToken, {
-        phone_lookups: lookupResult.lookups.map(({ hash, last4 }) => ({ hash, last4 })),
+        phone_lookups: lookupResult.lookups.map(({ hash, last4 }) => ({
+          hash,
+          last4,
+        })),
         limit: 50,
       });
       setContactMatches(matches);
       setContactScanSummary(
-        `${matches.length} match${matches.length === 1 ? "" : "es"} from ${lookupResult.totalContacts} contacts.`
+        `${matches.length} match${matches.length === 1 ? "" : "es"} from ${lookupResult.totalContacts} contacts.`,
       );
       if (matches.length === 0) {
         toast.info("No Hushh contacts found", {
@@ -841,7 +934,8 @@ export default function MarketplacePage() {
         });
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Could not match contacts.";
+      const message =
+        error instanceof Error ? error.message : "Could not match contacts.";
       setContactMatchError(message);
       toast.error(message);
     } finally {
@@ -851,116 +945,157 @@ export default function MarketplacePage() {
 
   const openTestInvestorWorkspace = useCallback(
     (userId: string) => {
-      router.push(buildRiaClientWorkspaceRoute(userId, { tab: "overview", testProfile: true }));
+      router.push(
+        buildRiaClientWorkspaceRoute(userId, {
+          tab: "overview",
+          testProfile: true,
+        }),
+      );
     },
-    [router]
+    [router],
   );
 
-  const createConnectionToInvestor = useCallback(async (investor: MarketplaceInvestor) => {
-    if (!user) return;
-    const investorUserId = marketplaceInvestorUserId(investor);
-    if (!isMarketplaceInvestorConnectable(investor) || !investorUserId) {
-      toast.info("Public investor profile", {
-        description: "This profile is discovery-only until an invite or verified Hushh account exists.",
-      });
-      return;
-    }
-    try {
-      setActionLoadingUserId(investorUserId);
-      const idToken = await user.getIdToken();
-      const request = await ConsentCenterService.createRequest({
-        idToken,
-        userId: user.uid,
-        payload: {
-          subject_user_id: investorUserId,
-          requester_actor_type: "ria",
-          subject_actor_type: "investor",
-          scope_template_id: "ria_financial_summary_v1",
-          duration_mode: "preset",
-          duration_hours: 168,
-        },
-      });
-      await persistInvestorAction(investor, "connect_request", {
-        request_id:
-          request && typeof request === "object" && "request_id" in request
-            ? String(request.request_id || "")
-            : null,
-        gesture: "right_swipe_or_connect",
-      });
+  const createConnectionToInvestor = useCallback(
+    async (investor: MarketplaceInvestor) => {
+      if (!user) return;
+      const investorUserId = marketplaceInvestorUserId(investor);
+      if (!isMarketplaceInvestorConnectable(investor) || !investorUserId) {
+        toast.info("Public investor profile", {
+          description:
+            "This profile is discovery-only until an invite or verified Hushh account exists.",
+        });
+        return;
+      }
+      try {
+        setActionLoadingUserId(investorUserId);
+        const idToken = await user.getIdToken();
+        const request = await ConsentCenterService.createRequest({
+          idToken,
+          userId: user.uid,
+          payload: {
+            subject_user_id: investorUserId,
+            requester_actor_type: "ria",
+            subject_actor_type: "investor",
+            scope_template_id: "ria_financial_summary_v1",
+            duration_mode: "preset",
+            duration_hours: 168,
+          },
+        });
+        await persistInvestorAction(investor, "connect_request", {
+          request_id:
+            request && typeof request === "object" && "request_id" in request
+              ? String(request.request_id || "")
+              : null,
+          gesture: "right_swipe_or_connect",
+        });
+        const investorId = marketplaceInvestorCardId(investor);
+        setPassedInvestorIds((current) =>
+          current.includes(investorId) ? current : [...current, investorId],
+        );
+        rememberInvestorDeckDecision("passed", investorId);
+        toast.success("Connection request sent", {
+          description:
+            "The investor can review it in their pending connections.",
+        });
+        router.push(buildMarketplaceConnectionsRoute({ tab: "pending" }));
+      } catch (error) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Failed to send connection request",
+        );
+      } finally {
+        setActionLoadingUserId(null);
+      }
+    },
+    [persistInvestorAction, rememberInvestorDeckDecision, router, user],
+  );
+
+  const createConnectionToAdvisor = useCallback(
+    async (ria: MarketplaceRia) => {
+      if (!user) return;
+      try {
+        setActionLoadingUserId(ria.user_id);
+        const idToken = await user.getIdToken();
+        await ConsentCenterService.createRequest({
+          idToken,
+          userId: user.uid,
+          payload: {
+            subject_user_id: ria.user_id,
+            requester_actor_type: "investor",
+            subject_actor_type: "ria",
+            scope_template_id: "investor_advisor_disclosure_v1",
+            duration_mode: "preset",
+            duration_hours: 168,
+          },
+        });
+        toast.success("Connection request sent", {
+          description:
+            "The advisor can review it in their pending connections.",
+        });
+        router.push(buildMarketplaceConnectionsRoute({ tab: "pending" }));
+      } catch (error) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Failed to send connection request",
+        );
+      } finally {
+        setActionLoadingUserId(null);
+      }
+    },
+    [router, user],
+  );
+
+  const shortlistInvestor = useCallback(
+    async (investor: MarketplaceInvestor) => {
       const investorId = marketplaceInvestorCardId(investor);
-      setPassedInvestorIds((current) =>
-        current.includes(investorId) ? current : [...current, investorId]
-      );
-      rememberInvestorDeckDecision("passed", investorId);
-      toast.success("Connection request sent", {
-        description: "The investor can review it in their pending connections.",
-      });
-      router.push(buildMarketplaceConnectionsRoute({ tab: "pending" }));
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to send connection request");
-    } finally {
-      setActionLoadingUserId(null);
-    }
-  }, [persistInvestorAction, rememberInvestorDeckDecision, router, user]);
+      try {
+        await persistInvestorAction(investor, "shortlist", {
+          gesture: "right_swipe_or_save",
+        });
+        setShortlistedInvestorIds((current) =>
+          current.includes(investorId) ? current : [...current, investorId],
+        );
+        setPassedInvestorIds((current) =>
+          current.includes(investorId) ? current : [...current, investorId],
+        );
+        rememberInvestorDeckDecision("shortlisted", investorId);
+        rememberInvestorDeckDecision("passed", investorId);
+        toast.success("Investor lead saved", {
+          description: "Saved to the database-backed RIA deck shortlist.",
+        });
+      } catch (error) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Could not save investor lead",
+        );
+      }
+    },
+    [persistInvestorAction, rememberInvestorDeckDecision],
+  );
 
-  const createConnectionToAdvisor = useCallback(async (ria: MarketplaceRia) => {
-    if (!user) return;
-    try {
-      setActionLoadingUserId(ria.user_id);
-      const idToken = await user.getIdToken();
-      await ConsentCenterService.createRequest({
-        idToken,
-        userId: user.uid,
-        payload: {
-          subject_user_id: ria.user_id,
-          requester_actor_type: "investor",
-          subject_actor_type: "ria",
-          scope_template_id: "investor_advisor_disclosure_v1",
-          duration_mode: "preset",
-          duration_hours: 168,
-        },
-      });
-      toast.success("Connection request sent", {
-        description: "The advisor can review it in their pending connections.",
-      });
-      router.push(buildMarketplaceConnectionsRoute({ tab: "pending" }));
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to send connection request");
-    } finally {
-      setActionLoadingUserId(null);
-    }
-  }, [router, user]);
-
-  const shortlistInvestor = useCallback(async (investor: MarketplaceInvestor) => {
-    const investorId = marketplaceInvestorCardId(investor);
-    try {
-      await persistInvestorAction(investor, "shortlist", { gesture: "right_swipe_or_save" });
-      setShortlistedInvestorIds((current) =>
-        current.includes(investorId) ? current : [...current, investorId]
-      );
-      setPassedInvestorIds((current) =>
-        current.includes(investorId) ? current : [...current, investorId]
-      );
-      rememberInvestorDeckDecision("shortlisted", investorId);
-      rememberInvestorDeckDecision("passed", investorId);
-      toast.success("Investor lead saved", {
-        description: "Saved to the database-backed RIA deck shortlist.",
-      });
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not save investor lead");
-    }
-  }, [persistInvestorAction, rememberInvestorDeckDecision]);
-
-  const openDiscoveryProfile = useCallback((card: DiscoveryCard) => {
-    if (card.kind === "investor") {
-      void persistInvestorAction(card.profile as MarketplaceInvestor, "view_more", {
-        gesture: "view_more",
-      }).catch((error) => {
-        console.warn("[Marketplace] Could not persist investor view action", error);
-      });
-    }
-    setSelectedProfile(toSelectedProfile(card));
-  }, [persistInvestorAction]);
+  const openDiscoveryProfile = useCallback(
+    (card: DiscoveryCard) => {
+      if (card.kind === "investor") {
+        void persistInvestorAction(
+          card.profile as MarketplaceInvestor,
+          "view_more",
+          {
+            gesture: "view_more",
+          },
+        ).catch((error) => {
+          console.warn(
+            "[Marketplace] Could not persist investor view action",
+            error,
+          );
+        });
+      }
+      setSelectedProfile(toSelectedProfile(card));
+    },
+    [persistInvestorAction],
+  );
 
   const openContactMatch = useCallback((match: MarketplaceContactMatch) => {
     if (match.kind === "ria") {
@@ -971,67 +1106,90 @@ export default function MarketplacePage() {
       return;
     }
     const profile = match.profile as MarketplaceInvestor;
-    setSelectedProfile({ kind: "investor", id: marketplaceInvestorCardId(profile) });
+    setSelectedProfile({
+      kind: "investor",
+      id: marketplaceInvestorCardId(profile),
+    });
   }, []);
 
-  const performPrimaryCardAction = useCallback((card: DiscoveryCard) => {
-    if (
-      currentPersona === "ria" &&
-      card.kind === "investor" &&
-      card.isTestProfile
-    ) {
-      const userId = discoveryCardUserId(card);
-      if (userId) openTestInvestorWorkspace(userId);
-      return;
-    }
-    if (card.kind === "ria") {
-      void createConnectionToAdvisor(card.profile as MarketplaceRia);
-      return;
-    }
-    const investor = card.profile as MarketplaceInvestor;
-    if (isMarketplaceInvestorShortlistable(investor)) {
-      void shortlistInvestor(investor);
-      return;
-    }
-    if (card.canConnect) {
-      void createConnectionToInvestor(investor);
-      return;
-    }
-    openDiscoveryProfile(card);
-  }, [
-    createConnectionToAdvisor,
-    createConnectionToInvestor,
-    currentPersona,
-    openDiscoveryProfile,
-    openTestInvestorWorkspace,
-    shortlistInvestor,
-  ]);
+  const performPrimaryCardAction = useCallback(
+    (card: DiscoveryCard) => {
+      if (
+        currentPersona === "ria" &&
+        card.kind === "investor" &&
+        card.isTestProfile
+      ) {
+        const userId = discoveryCardUserId(card);
+        if (userId) openTestInvestorWorkspace(userId);
+        return;
+      }
+      if (card.kind === "ria") {
+        void createConnectionToAdvisor(card.profile as MarketplaceRia);
+        return;
+      }
+      const investor = card.profile as MarketplaceInvestor;
+      if (isMarketplaceInvestorShortlistable(investor)) {
+        void shortlistInvestor(investor);
+        return;
+      }
+      if (card.canConnect) {
+        void createConnectionToInvestor(investor);
+        return;
+      }
+      openDiscoveryProfile(card);
+    },
+    [
+      createConnectionToAdvisor,
+      createConnectionToInvestor,
+      currentPersona,
+      openDiscoveryProfile,
+      openTestInvestorWorkspace,
+      shortlistInvestor,
+    ],
+  );
 
   const passCurrentCard = useCallback(() => {
     if (!swipeCard) return;
     if (directoryKind === "rias") {
-      setPassedRiaIds((current) => (current.includes(swipeCard.id) ? current : [...current, swipeCard.id]));
+      setPassedRiaIds((current) =>
+        current.includes(swipeCard.id) ? current : [...current, swipeCard.id],
+      );
       return;
     }
     setPassedInvestorIds((current) =>
-      current.includes(swipeCard.id) ? current : [...current, swipeCard.id]
+      current.includes(swipeCard.id) ? current : [...current, swipeCard.id],
     );
     rememberInvestorDeckDecision("passed", swipeCard.id);
     if (swipeCard.kind === "investor") {
-      void persistInvestorAction(swipeCard.profile as MarketplaceInvestor, "pass", {
-        gesture: "left_swipe_or_pass",
-      }).catch((error) => {
-        console.warn("[Marketplace] Could not persist investor pass action", error);
+      void persistInvestorAction(
+        swipeCard.profile as MarketplaceInvestor,
+        "pass",
+        {
+          gesture: "left_swipe_or_pass",
+        },
+      ).catch((error) => {
+        console.warn(
+          "[Marketplace] Could not persist investor pass action",
+          error,
+        );
       });
     }
-  }, [directoryKind, persistInvestorAction, rememberInvestorDeckDecision, swipeCard]);
+  }, [
+    directoryKind,
+    persistInvestorAction,
+    rememberInvestorDeckDecision,
+    swipeCard,
+  ]);
 
   useEffect(() => {
     function handlePointerMove(event: PointerEvent) {
       if (!dragStartRef.current) return;
       setDragOffset({
         x: event.clientX - dragStartRef.current.x,
-        y: Math.max(-24, Math.min(24, (event.clientY - dragStartRef.current.y) * 0.2)),
+        y: Math.max(
+          -24,
+          Math.min(24, (event.clientY - dragStartRef.current.y) * 0.2),
+        ),
       });
     }
 
@@ -1116,7 +1274,7 @@ export default function MarketplacePage() {
                 type="button"
                 className={cn(
                   "grid h-10 w-10 place-items-center rounded-full border-0 bg-card text-foreground shadow-[var(--app-card-shadow-standard)] transition-[background-color,transform] duration-200 hover:scale-105 active:scale-95",
-                  searchOpen && "bg-primary/10 text-primary"
+                  searchOpen && "bg-primary/10 text-primary",
                 )}
                 aria-label="Toggle search"
                 onClick={() => setSearchOpen((current) => !current)}
@@ -1136,7 +1294,11 @@ export default function MarketplacePage() {
               <button
                 type="button"
                 className="grid h-10 w-10 place-items-center rounded-full border-0 bg-card text-foreground shadow-[var(--app-card-shadow-standard)] transition-[background-color,transform] duration-200 hover:scale-105 active:scale-95"
-                aria-label={directoryKind === "investors" ? "Refresh deck" : "Restart deck"}
+                aria-label={
+                  directoryKind === "investors"
+                    ? "Refresh deck"
+                    : "Restart deck"
+                }
                 onClick={resetSwipeDeck}
               >
                 <RotateCcw className="h-4 w-4" />
@@ -1148,7 +1310,7 @@ export default function MarketplacePage() {
                 type="button"
                 className={cn(
                   "grid h-10 w-10 place-items-center rounded-full border-0 bg-card text-foreground shadow-[var(--app-card-shadow-standard)] transition-[background-color,transform] duration-200 hover:scale-105 active:scale-95",
-                  view === "swipe" && "bg-primary/10 text-primary"
+                  view === "swipe" && "bg-primary/10 text-primary",
                 )}
                 aria-label="Swipe view"
                 onClick={() => setView("swipe")}
@@ -1159,7 +1321,7 @@ export default function MarketplacePage() {
                 type="button"
                 className={cn(
                   "grid h-10 w-10 place-items-center rounded-full border-0 bg-card text-foreground shadow-[var(--app-card-shadow-standard)] transition-[background-color,transform] duration-200 hover:scale-105 active:scale-95",
-                  view === "list" && "bg-primary/10 text-primary"
+                  view === "list" && "bg-primary/10 text-primary",
                 )}
                 aria-label="List view"
                 onClick={() => setView("list")}
@@ -1184,7 +1346,9 @@ export default function MarketplacePage() {
                 <p
                   className={cn(
                     "mt-2 line-clamp-1 px-1 text-xs",
-                    contactMatchError ? "text-red-500" : "text-muted-foreground"
+                    contactMatchError
+                      ? "text-red-500"
+                      : "text-muted-foreground",
                   )}
                 >
                   {contactMatchError || contactScanSummary}
@@ -1243,489 +1407,563 @@ export default function MarketplacePage() {
           </RiaSurface>
         ) : null}
 
-      {iamUnavailable ? (
-        <RiaSurface className="border-dashed border-amber-500/40 bg-amber-500/5 p-4">
-          <p className="text-sm text-muted-foreground">
-            Connect is waiting on IAM schema readiness in this environment.
-          </p>
-        </RiaSurface>
-      ) : null}
+        {iamUnavailable ? (
+          <RiaSurface className="border-dashed border-amber-500/40 bg-amber-500/5 p-4">
+            <p className="text-sm text-muted-foreground">
+              Connect is waiting on IAM schema readiness in this environment.
+            </p>
+          </RiaSurface>
+        ) : null}
 
-      {!iamUnavailable && view === "swipe" ? (
-        <div className={cn("pb-16", searchOpen && "pt-12")}>
-          {!hasLoadedDirectory || loading ? (
-            <div className="flex min-h-[420px] items-center justify-center px-6 py-14 text-center">
-              <p className="text-sm text-muted-foreground">Loading discovery…</p>
-            </div>
-          ) : swipeCard ? (
-            <div className="px-0 pb-2 pt-1 sm:px-1 sm:pt-2">
-              <div className="relative mx-auto flex w-full max-w-[720px] items-center justify-center pt-1 sm:pt-2">
-                <div className="absolute inset-x-4 top-2 h-[calc(100%-14px)] rounded-[var(--radius-lg)] bg-card/50 opacity-50 sm:inset-x-6 sm:top-3" />
-                <div className="absolute inset-x-2 top-3 h-[calc(100%-10px)] rounded-[var(--radius-lg)] bg-card/70 opacity-70 sm:inset-x-3 sm:top-4" />
-                <div
-                  className="relative flex w-full touch-pan-y flex-col justify-between rounded-[var(--radius-lg)] border-0 bg-card p-5 shadow-[var(--app-card-shadow-feature)] transition-[transform,opacity] duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] sm:p-6"
-                  style={{
-                    transform: `translate3d(${dragOffset.x}px, ${dragOffset.y}px, 0) rotate(${swipeRotation}deg)`,
-                    opacity: swipeOpacity,
-                    minHeight: "min(60dvh, 560px)",
-                  }}
-                  onPointerDown={(event) => {
-                    dragStartRef.current = { x: event.clientX, y: event.clientY };
-                  }}
-                >
-                  <div className="space-y-5">
-                    <div className="flex items-center gap-4">
-                      <ProfileAvatar kind={swipeCard.kind} label={swipeCard.title} className="h-20 w-20 shrink-0 rounded-[24px]" />
-                      <div className="min-w-0 space-y-2">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="text-2xl font-semibold tracking-tight text-foreground sm:text-[2.1rem]">
-                            {swipeCard.title}
-                          </h3>
-                          {swipeCard.isTestProfile ? (
-                            <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-700">
-                              Test
-                            </span>
-                          ) : null}
-                          {swipeCard.kind === "ria" && swipeCard.verificationStatus && !swipeCard.isTestProfile ? (
-                            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
-                              <ShieldCheck className="h-3 w-3" />
-                              Verified
-                            </span>
-                          ) : null}
-                        </div>
-                        <p className="text-sm leading-6 text-foreground/86 sm:text-base">{swipeCard.headline}</p>
-                      </div>
-                    </div>
-
-                    <div className="rounded-[var(--radius-md)] bg-background/50 p-4 dark:bg-white/5">
-                      <p className="text-sm leading-6 text-foreground">{swipeCard.summary}</p>
-                      <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                        <span className="inline-flex items-center gap-2">
-                          {swipeCard.kind === "ria" ? (
-                            <Building2 className="h-4 w-4" />
-                          ) : (
-                            <MapPin className="h-4 w-4" />
-                          )}
-                          {swipeCard.metaLine}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2">
-                    <Button
-                      variant="none"
-                      effect="fade"
-                      size="sm"
-                      className="justify-center"
-                      onClick={passCurrentCard}
-                    >
-                      <X className="h-4 w-4 sm:mr-2" />
-                      <span className="hidden sm:inline">Pass</span>
-                    </Button>
-                    <Button
-                      variant="none"
-                      effect="fade"
-                      size="sm"
-                      className="justify-center"
-                      onClick={() => openDiscoveryProfile(swipeCard)}
-                    >
-                      <span className="hidden sm:inline">View</span>
-                      <ArrowUpRight className="h-4 w-4 sm:ml-2" />
-                    </Button>
-                    <Button
-                      variant="blue-gradient"
-                      effect="fill"
-                      size="sm"
-                      className="justify-center"
-                      onClick={() => performPrimaryCardAction(swipeCard)}
-                      disabled={
-                        (Boolean(discoveryCardUserId(swipeCard)) &&
-                          actionLoadingUserId === discoveryCardUserId(swipeCard)) ||
-                        (Boolean(swipeCard.isTestProfile) && swipeCard.kind === "ria")
-                      }
-                    >
-                      <span className="truncate">
-                        {swipeCard.isTestProfile
-                          ? swipeCard.kind === "investor" && currentPersona === "ria"
-                            ? "Open workspace"
-                            : "Demo"
-                          : Boolean(discoveryCardUserId(swipeCard)) &&
-                              actionLoadingUserId === discoveryCardUserId(swipeCard)
-                            ? "Connecting..."
-                            : currentPersona === "investor"
-                              ? "Request advisory"
-                              : swipeCard.canConnect
-                                ? "Send request"
-                                : swipeCard.kind === "investor" &&
-                                    isMarketplaceInvestorShortlistable(
-                                      swipeCard.profile as MarketplaceInvestor
-                                    )
-                                  ? "Save lead"
-                                  : "View profile"}
-                      </span>
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center gap-4 px-6 py-14 text-center">
-              <h3 className="text-xl font-semibold tracking-tight text-foreground">
-                {investorDeckComplete ? "Deck complete" : "That&apos;s everyone for now"}
-              </h3>
-              <p className="max-w-xl text-sm leading-6 text-muted-foreground">
-                {investorDeckComplete
-                  ? `You handled every eligible investor in this deck. ${investorSavedLeadCount} saved lead${investorSavedLeadCount === 1 ? "" : "s"} remain in your database-backed shortlist.`
-                  : `You've browsed through all available ${directoryKind === "rias" ? "advisors" : "investors"} in this session. New profiles appear as more people join the marketplace.`}
-              </p>
-              {directoryKind === "investors" && investorDeckMeta ? (
-                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                  {investorDeckMeta.handled_count} handled · {investorDeckMeta.remaining_count} unseen
+        {!iamUnavailable && view === "swipe" ? (
+          <div className={cn("pb-16", searchOpen && "pt-12")}>
+            {!hasLoadedDirectory || loading ? (
+              <div className="flex min-h-[420px] items-center justify-center px-6 py-14 text-center">
+                <p className="text-sm text-muted-foreground">
+                  Loading discovery…
                 </p>
-              ) : null}
-              <div className="flex flex-wrap justify-center gap-2">
-                <Button variant="blue-gradient" effect="fill" size="sm" onClick={resetSwipeDeck}>
-                  <RotateCcw className="mr-2 h-4 w-4" />
-                  {directoryKind === "investors" ? "Refresh deck" : "Start over"}
-                </Button>
-                <Button variant="none" effect="fade" size="sm" onClick={() => setView("list")}>
-                  <List className="mr-2 h-4 w-4" />
-                  Switch to list
-                </Button>
               </div>
-            </div>
-          )}
-        </div>
-      ) : null}
+            ) : swipeCard ? (
+              <div className="px-0 pb-2 pt-1 sm:px-1 sm:pt-2">
+                <div className="relative mx-auto flex w-full max-w-[720px] items-center justify-center pt-1 sm:pt-2">
+                  <div className="absolute inset-x-4 top-2 h-[calc(100%-14px)] rounded-[var(--radius-lg)] bg-card/50 opacity-50 sm:inset-x-6 sm:top-3" />
+                  <div className="absolute inset-x-2 top-3 h-[calc(100%-10px)] rounded-[var(--radius-lg)] bg-card/70 opacity-70 sm:inset-x-3 sm:top-4" />
+                  <div
+                    className="relative flex w-full touch-pan-y flex-col justify-between rounded-[var(--radius-lg)] border-0 bg-card p-5 shadow-[var(--app-card-shadow-feature)] transition-[transform,opacity] duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] sm:p-6"
+                    style={{
+                      transform: `translate3d(${dragOffset.x}px, ${dragOffset.y}px, 0) rotate(${swipeRotation}deg)`,
+                      opacity: swipeOpacity,
+                      minHeight: "min(60dvh, 560px)",
+                    }}
+                    onPointerDown={(event) => {
+                      dragStartRef.current = {
+                        x: event.clientX,
+                        y: event.clientY,
+                      };
+                    }}
+                  >
+                    <div className="space-y-5">
+                      <div className="flex items-center gap-4">
+                        <ProfileAvatar
+                          kind={swipeCard.kind}
+                          label={swipeCard.title}
+                          className="h-20 w-20 shrink-0 rounded-[24px]"
+                        />
+                        <div className="min-w-0 space-y-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="text-2xl font-semibold tracking-tight text-foreground sm:text-[2.1rem]">
+                              {swipeCard.title}
+                            </h3>
+                            {swipeCard.isTestProfile ? (
+                              <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-700">
+                                Test
+                              </span>
+                            ) : null}
+                            {swipeCard.kind === "ria" &&
+                            swipeCard.verificationStatus &&
+                            !swipeCard.isTestProfile ? (
+                              <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
+                                <ShieldCheck className="h-3 w-3" />
+                                Verified
+                              </span>
+                            ) : null}
+                          </div>
+                          <p className="text-sm leading-6 text-foreground/86 sm:text-base">
+                            {swipeCard.headline}
+                          </p>
+                        </div>
+                      </div>
 
-      {!iamUnavailable && view === "list" ? (
-        <div className="grid gap-4 pb-16 md:grid-cols-2 xl:grid-cols-3">
-          {activeCards.map((item) => {
-            const userId = discoveryCardUserId(item);
-            const isPublicSecInvestor =
-              item.kind === "investor" &&
-              isPublicSecMarketplaceInvestor(item.profile as MarketplaceInvestor);
-            return (
-              <RiaSurface
-                key={`${item.kind}-${item.id}`}
-                className="grid h-full grid-rows-[auto_1fr_auto] gap-4 rounded-[28px] p-4 sm:p-5"
-              >
-                <div className="flex items-start gap-4">
-                  <ProfileAvatar kind={item.kind} label={item.title} />
-                  <div className="min-w-0 flex-1 space-y-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-lg font-semibold tracking-tight text-foreground">
-                        {item.title}
-                      </h3>
-                      {item.isTestProfile ? (
-                        <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-700">
-                          Test
-                        </span>
-                      ) : null}
-                      {item.kind === "ria" && item.verificationStatus && !item.isTestProfile ? (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
-                          <ShieldCheck className="h-3 w-3" />
-                          Verified
-                        </span>
-                      ) : null}
-                      {isPublicSecInvestor ? (
-                        <span className="rounded-full border border-sky-500/20 bg-sky-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-700">
-                          Public SEC
-                        </span>
-                      ) : null}
+                      <div className="rounded-[var(--radius-md)] bg-background/50 p-4 dark:bg-white/5">
+                        <p className="text-sm leading-6 text-foreground">
+                          {swipeCard.summary}
+                        </p>
+                        <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                          <span className="inline-flex items-center gap-2">
+                            {swipeCard.kind === "ria" ? (
+                              <Building2 className="h-4 w-4" />
+                            ) : (
+                              <MapPin className="h-4 w-4" />
+                            )}
+                            {swipeCard.metaLine}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-sm leading-6 text-foreground/84">{item.headline}</p>
+
+                    <div className="grid grid-cols-3 gap-2">
+                      <Button
+                        variant="none"
+                        effect="fade"
+                        size="sm"
+                        className="justify-center"
+                        onClick={passCurrentCard}
+                      >
+                        <X className="h-4 w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Pass</span>
+                      </Button>
+                      <Button
+                        variant="none"
+                        effect="fade"
+                        size="sm"
+                        className="justify-center"
+                        onClick={() => openDiscoveryProfile(swipeCard)}
+                      >
+                        <span className="hidden sm:inline">View</span>
+                        <ArrowUpRight className="h-4 w-4 sm:ml-2" />
+                      </Button>
+                      <Button
+                        variant="blue-gradient"
+                        effect="fill"
+                        size="sm"
+                        className="justify-center"
+                        onClick={() => performPrimaryCardAction(swipeCard)}
+                        disabled={
+                          (Boolean(discoveryCardUserId(swipeCard)) &&
+                            actionLoadingUserId ===
+                              discoveryCardUserId(swipeCard)) ||
+                          (Boolean(swipeCard.isTestProfile) &&
+                            swipeCard.kind === "ria")
+                        }
+                      >
+                        <span className="truncate">
+                          {swipeCard.isTestProfile
+                            ? swipeCard.kind === "investor" &&
+                              currentPersona === "ria"
+                              ? "Open workspace"
+                              : "Demo"
+                            : Boolean(discoveryCardUserId(swipeCard)) &&
+                                actionLoadingUserId ===
+                                  discoveryCardUserId(swipeCard)
+                              ? "Connecting..."
+                              : currentPersona === "investor"
+                                ? "Request advisory"
+                                : swipeCard.canConnect
+                                  ? "Send request"
+                                  : swipeCard.kind === "investor" &&
+                                      isMarketplaceInvestorShortlistable(
+                                        swipeCard.profile as MarketplaceInvestor,
+                                      )
+                                    ? "Save lead"
+                                    : "View profile"}
+                        </span>
+                      </Button>
+                    </div>
                   </div>
                 </div>
-
-                <div className="rounded-[var(--radius-md)] bg-background/50 p-4 dark:bg-white/5">
-                  <p className="text-sm leading-6 text-foreground">{item.summary}</p>
-                  <p className="mt-3 text-sm text-muted-foreground">{item.metaLine}</p>
-                </div>
-
-                <div className="mt-auto grid grid-cols-1 gap-2 sm:grid-cols-2">
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-4 px-6 py-14 text-center">
+                <h3 className="text-xl font-semibold tracking-tight text-foreground">
+                  {investorDeckComplete
+                    ? "Deck complete"
+                    : "That&apos;s everyone for now"}
+                </h3>
+                <p className="max-w-xl text-sm leading-6 text-muted-foreground">
+                  {investorDeckComplete
+                    ? `You handled every eligible investor in this deck. ${investorSavedLeadCount} saved lead${investorSavedLeadCount === 1 ? "" : "s"} remain in your database-backed shortlist.`
+                    : `You've browsed through all available ${directoryKind === "rias" ? "advisors" : "investors"} in this session. New profiles appear as more people join the marketplace.`}
+                </p>
+                {directoryKind === "investors" && investorDeckMeta ? (
+                  <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                    {investorDeckMeta.handled_count} handled ·{" "}
+                    {investorDeckMeta.remaining_count} unseen
+                  </p>
+                ) : null}
+                <div className="flex flex-wrap justify-center gap-2">
                   <Button
                     variant="blue-gradient"
                     effect="fill"
                     size="sm"
-                    className="justify-center"
-                    onClick={() => performPrimaryCardAction(item)}
-                    disabled={
-                      (Boolean(userId) && actionLoadingUserId === userId) ||
-                      (Boolean(item.isTestProfile) && item.kind === "ria")
-                    }
+                    onClick={resetSwipeDeck}
                   >
-                    {item.isTestProfile
-                      ? item.kind === "investor" && currentPersona === "ria"
-                        ? "Open workspace"
-                        : "Demo"
-                      : Boolean(userId) && actionLoadingUserId === userId
-                        ? "Connecting..."
-                        : currentPersona === "investor"
-                          ? "Request advisory"
-                          : item.canConnect
-                            ? "Send request"
-                            : item.kind === "investor" &&
-                                isMarketplaceInvestorShortlistable(
-                                  item.profile as MarketplaceInvestor
-                                )
-                              ? "Save lead"
-                              : "View profile"}
+                    <RotateCcw className="mr-2 h-4 w-4" />
+                    {directoryKind === "investors"
+                      ? "Refresh deck"
+                      : "Start over"}
                   </Button>
                   <Button
                     variant="none"
                     effect="fade"
                     size="sm"
-                    className="justify-center"
-                    onClick={() => openDiscoveryProfile(item)}
+                    onClick={() => setView("list")}
                   >
-                    View details
-                    <ArrowUpRight className="ml-2 h-4 w-4" />
+                    <List className="mr-2 h-4 w-4" />
+                    Switch to list
                   </Button>
                 </div>
-              </RiaSurface>
-            );
-          })}
-
-          {!loading && activeCards.length === 0 ? (
-            <RiaSurface className="col-span-full p-6 text-center">
-              <h3 className="text-lg font-semibold tracking-tight text-foreground">No profiles</h3>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Try a broader search.
-              </p>
-            </RiaSurface>
-          ) : null}
-        </div>
-      ) : null}
-
-      <SettingsDetailPanel
-        open={Boolean(selectedProfile)}
-        onOpenChange={(open) => {
-          if (!open) setSelectedProfile(null);
-        }}
-        title={
-          selectedProfile?.kind === "ria"
-            ? selectedAdvisor?.display_name || "Advisor details"
-            : selectedInvestor?.display_name || "Investor details"
-        }
-        description={
-          selectedProfile?.kind === "ria"
-            ? selectedAdvisor?.headline ||
-              "Review this advisor profile before you decide whether to connect."
-            : selectedInvestor?.headline ||
-              "Review this investor profile before you decide whether to connect."
-        }
-      >
-        <div className="space-y-4">
-          {selectedProfile?.kind === "ria" && selectedRiaLoading ? (
-            <p className="text-sm text-muted-foreground">Loading advisor details…</p>
-          ) : null}
-          {selectedProfile?.kind === "ria" && selectedRiaError ? (
-            <RiaSurface className="border-red-500/20 bg-red-500/5 p-4">
-              <p className="text-sm text-red-500">{selectedRiaError}</p>
-            </RiaSurface>
-          ) : null}
-
-          {selectedProfile?.kind === "ria" && selectedAdvisor ? (
-            <>
-              <div className="flex items-start gap-4">
-                <ProfileAvatar kind="ria" label={selectedAdvisor.display_name} className="h-16 w-16" />
-                <div className="space-y-2">
-                  {selectedInjectedRia ? (
-                    <span className="inline-flex rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-700">
-                      Test
-                    </span>
-                  ) : null}
-                  <p className="text-sm leading-6 text-muted-foreground">
-                    {selectedAdvisorFirmNames || "No public firm details shared yet."}
-                  </p>
-                </div>
               </div>
+            )}
+          </div>
+        ) : null}
 
-              <RiaSurface className="p-4">
-                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                  Strategy summary
-                </p>
-                <p className="mt-3 text-sm leading-7 text-foreground">
-                  {selectedAdvisor.strategy_summary ||
-                    selectedAdvisor.strategy ||
-                    selectedAdvisor.bio ||
-                    "No public strategy summary is available yet."}
+        {!iamUnavailable && view === "list" ? (
+          <div className="grid gap-4 pb-16 md:grid-cols-2 xl:grid-cols-3">
+            {activeCards.map((item) => {
+              const userId = discoveryCardUserId(item);
+              const isPublicSecInvestor =
+                item.kind === "investor" &&
+                isPublicSecMarketplaceInvestor(
+                  item.profile as MarketplaceInvestor,
+                );
+              return (
+                <RiaSurface
+                  key={`${item.kind}-${item.id}`}
+                  className="grid h-full grid-rows-[auto_1fr_auto] gap-4 rounded-[28px] p-4 sm:p-5"
+                >
+                  <div className="flex items-start gap-4">
+                    <ProfileAvatar kind={item.kind} label={item.title} />
+                    <div className="min-w-0 flex-1 space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-lg font-semibold tracking-tight text-foreground">
+                          {item.title}
+                        </h3>
+                        {item.isTestProfile ? (
+                          <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-700">
+                            Test
+                          </span>
+                        ) : null}
+                        {item.kind === "ria" &&
+                        item.verificationStatus &&
+                        !item.isTestProfile ? (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
+                            <ShieldCheck className="h-3 w-3" />
+                            Verified
+                          </span>
+                        ) : null}
+                        {isPublicSecInvestor ? (
+                          <span className="rounded-full border border-sky-500/20 bg-sky-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-700">
+                            Public SEC
+                          </span>
+                        ) : null}
+                      </div>
+                      <p className="text-sm leading-6 text-foreground/84">
+                        {item.headline}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-[var(--radius-md)] bg-background/50 p-4 dark:bg-white/5">
+                    <p className="text-sm leading-6 text-foreground">
+                      {item.summary}
+                    </p>
+                    <p className="mt-3 text-sm text-muted-foreground">
+                      {item.metaLine}
+                    </p>
+                  </div>
+
+                  <div className="mt-auto grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <Button
+                      variant="blue-gradient"
+                      effect="fill"
+                      size="sm"
+                      className="justify-center"
+                      onClick={() => performPrimaryCardAction(item)}
+                      disabled={
+                        (Boolean(userId) && actionLoadingUserId === userId) ||
+                        (Boolean(item.isTestProfile) && item.kind === "ria")
+                      }
+                    >
+                      {item.isTestProfile
+                        ? item.kind === "investor" && currentPersona === "ria"
+                          ? "Open workspace"
+                          : "Demo"
+                        : Boolean(userId) && actionLoadingUserId === userId
+                          ? "Connecting..."
+                          : currentPersona === "investor"
+                            ? "Request advisory"
+                            : item.canConnect
+                              ? "Send request"
+                              : item.kind === "investor" &&
+                                  isMarketplaceInvestorShortlistable(
+                                    item.profile as MarketplaceInvestor,
+                                  )
+                                ? "Save lead"
+                                : "View profile"}
+                    </Button>
+                    <Button
+                      variant="none"
+                      effect="fade"
+                      size="sm"
+                      className="justify-center"
+                      onClick={() => openDiscoveryProfile(item)}
+                    >
+                      View details
+                      <ArrowUpRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
+                </RiaSurface>
+              );
+            })}
+
+            {!loading && activeCards.length === 0 ? (
+              <RiaSurface className="col-span-full p-6 text-center">
+                <h3 className="text-lg font-semibold tracking-tight text-foreground">
+                  No profiles
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  Try a broader search.
                 </p>
               </RiaSurface>
+            ) : null}
+          </div>
+        ) : null}
 
-              <div className="flex flex-wrap gap-2">
-                {currentPersona === "investor" ? (
+        <SettingsDetailPanel
+          open={Boolean(selectedProfile)}
+          onOpenChange={(open) => {
+            if (!open) setSelectedProfile(null);
+          }}
+          title={
+            selectedProfile?.kind === "ria"
+              ? selectedAdvisor?.display_name || "Advisor details"
+              : selectedInvestor?.display_name || "Investor details"
+          }
+          description={
+            selectedProfile?.kind === "ria"
+              ? selectedAdvisor?.headline ||
+                "Review this advisor profile before you decide whether to connect."
+              : selectedInvestor?.headline ||
+                "Review this investor profile before you decide whether to connect."
+          }
+        >
+          <div className="space-y-4">
+            {selectedProfile?.kind === "ria" && selectedRiaLoading ? (
+              <p className="text-sm text-muted-foreground">
+                Loading advisor details…
+              </p>
+            ) : null}
+            {selectedProfile?.kind === "ria" && selectedRiaError ? (
+              <RiaSurface className="border-red-500/20 bg-red-500/5 p-4">
+                <p className="text-sm text-red-500">{selectedRiaError}</p>
+              </RiaSurface>
+            ) : null}
+
+            {selectedProfile?.kind === "ria" && selectedAdvisor ? (
+              <>
+                <div className="flex items-start gap-4">
+                  <ProfileAvatar
+                    kind="ria"
+                    label={selectedAdvisor.display_name}
+                    className="h-16 w-16"
+                  />
+                  <div className="space-y-2">
+                    {selectedInjectedRia ? (
+                      <span className="inline-flex rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-700">
+                        Test
+                      </span>
+                    ) : null}
+                    <p className="text-sm leading-6 text-muted-foreground">
+                      {selectedAdvisorFirmNames ||
+                        "No public firm details shared yet."}
+                    </p>
+                  </div>
+                </div>
+
+                <RiaSurface className="p-4">
+                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                    Strategy summary
+                  </p>
+                  <p className="mt-3 text-sm leading-7 text-foreground">
+                    {selectedAdvisor.strategy_summary ||
+                      selectedAdvisor.strategy ||
+                      selectedAdvisor.bio ||
+                      "No public strategy summary is available yet."}
+                  </p>
+                </RiaSurface>
+
+                <div className="flex flex-wrap gap-2">
+                  {currentPersona === "investor" ? (
+                    <Button
+                      variant="blue-gradient"
+                      effect="fill"
+                      size="sm"
+                      onClick={() =>
+                        void createConnectionToAdvisor(selectedAdvisor)
+                      }
+                      disabled={
+                        actionLoadingUserId === selectedAdvisor.user_id ||
+                        Boolean(selectedInjectedRia)
+                      }
+                    >
+                      {selectedInjectedRia
+                        ? "Demo"
+                        : actionLoadingUserId === selectedAdvisor.user_id
+                          ? "Connecting..."
+                          : "Request advisory"}
+                    </Button>
+                  ) : null}
+                  {selectedAdvisor.disclosures_url ? (
+                    <Button asChild variant="none" effect="fade" size="sm">
+                      <a
+                        href={selectedAdvisor.disclosures_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Public disclosure
+                        <ArrowUpRight className="ml-2 h-4 w-4" />
+                      </a>
+                    </Button>
+                  ) : null}
+                  <Button
+                    variant="none"
+                    effect="fade"
+                    size="sm"
+                    onClick={() => router.push(connectionsRoute)}
+                  >
+                    View connections
+                  </Button>
+                </div>
+              </>
+            ) : null}
+
+            {selectedProfile?.kind === "investor" && selectedInvestor ? (
+              <>
+                <div className="flex items-start gap-4">
+                  <ProfileAvatar
+                    kind="investor"
+                    label={selectedInvestor.display_name}
+                    className="h-16 w-16"
+                  />
+                  <div className="space-y-2">
+                    {selectedInvestorIsTest ? (
+                      <span className="inline-flex rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-700">
+                        Test
+                      </span>
+                    ) : null}
+                    {isPublicSecMarketplaceInvestor(selectedInvestor) ? (
+                      <span className="inline-flex rounded-full border border-sky-500/20 bg-sky-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-700">
+                        Public SEC profile
+                      </span>
+                    ) : null}
+                    {selectedInvestorCurationLabel ? (
+                      <span className="inline-flex rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
+                        {selectedInvestorCurationLabel}
+                      </span>
+                    ) : null}
+                    <p className="text-sm leading-6 text-muted-foreground">
+                      {selectedInvestor.location_hint ||
+                        selectedInvestorSourceLabel ||
+                        "Public discovery profile"}
+                    </p>
+                  </div>
+                </div>
+
+                <RiaSurface className="p-4">
+                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                    Fit summary
+                  </p>
+                  <p className="mt-3 text-sm leading-7 text-foreground">
+                    {selectedInvestor.strategy_summary ||
+                      (selectedInvestorConnectable
+                        ? "This investor has opted into discovery and is available for a connection flow."
+                        : "This public investor profile is available for discovery review. Direct consent requests require a verified Hushh investor account.")}
+                  </p>
+                </RiaSurface>
+
+                <RiaSurface className="space-y-3 p-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                      Evidence
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-foreground">
+                      {selectedInvestorFormsLabel}
+                    </p>
+                  </div>
+                  {selectedInvestorAddress ? (
+                    <p className="text-sm leading-6 text-muted-foreground">
+                      {selectedInvestorAddress}
+                    </p>
+                  ) : null}
+                  {selectedInvestor.curation_reason ? (
+                    <p className="text-sm leading-6 text-muted-foreground">
+                      {selectedInvestor.curation_reason}
+                    </p>
+                  ) : null}
+                  {typeof selectedInvestor.quality_score === "number" ? (
+                    <p className="text-sm leading-6 text-muted-foreground">
+                      Quality score: {selectedInvestor.quality_score}/100
+                    </p>
+                  ) : null}
+                  {selectedInvestorEvidenceLinks.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {selectedInvestorEvidenceLinks.map((url) => (
+                        <Button
+                          key={url}
+                          asChild
+                          variant="none"
+                          effect="fade"
+                          size="sm"
+                        >
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            SEC source
+                            <ArrowUpRight className="ml-2 h-4 w-4" />
+                          </a>
+                        </Button>
+                      ))}
+                    </div>
+                  ) : null}
+                </RiaSurface>
+
+                <div className="flex flex-wrap gap-2">
                   <Button
                     variant="blue-gradient"
                     effect="fill"
                     size="sm"
-                    onClick={() => void createConnectionToAdvisor(selectedAdvisor)}
-                    disabled={actionLoadingUserId === selectedAdvisor.user_id || Boolean(selectedInjectedRia)}
-                  >
-                    {selectedInjectedRia
-                      ? "Demo"
-                      : actionLoadingUserId === selectedAdvisor.user_id
-                        ? "Connecting..."
-                        : "Request advisory"}
-                  </Button>
-                ) : null}
-                {selectedAdvisor.disclosures_url ? (
-                  <Button asChild variant="none" effect="fade" size="sm">
-                    <a href={selectedAdvisor.disclosures_url} target="_blank" rel="noopener noreferrer">
-                      Public disclosure
-                      <ArrowUpRight className="ml-2 h-4 w-4" />
-                    </a>
-                  </Button>
-                ) : null}
-                <Button
-                  variant="none"
-                  effect="fade"
-                  size="sm"
-                  onClick={() => router.push(connectionsRoute)}
-                >
-                  View connections
-                </Button>
-              </div>
-            </>
-          ) : null}
-
-          {selectedProfile?.kind === "investor" && selectedInvestor ? (
-            <>
-              <div className="flex items-start gap-4">
-                <ProfileAvatar kind="investor" label={selectedInvestor.display_name} className="h-16 w-16" />
-                <div className="space-y-2">
-                  {selectedInvestorIsTest ? (
-                    <span className="inline-flex rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-700">
-                      Test
-                    </span>
-                  ) : null}
-                  {isPublicSecMarketplaceInvestor(selectedInvestor) ? (
-                    <span className="inline-flex rounded-full border border-sky-500/20 bg-sky-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-700">
-                      Public SEC profile
-                    </span>
-                  ) : null}
-                  {selectedInvestorCurationLabel ? (
-                    <span className="inline-flex rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
-                      {selectedInvestorCurationLabel}
-                    </span>
-                  ) : null}
-                  <p className="text-sm leading-6 text-muted-foreground">
-                    {selectedInvestor.location_hint ||
-                      selectedInvestorSourceLabel ||
-                      "Public discovery profile"}
-                  </p>
-                </div>
-              </div>
-
-              <RiaSurface className="p-4">
-                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                  Fit summary
-                </p>
-                <p className="mt-3 text-sm leading-7 text-foreground">
-                  {selectedInvestor.strategy_summary ||
-                    (selectedInvestorConnectable
-                      ? "This investor has opted into discovery and is available for a connection flow."
-                      : "This public investor profile is available for discovery review. Direct consent requests require a verified Hushh investor account.")}
-                </p>
-              </RiaSurface>
-
-              <RiaSurface className="space-y-3 p-4">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                    Evidence
-                  </p>
-                  <p className="mt-2 text-sm leading-6 text-foreground">
-                    {selectedInvestorFormsLabel}
-                  </p>
-                </div>
-                {selectedInvestorAddress ? (
-                  <p className="text-sm leading-6 text-muted-foreground">
-                    {selectedInvestorAddress}
-                  </p>
-                ) : null}
-                {selectedInvestor.curation_reason ? (
-                  <p className="text-sm leading-6 text-muted-foreground">
-                    {selectedInvestor.curation_reason}
-                  </p>
-                ) : null}
-                {typeof selectedInvestor.quality_score === "number" ? (
-                  <p className="text-sm leading-6 text-muted-foreground">
-                    Quality score: {selectedInvestor.quality_score}/100
-                  </p>
-                ) : null}
-                {selectedInvestorEvidenceLinks.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {selectedInvestorEvidenceLinks.map((url) => (
-                      <Button key={url} asChild variant="none" effect="fade" size="sm">
-                        <a href={url} target="_blank" rel="noopener noreferrer">
-                          SEC source
-                          <ArrowUpRight className="ml-2 h-4 w-4" />
-                        </a>
-                      </Button>
-                    ))}
-                  </div>
-                ) : null}
-              </RiaSurface>
-
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant="blue-gradient"
-                  effect="fill"
-                  size="sm"
-                  onClick={() => {
-                    if (
-                      currentPersona === "ria" &&
-                      selectedInvestorIsTest
-                    ) {
-                      if (selectedInvestorUserId) {
-                        openTestInvestorWorkspace(selectedInvestorUserId);
+                    onClick={() => {
+                      if (currentPersona === "ria" && selectedInvestorIsTest) {
+                        if (selectedInvestorUserId) {
+                          openTestInvestorWorkspace(selectedInvestorUserId);
+                        }
+                        return;
                       }
-                      return;
+                      if (selectedInvestorShortlistable) {
+                        void shortlistInvestor(selectedInvestor);
+                        setSelectedProfile(null);
+                        return;
+                      }
+                      if (selectedInvestorConnectable) {
+                        void createConnectionToInvestor(selectedInvestor);
+                      }
+                    }}
+                    disabled={
+                      (!selectedInvestorConnectable &&
+                        !selectedInvestorShortlistable) ||
+                      (Boolean(selectedInvestorUserId) &&
+                        actionLoadingUserId === selectedInvestorUserId &&
+                        !selectedInvestorIsTest)
                     }
-                    if (selectedInvestorShortlistable) {
-                      void shortlistInvestor(selectedInvestor);
-                      setSelectedProfile(null);
-                      return;
-                    }
-                    if (selectedInvestorConnectable) {
-                      void createConnectionToInvestor(selectedInvestor);
-                    }
-                  }}
-                  disabled={
-                    (!selectedInvestorConnectable && !selectedInvestorShortlistable) ||
-                    (Boolean(selectedInvestorUserId) &&
-                      actionLoadingUserId === selectedInvestorUserId &&
-                      !selectedInvestorIsTest)
-                  }
-                >
-                  {selectedInvestorIsTest
-                    ? "Open workspace"
-                    : Boolean(selectedInvestorUserId) &&
-                        actionLoadingUserId === selectedInvestorUserId
-                      ? "Connecting..."
-                      : selectedInvestorConnectable
-                        ? "Send request"
-                        : selectedInvestorShortlistable
-                          ? selectedInvestorIsShortlisted
-                            ? "Saved lead"
-                            : "Save lead"
-                          : "Discovery only"}
-                </Button>
-                <Button
-                  variant="none"
-                  effect="fade"
-                  size="sm"
-                  onClick={() => router.push(connectionsRoute)}
-                >
-                  View connections
-                </Button>
-              </div>
-            </>
-          ) : null}
-        </div>
-      </SettingsDetailPanel>
+                  >
+                    {selectedInvestorIsTest
+                      ? "Open workspace"
+                      : Boolean(selectedInvestorUserId) &&
+                          actionLoadingUserId === selectedInvestorUserId
+                        ? "Connecting..."
+                        : selectedInvestorConnectable
+                          ? "Send request"
+                          : selectedInvestorShortlistable
+                            ? selectedInvestorIsShortlisted
+                              ? "Saved lead"
+                              : "Save lead"
+                            : "Discovery only"}
+                  </Button>
+                  <Button
+                    variant="none"
+                    effect="fade"
+                    size="sm"
+                    onClick={() => router.push(connectionsRoute)}
+                  >
+                    View connections
+                  </Button>
+                </div>
+              </>
+            ) : null}
+          </div>
+        </SettingsDetailPanel>
       </AppPageContentRegion>
     </AppPageShell>
   );

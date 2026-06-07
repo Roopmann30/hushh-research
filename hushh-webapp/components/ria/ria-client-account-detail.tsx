@@ -4,10 +4,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 
 import { SectionHeader } from "@/components/app-ui/page-sections";
-import {
-  SettingsGroup,
-  SettingsRow,
-} from "@/components/profile/settings-ui";
+import { SettingsGroup, SettingsRow } from "@/components/profile/settings-ui";
 import {
   MetricTile,
   RiaCompatibilityState,
@@ -15,9 +12,7 @@ import {
 } from "@/components/ria/ria-page-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  buildRiaClientWorkspaceRoute,
-} from "@/lib/navigation/routes";
+import { buildRiaClientWorkspaceRoute } from "@/lib/navigation/routes";
 import { useRiaClientWorkspaceState } from "@/components/ria/use-ria-client-workspace-state";
 import { Database, Loader2, Wallet } from "lucide-react";
 import { usePublishVoiceSurfaceMetadata } from "@/lib/voice/voice-surface-metadata";
@@ -61,11 +56,15 @@ export function RiaClientAccountDetail({
     forceTestProfile,
   });
 
-  const accountBranch = (detail?.account_branches || workspace?.account_branches || []).find(
+  const accountBranch = (
+    detail?.account_branches ||
+    workspace?.account_branches ||
+    []
+  ).find(
     (branch) =>
       branch.branch_id === accountId ||
       branch.account_id === accountId ||
-      branch.persistent_account_id === accountId
+      branch.persistent_account_id === accountId,
   );
   const financialSummary = (workspace?.domain_summaries?.financial ||
     detail?.domain_summaries?.financial ||
@@ -98,7 +97,7 @@ export function RiaClientAccountDetail({
         account_status: accountBranch?.status || null,
       },
     }),
-    [accountBranch?.name, accountBranch?.status, accountId, clientId]
+    [accountBranch?.name, accountBranch?.status, accountId, clientId],
   );
   usePublishVoiceSurfaceMetadata(voiceSurfaceMetadata);
 
@@ -191,10 +190,24 @@ export function RiaClientAccountDetail({
       {accountBranch ? (
         <>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <MetricTile label="Status" value={formatStatusLabel(accountBranch.status)} />
-            <MetricTile label="Institution" value={accountBranch.institution_name || "Unknown"} />
-            <MetricTile label="Type" value={accountBranch.type || "Investment"} />
-            <MetricTile label="Mask" value={accountBranch.mask ? `••${accountBranch.mask}` : "Unavailable"} />
+            <MetricTile
+              label="Status"
+              value={formatStatusLabel(accountBranch.status)}
+            />
+            <MetricTile
+              label="Institution"
+              value={accountBranch.institution_name || "Unknown"}
+            />
+            <MetricTile
+              label="Type"
+              value={accountBranch.type || "Investment"}
+            />
+            <MetricTile
+              label="Mask"
+              value={
+                accountBranch.mask ? `••${accountBranch.mask}` : "Unavailable"
+              }
+            />
           </div>
 
           <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
@@ -218,7 +231,9 @@ export function RiaClientAccountDetail({
                 />
                 <SettingsRow
                   title="Display name"
-                  description={accountBranch.official_name || accountBranch.name}
+                  description={
+                    accountBranch.official_name || accountBranch.name
+                  }
                 />
                 <SettingsRow
                   title="Subtype"
@@ -226,7 +241,10 @@ export function RiaClientAccountDetail({
                 />
                 <SettingsRow
                   title="Grant source"
-                  description={accountBranch.granted_by_bundle_key || "Kai specialized access"}
+                  description={
+                    accountBranch.granted_by_bundle_key ||
+                    "Kai specialized access"
+                  }
                 />
               </SettingsGroup>
             </section>
@@ -246,15 +264,25 @@ export function RiaClientAccountDetail({
                 />
                 <SettingsRow
                   title="Household risk"
-                  description={String(financialSummary.risk_profile || "Unavailable")}
+                  description={String(
+                    financialSummary.risk_profile || "Unavailable",
+                  )}
                 />
                 <SettingsRow
                   title="Known account count"
-                  description={String(financialSummary.account_count || detail?.account_branches.length || 0)}
+                  description={String(
+                    financialSummary.account_count ||
+                      detail?.account_branches.length ||
+                      0,
+                  )}
                 />
                 <SettingsRow
                   title="Known holdings"
-                  description={String(financialSummary.holdings_count || detail?.total_attributes || 0)}
+                  description={String(
+                    financialSummary.holdings_count ||
+                      detail?.total_attributes ||
+                      0,
+                  )}
                 />
               </SettingsGroup>
             </section>

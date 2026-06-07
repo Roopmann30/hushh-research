@@ -49,7 +49,9 @@ type AgentPopoverMotionState = "idle" | "opening" | "closing";
 const AGENT_POPOVER_TRANSITION_MS = 360;
 const DEFAULT_CUSTOM_SIZE: AgentPopoverSize = AGENT_POPOVER_PRESET_SIZES.large;
 
-const AgentPopoverContext = createContext<AgentPopoverContextValue | null>(null);
+const AgentPopoverContext = createContext<AgentPopoverContextValue | null>(
+  null,
+);
 
 function getViewportSize() {
   if (typeof window === "undefined") {
@@ -64,12 +66,16 @@ function getViewportSize() {
 function readStoredSizeMode(): AgentPopoverSizeMode {
   if (typeof window === "undefined") return AGENT_POPOVER_DEFAULT_SIZE_MODE;
   const stored = window.localStorage.getItem(AGENT_POPOVER_STORAGE_KEYS.mode);
-  return isAgentPopoverSizeMode(stored) ? stored : AGENT_POPOVER_DEFAULT_SIZE_MODE;
+  return isAgentPopoverSizeMode(stored)
+    ? stored
+    : AGENT_POPOVER_DEFAULT_SIZE_MODE;
 }
 
 function readStoredCustomSize(): AgentPopoverSize {
   if (typeof window === "undefined") return DEFAULT_CUSTOM_SIZE;
-  const stored = window.localStorage.getItem(AGENT_POPOVER_STORAGE_KEYS.customSize);
+  const stored = window.localStorage.getItem(
+    AGENT_POPOVER_STORAGE_KEYS.customSize,
+  );
   if (!stored) return DEFAULT_CUSTOM_SIZE;
   try {
     const parsed = JSON.parse(stored) as Partial<AgentPopoverSize>;
@@ -77,7 +83,11 @@ function readStoredCustomSize(): AgentPopoverSize {
       return DEFAULT_CUSTOM_SIZE;
     }
     const viewport = getViewportSize();
-    return clampAgentPopoverSize(parsed as AgentPopoverSize, viewport.width, viewport.height);
+    return clampAgentPopoverSize(
+      parsed as AgentPopoverSize,
+      viewport.width,
+      viewport.height,
+    );
   } catch {
     return DEFAULT_CUSTOM_SIZE;
   }
@@ -100,8 +110,10 @@ export function AgentPopoverProvider({ children }: { children: ReactNode }) {
   const [hasOpened, setHasOpened] = useState(false);
   const [motionState, setMotionState] =
     useState<AgentPopoverMotionState>("idle");
-  const [sizeMode, setSizeModeState] = useState<AgentPopoverSizeMode>(readStoredSizeMode);
-  const [customSize, setCustomSize] = useState<AgentPopoverSize>(readStoredCustomSize);
+  const [sizeMode, setSizeModeState] =
+    useState<AgentPopoverSizeMode>(readStoredSizeMode);
+  const [customSize, setCustomSize] =
+    useState<AgentPopoverSize>(readStoredCustomSize);
   const animationFrameRef = useRef<number | null>(null);
   const motionTimerRef = useRef<number | null>(null);
 
@@ -162,7 +174,15 @@ export function AgentPopoverProvider({ children }: { children: ReactNode }) {
       minimizeAgent,
       setSizeMode,
     }),
-    [expanded, hasOpened, minimizeAgent, motionState, openAgent, setSizeMode, sizeMode]
+    [
+      expanded,
+      hasOpened,
+      minimizeAgent,
+      motionState,
+      openAgent,
+      setSizeMode,
+      sizeMode,
+    ],
   );
 
   useEffect(() => {
@@ -172,7 +192,7 @@ export function AgentPopoverProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     window.localStorage.setItem(
       AGENT_POPOVER_STORAGE_KEYS.customSize,
-      JSON.stringify(customSize)
+      JSON.stringify(customSize),
     );
   }, [customSize]);
 
@@ -180,7 +200,7 @@ export function AgentPopoverProvider({ children }: { children: ReactNode }) {
     const handleResize = () => {
       const viewport = getViewportSize();
       setCustomSize((current) =>
-        clampAgentPopoverSize(current, viewport.width, viewport.height)
+        clampAgentPopoverSize(current, viewport.width, viewport.height),
       );
     };
     window.addEventListener("resize", handleResize);
@@ -190,7 +210,10 @@ export function AgentPopoverProvider({ children }: { children: ReactNode }) {
   return (
     <AgentPopoverContext.Provider value={value}>
       {children}
-      <AgentPopoverSurface customSize={customSize} setCustomSize={setCustomSize} />
+      <AgentPopoverSurface
+        customSize={customSize}
+        setCustomSize={setCustomSize}
+      />
     </AgentPopoverContext.Provider>
   );
 }
@@ -200,11 +223,21 @@ type AgentPopoverSurfaceProps = {
   setCustomSize: Dispatch<SetStateAction<AgentPopoverSize>>;
 };
 
-function AgentPopoverSurface({ customSize, setCustomSize }: AgentPopoverSurfaceProps) {
+function AgentPopoverSurface({
+  customSize,
+  setCustomSize,
+}: AgentPopoverSurfaceProps) {
   const { isAuthenticated } = useAuth();
   const pathname = usePathname();
-  const { expanded, hasOpened, motionState, sizeMode, setSizeMode, openAgent, minimizeAgent } =
-    useAgentPopover();
+  const {
+    expanded,
+    hasOpened,
+    motionState,
+    sizeMode,
+    setSizeMode,
+    openAgent,
+    minimizeAgent,
+  } = useAgentPopover();
   const isLegacyAgentRoute = pathname === ROUTES.AGENT;
   const canShowAgent = isAuthenticated && !isLegacyAgentRoute;
   const useRiaActionBarTrigger = isRiaActionBarRoute(pathname);
@@ -224,7 +257,7 @@ function AgentPopoverSurface({ customSize, setCustomSize }: AgentPopoverSurfaceP
     return clampAgentPopoverSize(
       resolveAgentPopoverSize(sizeMode, customSize),
       viewport.width,
-      viewport.height
+      viewport.height,
     );
   }, [customSize, sizeMode]);
 
@@ -234,7 +267,7 @@ function AgentPopoverSurface({ customSize, setCustomSize }: AgentPopoverSurfaceP
         "--agent-popover-width": `${resolvedPanelSize.width}px`,
         "--agent-popover-height": `${resolvedPanelSize.height}px`,
       }) as CSSProperties,
-    [resolvedPanelSize.height, resolvedPanelSize.width]
+    [resolvedPanelSize.height, resolvedPanelSize.width],
   );
 
   const handleNavigationActionComplete = useCallback(() => {
@@ -258,7 +291,12 @@ function AgentPopoverSurface({ customSize, setCustomSize }: AgentPopoverSurfaceP
       };
       setSizeMode("custom");
     },
-    [isFullscreen, resolvedPanelSize.height, resolvedPanelSize.width, setSizeMode]
+    [
+      isFullscreen,
+      resolvedPanelSize.height,
+      resolvedPanelSize.width,
+      setSizeMode,
+    ],
   );
 
   const handleResizePointerMove = useCallback(
@@ -274,11 +312,11 @@ function AgentPopoverSurface({ customSize, setCustomSize }: AgentPopoverSurfaceP
             height: start.startHeight + start.startY - event.clientY,
           },
           viewport.width,
-          viewport.height
-        )
+          viewport.height,
+        ),
       );
     },
-    [setCustomSize]
+    [setCustomSize],
   );
 
   const handleResizePointerEnd = useCallback(
@@ -290,7 +328,7 @@ function AgentPopoverSurface({ customSize, setCustomSize }: AgentPopoverSurfaceP
         event.currentTarget.releasePointerCapture(event.pointerId);
       }
     },
-    []
+    [],
   );
 
   if (!isAuthenticated) {
@@ -307,7 +345,7 @@ function AgentPopoverSurface({ customSize, setCustomSize }: AgentPopoverSurfaceP
         <div
           className={cn(
             "pointer-events-none fixed inset-0 z-[460] transition-opacity duration-300 motion-reduce:transition-none",
-            surfaceVisible ? "opacity-100" : "opacity-0"
+            surfaceVisible ? "opacity-100" : "opacity-0",
           )}
           aria-hidden={!expanded}
         >
@@ -320,7 +358,7 @@ function AgentPopoverSurface({ customSize, setCustomSize }: AgentPopoverSurfaceP
               expanded
                 ? "translate-x-0 translate-y-0 scale-100 opacity-100 blur-0"
                 : "pointer-events-none translate-x-3 translate-y-[calc(100%-5.75rem)] scale-[0.2] opacity-0 blur-sm",
-              isCollapsing && "rounded-2xl ring-1 ring-primary/25"
+              isCollapsing && "rounded-2xl ring-1 ring-primary/25",
             )}
             style={panelStyle}
             role="dialog"
@@ -376,7 +414,7 @@ function AgentPopoverSurface({ customSize, setCustomSize }: AgentPopoverSurfaceP
             expanded && !isCollapsing
               ? "pointer-events-none translate-y-3 scale-95 opacity-0"
               : "translate-y-0 scale-100 opacity-100",
-            isCollapsing && "ring-1 ring-primary/30 shadow-primary/20"
+            isCollapsing && "ring-1 ring-primary/30 shadow-primary/20",
           )}
           style={{
             bottom:
@@ -432,9 +470,9 @@ function AgentPopoverWindowControls({
         size="icon-xs"
         className="h-8 w-10 rounded-none text-zinc-400 hover:bg-white/[0.08] hover:text-zinc-100 focus-visible:ring-2 focus-visible:ring-primary/60"
         onClick={() => setSizeMode(isFullscreen ? "large" : "fullscreen")}
-      aria-label={isFullscreen ? "Restore Agent" : "Maximize Agent"}
-      title={isFullscreen ? "Restore Agent" : "Maximize Agent"}
-    >
+        aria-label={isFullscreen ? "Restore Agent" : "Maximize Agent"}
+        title={isFullscreen ? "Restore Agent" : "Maximize Agent"}
+      >
         {isFullscreen ? (
           <Minimize2 className="h-3.5 w-3.5" />
         ) : (

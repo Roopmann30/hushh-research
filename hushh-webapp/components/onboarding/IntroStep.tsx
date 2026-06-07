@@ -1,6 +1,12 @@
 "use client";
 
-import { ArrowRight, CandlestickChart, LogIn, TrendingUp, Zap } from "lucide-react";
+import {
+  ArrowRight,
+  CandlestickChart,
+  LogIn,
+  TrendingUp,
+  Zap,
+} from "lucide-react";
 import { Button } from "@/lib/morphy-ux/button";
 import { BrandMark, Icon, OnboardingFeatureList } from "@/lib/morphy-ux/ui";
 

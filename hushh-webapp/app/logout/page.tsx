@@ -92,7 +92,10 @@ export default function LogoutPage() {
           await OnboardingLocalService.clearMarketingSeen();
           await OnboardingLocalService.markForceIntroOnce();
         } catch (onboardingError) {
-          console.warn("[LogoutPage] Failed to reset onboarding flags:", onboardingError);
+          console.warn(
+            "[LogoutPage] Failed to reset onboarding flags:",
+            onboardingError,
+          );
         }
         setOnboardingRequiredCookie(false);
         setOnboardingFlowActiveCookie(false);

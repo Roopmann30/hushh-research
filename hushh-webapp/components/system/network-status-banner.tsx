@@ -19,7 +19,10 @@ export function NetworkStatusBanner() {
     >
       <div className="flex items-center justify-center gap-2">
         <WifiOff className="h-4 w-4" />
-        <span>You are offline. Some data may be outdated until your connection returns.</span>
+        <span>
+          You are offline. Some data may be outdated until your connection
+          returns.
+        </span>
       </div>
     </div>
   );

@@ -16,7 +16,11 @@ function clamp01(value: number): number {
   return value;
 }
 
-export function VoiceEqualizer({ state, level, bars = 14 }: VoiceEqualizerProps) {
+export function VoiceEqualizer({
+  state,
+  level,
+  bars = 14,
+}: VoiceEqualizerProps) {
   const [animationTick, setAnimationTick] = useState(0);
 
   useEffect(() => {
@@ -40,7 +44,9 @@ export function VoiceEqualizer({ state, level, bars = 14 }: VoiceEqualizerProps)
     const maxHeight = state === "processing" ? 24 : 34;
 
     const effectiveLevel = clamp01(
-      state === "processing" ? Math.max(0.18, level * 0.45) : Math.max(0.1, level)
+      state === "processing"
+        ? Math.max(0.18, level * 0.45)
+        : Math.max(0.1, level),
     );
 
     return Array.from({ length: bars }, (_, index) => {
@@ -58,7 +64,7 @@ export function VoiceEqualizer({ state, level, bars = 14 }: VoiceEqualizerProps)
           key={index}
           className={cn(
             "w-1 rounded-full bg-foreground/85 transition-[height,opacity] duration-100",
-            state === "processing" ? "opacity-70" : "opacity-90"
+            state === "processing" ? "opacity-70" : "opacity-90",
           )}
           style={{ height }}
         />

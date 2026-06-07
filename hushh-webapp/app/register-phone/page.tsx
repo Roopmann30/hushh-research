@@ -61,7 +61,9 @@ function PhoneMandatePageContent() {
     const currentPath = redirectPath
       ? `${ROUTES.PHONE_MANDATE}?redirect=${encodeURIComponent(redirectPath)}`
       : ROUTES.PHONE_MANDATE;
-    router.replace(`${ROUTES.LOGIN}?redirect=${encodeURIComponent(currentPath)}`);
+    router.replace(
+      `${ROUTES.LOGIN}?redirect=${encodeURIComponent(currentPath)}`,
+    );
   }, [loading, redirectPath, router, user]);
 
   const continueToNextRoute = useCallback(
@@ -84,7 +86,7 @@ function PhoneMandatePageContent() {
       });
       router.replace(nextPath);
     },
-    [redirectPath, refreshUser, router, user]
+    [redirectPath, refreshUser, router, user],
   );
 
   const shouldBypassLocalPhoneMandate =
@@ -102,11 +104,15 @@ function PhoneMandatePageContent() {
   }, [continueToNextRoute, shouldBypassLocalPhoneMandate, user]);
 
   if (loading || !user) {
-    return <HushhLoader label="Loading phone verification..." variant="fullscreen" />;
+    return (
+      <HushhLoader label="Loading phone verification..." variant="fullscreen" />
+    );
   }
 
   if (shouldBypassLocalPhoneMandate) {
-    return <HushhLoader label="Continuing local session..." variant="fullscreen" />;
+    return (
+      <HushhLoader label="Continuing local session..." variant="fullscreen" />
+    );
   }
 
   const shell = (
@@ -156,7 +162,14 @@ function PhoneMandatePageContent() {
 
 export default function RegisterPhonePage() {
   return (
-    <Suspense fallback={<HushhLoader label="Loading phone verification..." variant="fullscreen" />}>
+    <Suspense
+      fallback={
+        <HushhLoader
+          label="Loading phone verification..."
+          variant="fullscreen"
+        />
+      }
+    >
       <PhoneMandatePageContent />
     </Suspense>
   );

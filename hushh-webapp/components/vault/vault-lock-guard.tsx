@@ -118,7 +118,11 @@ export function VaultLockGuard({ children }: VaultLockGuardProps) {
   }, [beginTask, endTask, isVaultUnlocked]);
 
   useEffect(() => {
-    if (!nativeTestBootstrapManaged || isVaultUnlocked || nativeReplayAttemptedRef.current) {
+    if (
+      !nativeTestBootstrapManaged ||
+      isVaultUnlocked ||
+      nativeReplayAttemptedRef.current
+    ) {
       return;
     }
     const bridge =
@@ -157,7 +161,10 @@ export function VaultLockGuard({ children }: VaultLockGuardProps) {
           setHasVault(exists);
         }
       } catch (error) {
-        console.warn("[VaultLockGuard] Failed to check vault existence:", error);
+        console.warn(
+          "[VaultLockGuard] Failed to check vault existence:",
+          error,
+        );
         if (!cancelled) {
           // Fail closed on transient check failures to preserve existing secure behavior.
           vaultPresenceCache.set(userId, true);
@@ -174,13 +181,26 @@ export function VaultLockGuard({ children }: VaultLockGuardProps) {
   }, [authLoading, userId, isVaultUnlocked]);
 
   useEffect(() => {
-    if (isVaultUnlocked || authLoading || !userId || hasVault === null || vaultStepDoneRef.current) {
+    if (
+      isVaultUnlocked ||
+      authLoading ||
+      !userId ||
+      hasVault === null ||
+      vaultStepDoneRef.current
+    ) {
       return;
     }
     completeTaskStep(PROGRESS_SCOPE);
     vaultStepDoneRef.current = true;
     endTask(PROGRESS_SCOPE);
-  }, [authLoading, completeTaskStep, endTask, hasVault, isVaultUnlocked, userId]);
+  }, [
+    authLoading,
+    completeTaskStep,
+    endTask,
+    hasVault,
+    isVaultUnlocked,
+    userId,
+  ]);
 
   // ============================================================================
   // FAST PATH: If vault is unlocked (in memory) OR was unlocked earlier in this
@@ -194,7 +214,7 @@ export function VaultLockGuard({ children }: VaultLockGuardProps) {
   // ============================================================================
   // SLOW PATH: Vault not unlocked, need to check auth and show appropriate UI
   // ============================================================================
-  
+
   // Auth still loading - show loader
   if (authLoading) {
     return <HushhLoader label="Checking session..." />;
@@ -217,7 +237,7 @@ export function VaultLockGuard({ children }: VaultLockGuardProps) {
     // UITest-only: NativeTestBootstrap unlocks via passphrase while we show a loader.
     const bootstrapState =
       typeof window !== "undefined"
-        ? window.__HUSHH_NATIVE_TEST__?.bootstrapState ?? ""
+        ? (window.__HUSHH_NATIVE_TEST__?.bootstrapState ?? "")
         : "";
     if (bootstrapState === "vault_error" || bootstrapState === "auth_error") {
       // Fall through to passphrase-only unlock dialog below.

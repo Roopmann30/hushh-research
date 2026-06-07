@@ -21,7 +21,8 @@ type LiquidGlassSceneContextValue = {
   parentSceneVersion: number;
 };
 
-const LiquidGlassSceneContext = createContext<LiquidGlassSceneContextValue | null>(null);
+const LiquidGlassSceneContext =
+  createContext<LiquidGlassSceneContextValue | null>(null);
 
 export function LiquidGlassSceneProvider({
   sceneStyle,
@@ -85,7 +86,12 @@ export function LiquidGlassSceneProvider({
       parentSceneRootRef: parentContext?.sceneRootRef ?? null,
       parentSceneVersion: parentContext?.sceneVersion ?? 0,
     }),
-    [parentContext?.sceneVersion, parentContext?.sceneRootRef, sceneStyle, sceneVersion]
+    [
+      parentContext?.sceneVersion,
+      parentContext?.sceneRootRef,
+      sceneStyle,
+      sceneVersion,
+    ],
   );
 
   return (
@@ -122,7 +128,9 @@ export function LiquidGlassSceneRoot({
 export function useLiquidGlassScene() {
   const context = useContext(LiquidGlassSceneContext);
   if (!context) {
-    throw new Error("useLiquidGlassScene must be used inside LiquidGlassSceneProvider");
+    throw new Error(
+      "useLiquidGlassScene must be used inside LiquidGlassSceneProvider",
+    );
   }
   return context;
 }
@@ -135,7 +143,9 @@ export function useLiquidGlassSceneRootRef() {
   return useLiquidGlassScene().sceneRootRef;
 }
 
-export function useSceneMetrics(elementRef: React.RefObject<HTMLElement | null>) {
+export function useSceneMetrics(
+  elementRef: React.RefObject<HTMLElement | null>,
+) {
   const context = useLiquidGlassScene();
   const [metrics, setMetrics] = useState({ x: 0, y: 0, width: 0, height: 0 });
 
@@ -149,7 +159,7 @@ export function useSceneMetrics(elementRef: React.RefObject<HTMLElement | null>)
     const update = () => {
       const sceneRect = scene.getBoundingClientRect();
       const elRect = element.getBoundingClientRect();
-      
+
       const newX = elRect.left - sceneRect.left;
       const newY = elRect.top - sceneRect.top;
       const newWidth = sceneRect.width;

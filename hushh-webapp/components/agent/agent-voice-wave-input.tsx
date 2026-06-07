@@ -59,7 +59,9 @@ export function AgentVoiceWaveInput({
         <div className="mt-2 flex h-8 items-center gap-1 overflow-hidden">
           {WAVE_BARS.map((index) => {
             const phase = Math.sin(index * 0.85);
-            const scale = muted ? 0.12 : activeLevel * (0.7 + Math.abs(phase) * 0.8);
+            const scale = muted
+              ? 0.12
+              : activeLevel * (0.7 + Math.abs(phase) * 0.8);
             return (
               <span
                 key={index}
@@ -68,9 +70,11 @@ export function AgentVoiceWaveInput({
                   (status === "listening" || status === "speaking") &&
                     !muted &&
                     "animate-pulse",
-                  status === "error" && "bg-destructive/70"
+                  status === "error" && "bg-destructive/70",
                 )}
-                style={{ height: `${Math.max(5, Math.min(30, 5 + scale * 30))}px` }}
+                style={{
+                  height: `${Math.max(5, Math.min(30, 5 + scale * 30))}px`,
+                }}
               />
             );
           })}

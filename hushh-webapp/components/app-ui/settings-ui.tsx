@@ -42,7 +42,8 @@ function isKnownInteractiveComponent(type: unknown): boolean {
   }
   const typedComponent = type as { displayName?: string; name?: string };
   const displayName =
-    typeof typedComponent.displayName === "string" && typedComponent.displayName.trim()
+    typeof typedComponent.displayName === "string" &&
+    typedComponent.displayName.trim()
       ? typedComponent.displayName
       : typeof typedComponent.name === "string"
         ? typedComponent.name
@@ -71,7 +72,10 @@ function containsInteractiveNode(node: ReactNode): boolean {
       return false;
     }
 
-    if (typeof child.type === "string" && INTERACTIVE_HTML_TAGS.has(child.type)) {
+    if (
+      typeof child.type === "string" &&
+      INTERACTIVE_HTML_TAGS.has(child.type)
+    ) {
       return true;
     }
 
@@ -108,15 +112,23 @@ export function SettingsGroup({
       className={cn(
         "relative isolate [--settings-group-radius:30px] overflow-hidden rounded-[calc(var(--app-card-radius-feature)+6px)]",
         "border border-[color:var(--app-card-border-standard)] bg-[color:var(--app-card-surface-default-solid)]",
-        !embedded && "sm:rounded-[var(--app-card-radius-feature)]"
+        !embedded && "sm:rounded-[var(--app-card-radius-feature)]",
       )}
     >
-      <div className="relative isolate divide-y divide-border/60">{children}</div>
+      <div className="relative isolate divide-y divide-border/60">
+        {children}
+      </div>
     </div>
   );
 
   return (
-    <section className={cn("w-full space-y-[var(--settings-group-stack-gap)]", className)} data-testid={testId}>
+    <section
+      className={cn(
+        "w-full space-y-[var(--settings-group-stack-gap)]",
+        className,
+      )}
+      data-testid={testId}
+    >
       {eyebrow || title || description ? (
         <div className="space-y-[var(--settings-heading-stack-gap)] px-0.5 sm:px-1">
           {eyebrow || title ? (
@@ -185,24 +197,32 @@ export function SettingsRow({
   testId?: string;
 }) {
   const resolvedAsChild = asChild && isValidElement(children);
-  const isInteractive = !disabled && (typeof onClick === "function" || resolvedAsChild);
-  const shouldStackTrailing = stackTrailingOnMobile && Boolean(trailing) && !chevron;
+  const isInteractive =
+    !disabled && (typeof onClick === "function" || resolvedAsChild);
+  const shouldStackTrailing =
+    stackTrailingOnMobile && Boolean(trailing) && !chevron;
   const hasInteractiveTrailing = containsInteractiveNode(trailing);
-  const splitPrimaryAction = Boolean(!asChild && onClick && hasInteractiveTrailing);
-  const Comp = resolvedAsChild ? Slot.Root : onClick && !splitPrimaryAction ? "button" : "div";
+  const splitPrimaryAction = Boolean(
+    !asChild && onClick && hasInteractiveTrailing,
+  );
+  const Comp = resolvedAsChild
+    ? Slot.Root
+    : onClick && !splitPrimaryAction
+      ? "button"
+      : "div";
   const rowRadiusClassName =
     "[--settings-row-top-radius:0px] [--settings-row-bottom-radius:0px] first:[--settings-row-top-radius:calc(var(--settings-group-radius)-1px)] last:[--settings-row-bottom-radius:calc(var(--settings-group-radius)-1px)] [border-top-left-radius:var(--settings-row-top-radius)] [border-top-right-radius:var(--settings-row-top-radius)] [border-bottom-left-radius:var(--settings-row-bottom-radius)] [border-bottom-right-radius:var(--settings-row-bottom-radius)]";
   const rowShellClassName = cn(
     "group/settings-row relative isolate overflow-hidden bg-[color:var(--app-list-row-surface)] sm:bg-transparent",
     rowRadiusClassName,
     disabled && "cursor-not-allowed opacity-60",
-    className
+    className,
   );
   const mainContent = (
     <div
       className={cn(
         "relative z-0 flex min-w-0 gap-[var(--settings-row-gap)]",
-        shouldStackTrailing ? "items-start sm:items-center" : "items-center"
+        shouldStackTrailing ? "items-start sm:items-center" : "items-center",
       )}
     >
       {leading ? (
@@ -211,7 +231,7 @@ export function SettingsRow({
         <span
           className={cn(
             "inline-flex h-8 w-8 shrink-0 items-center justify-center self-center rounded-2xl bg-muted/65 text-muted-foreground sm:h-10 sm:w-10",
-            tone === "destructive" && "bg-destructive/10 text-destructive"
+            tone === "destructive" && "bg-destructive/10 text-destructive",
           )}
         >
           <Icon icon={icon} size="md" />
@@ -221,7 +241,7 @@ export function SettingsRow({
         <div
           className={cn(
             "text-[13px] font-medium tracking-tight text-foreground [overflow-wrap:anywhere] sm:text-[14px]",
-            tone === "destructive" && "text-destructive"
+            tone === "destructive" && "text-destructive",
           )}
         >
           {title}
@@ -234,25 +254,26 @@ export function SettingsRow({
       </div>
     </div>
   );
-  const trailingContent = trailing || chevron ? (
+  const trailingContent =
+    trailing || chevron ? (
       <div
         className={cn(
           "relative z-0 flex max-w-full shrink-0 items-center justify-end self-center gap-2.5 pr-0.5 sm:pr-1",
           shouldStackTrailing &&
-            "w-full justify-start pl-[2.65rem] pt-1 sm:w-auto sm:justify-end sm:pl-0 sm:pt-0"
+            "w-full justify-start pl-[2.65rem] pt-1 sm:w-auto sm:justify-end sm:pl-0 sm:pt-0",
         )}
-    >
-      {trailing}
-      {chevron ? (
-        <ChevronRight
-          className={cn(
-            "h-4 w-4 shrink-0 text-muted-foreground/90 transition-transform",
-            isInteractive && "group-hover:translate-x-0.5"
-          )}
-        />
-      ) : null}
-    </div>
-  ) : null;
+      >
+        {trailing}
+        {chevron ? (
+          <ChevronRight
+            className={cn(
+              "h-4 w-4 shrink-0 text-muted-foreground/90 transition-transform",
+              isInteractive && "group-hover:translate-x-0.5",
+            )}
+          />
+        ) : null}
+      </div>
+    ) : null;
 
   const sharedClassName = cn(
     "relative isolate grid w-full appearance-none overflow-hidden border-0 bg-transparent px-[var(--settings-row-px)] py-[var(--settings-row-py)] text-left outline-hidden ring-0 [-webkit-tap-highlight-color:transparent]",
@@ -260,21 +281,28 @@ export function SettingsRow({
       ? "grid-cols-1 gap-y-[var(--settings-row-stack-gap)] sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-x-[var(--settings-row-gap)] sm:gap-y-0"
       : "grid-cols-[minmax(0,1fr)_auto] items-center gap-x-[var(--settings-row-gap)]",
     isInteractive &&
-      "transition-[border-color,box-shadow] focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0"
+      "transition-[border-color,box-shadow] focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0",
   );
   const primaryActionClassName = cn(
-    "relative isolate min-w-0 overflow-hidden rounded-[inherit] border-0 bg-transparent px-[var(--settings-row-px)] py-[var(--settings-row-py)] text-left outline-hidden ring-0 transition-[border-color,box-shadow] [-webkit-tap-highlight-color:transparent] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+    "relative isolate min-w-0 overflow-hidden rounded-[inherit] border-0 bg-transparent px-[var(--settings-row-px)] py-[var(--settings-row-py)] text-left outline-hidden ring-0 transition-[border-color,box-shadow] [-webkit-tap-highlight-color:transparent] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
   );
   const voiceProps = {
     "data-voice-control-id": voiceControlId || undefined,
     "data-voice-action-id": voiceActionId || undefined,
-    "data-voice-label": voiceLabel || (typeof title === "string" ? title : undefined),
-    "data-voice-purpose": voicePurpose || (typeof description === "string" ? description : undefined),
+    "data-voice-label":
+      voiceLabel || (typeof title === "string" ? title : undefined),
+    "data-voice-purpose":
+      voicePurpose ||
+      (typeof description === "string" ? description : undefined),
   };
-  const asChildContent =
-    resolvedAsChild
-      ? cloneElement(children as ReactElement, undefined, mainContent, trailingContent)
-      : children;
+  const asChildContent = resolvedAsChild
+    ? cloneElement(
+        children as ReactElement,
+        undefined,
+        mainContent,
+        trailingContent,
+      )
+    : children;
 
   if (splitPrimaryAction) {
     return (
@@ -284,7 +312,7 @@ export function SettingsRow({
             "relative z-10 grid w-full px-[var(--settings-row-px)] py-[var(--settings-row-py)]",
             shouldStackTrailing
               ? "grid-cols-1 gap-y-0 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-x-3"
-              : "grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3"
+              : "grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3",
           )}
         >
           <button
@@ -303,9 +331,7 @@ export function SettingsRow({
             />
           </button>
           {trailingContent ? (
-            <div onClick={(e) => e.stopPropagation()}>
-              {trailingContent}
-            </div>
+            <div onClick={(e) => e.stopPropagation()}>{trailingContent}</div>
           ) : null}
         </div>
       </div>
@@ -320,12 +346,14 @@ export function SettingsRow({
             aria-hidden
             className={cn(
               "pointer-events-none absolute inset-0 z-[1] bg-transparent transition-[background-color]",
-              "group-hover/settings-row:bg-foreground/[0.04] group-active/settings-row:bg-foreground/[0.065]"
+              "group-hover/settings-row:bg-foreground/[0.04] group-active/settings-row:bg-foreground/[0.065]",
             )}
           />
         ) : null}
         <Comp
-          {...(!resolvedAsChild ? { "aria-disabled": disabled || undefined } : {})}
+          {...(!resolvedAsChild
+            ? { "aria-disabled": disabled || undefined }
+            : {})}
           className={sharedClassName}
           {...voiceProps}
         >
@@ -342,7 +370,7 @@ export function SettingsRow({
           aria-hidden
           className={cn(
             "pointer-events-none absolute inset-0 z-[1] bg-transparent transition-[background-color]",
-            "group-hover/settings-row:bg-foreground/[0.04] group-active/settings-row:bg-foreground/[0.065]"
+            "group-hover/settings-row:bg-foreground/[0.04] group-active/settings-row:bg-foreground/[0.065]",
           )}
         />
       ) : null}
@@ -405,11 +433,11 @@ export function SettingsDetailPanel({
             <DrawerDescription
               className={cn(
                 "text-sm leading-5 sm:leading-6",
-                !description && "sr-only"
+                !description && "sr-only",
               )}
             >
               {description ?? "Settings"}
-          </DrawerDescription>
+            </DrawerDescription>
           </DrawerHeader>
           <div className="flex-1 overflow-y-auto bg-[color:var(--app-card-surface-default-solid)] px-3 pb-[calc(var(--app-safe-area-bottom-effective,env(safe-area-inset-bottom,0px))+2rem)] pt-3 sm:px-4 sm:pt-4">
             {children}
@@ -426,7 +454,7 @@ export function SettingsDetailPanel({
         style={desktopMaxWidth ? { maxWidth: desktopMaxWidth } : undefined}
         className={cn(
           "w-[calc(100%-1.5rem)] overflow-hidden p-0",
-          desktopMaxWidthClassName || "sm:!max-w-[720px]"
+          desktopMaxWidthClassName || "sm:!max-w-[720px]",
         )}
       >
         <DialogHeader className="sticky top-0 z-10 border-b border-[color:var(--app-card-border-standard)] bg-[color:var(--app-card-surface-default-solid)] px-6 py-4 text-left">

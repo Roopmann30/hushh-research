@@ -2,7 +2,12 @@
 
 import { AlertTriangle, CheckCircle2, Loader2, RefreshCcw } from "lucide-react";
 
-type AsyncActionStatusState = "idle" | "loading" | "success" | "error" | "retrying";
+type AsyncActionStatusState =
+  | "idle"
+  | "loading"
+  | "success"
+  | "error"
+  | "retrying";
 
 type AsyncActionStatusProps = {
   state: AsyncActionStatusState;

@@ -25,7 +25,9 @@ type NativeTestBeaconProps = {
   dataState: NativeTestDataState;
   errorCode?: string | null;
   errorMessage?: string | null;
-  attachToBridge?: ((bridge: NonNullable<Window["__HUSHH_NATIVE_TEST__"]>) => void) | null;
+  attachToBridge?:
+    | ((bridge: NonNullable<Window["__HUSHH_NATIVE_TEST__"]>) => void)
+    | null;
 };
 
 export function NativeTestBeacon({

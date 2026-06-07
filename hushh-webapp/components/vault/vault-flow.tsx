@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, useLayoutEffect } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useLayoutEffect,
+} from "react";
 import { Capacitor } from "@capacitor/core";
 import { Button, Card, CardContent } from "@/lib/morphy-ux/morphy";
 import {
@@ -35,7 +41,10 @@ import { useVault } from "@/lib/vault/vault-context";
 import { HushhLoader } from "@/components/app-ui/hushh-loader";
 import { Icon } from "@/lib/morphy-ux/ui";
 import type { GeneratedVaultKeyMode } from "@/lib/services/vault-bootstrap-service";
-import { VaultMethodService, type VaultMethod } from "@/lib/services/vault-method-service";
+import {
+  VaultMethodService,
+  type VaultMethod,
+} from "@/lib/services/vault-method-service";
 import { VaultMethodPromptLocalService } from "@/lib/services/vault-method-prompt-local-service";
 import { resolvePasskeyRpId } from "@/lib/vault/passkey-rp";
 import { copyToClipboard } from "@/lib/utils/clipboard";
@@ -150,21 +159,29 @@ export function VaultFlow({
     !unlockWithPassphraseFallback;
   const showRecoveryAlternative = true;
   const showUnlockOtherMethods =
-    showVaultKeyAlternative || showPasskeyAlternative || showRecoveryAlternative;
+    showVaultKeyAlternative ||
+    showPasskeyAlternative ||
+    showRecoveryAlternative;
 
-  const finalizeUnlock = useCallback(async (decryptedKey: string): Promise<boolean> => {
-    try {
-      const { token, expiresAt } = await VaultService.getOrIssueVaultOwnerToken(user.uid);
-      VaultService.setVaultCheckCache(user.uid, true);
-      unlockVault(decryptedKey, token, expiresAt);
-      onSuccess({ mode: vaultMode });
-      return true;
-    } catch (tokenError) {
-      console.error("Failed to issue VAULT_OWNER token:", tokenError);
-      toast.error("Vault opened, but we could not complete access setup. Please try again.");
-      return false;
-    }
-  }, [onSuccess, unlockVault, user.uid, vaultMode]);
+  const finalizeUnlock = useCallback(
+    async (decryptedKey: string): Promise<boolean> => {
+      try {
+        const { token, expiresAt } =
+          await VaultService.getOrIssueVaultOwnerToken(user.uid);
+        VaultService.setVaultCheckCache(user.uid, true);
+        unlockVault(decryptedKey, token, expiresAt);
+        onSuccess({ mode: vaultMode });
+        return true;
+      } catch (tokenError) {
+        console.error("Failed to issue VAULT_OWNER token:", tokenError);
+        toast.error(
+          "Vault opened, but we could not complete access setup. Please try again.",
+        );
+        return false;
+      }
+    },
+    [onSuccess, unlockVault, user.uid, vaultMode],
+  );
 
   // Initial Vault Status Check
   useEffect(() => {
@@ -185,17 +202,21 @@ export function VaultFlow({
           const preferPassphraseForAutomation =
             shouldSkipGeneratedVaultUnlockForAutomation();
           const primaryWrapper = VaultService.getPrimaryWrapper(vaultData);
-          const quickMethodCandidates: VaultMethod[] = Capacitor.isNativePlatform()
-            ? [
-                "generated_default_native_passkey_prf",
-                "generated_default_native_biometric",
-              ]
-            : ["generated_default_web_prf"];
+          const quickMethodCandidates: VaultMethod[] =
+            Capacitor.isNativePlatform()
+              ? [
+                  "generated_default_native_passkey_prf",
+                  "generated_default_native_biometric",
+                ]
+              : ["generated_default_web_prf"];
           const quickMethod =
             quickMethodCandidates
-              .map((method) => VaultService.getWrapperByMethod(vaultData, method))
+              .map((method) =>
+                VaultService.getWrapperByMethod(vaultData, method),
+              )
               .find((wrapper) => !!wrapper) ?? null;
-          const nextQuickMethod = (quickMethod?.method as GeneratedVaultKeyMode | undefined) ?? null;
+          const nextQuickMethod =
+            (quickMethod?.method as GeneratedVaultKeyMode | undefined) ?? null;
           setAvailableGeneratedMethod(nextQuickMethod);
           const primaryPrefersQuickMethod =
             vaultData.primaryMethod === "generated_default_native_biometric" ||
@@ -205,9 +226,7 @@ export function VaultFlow({
           if (primaryPrefersQuickMethod && !nextQuickMethod) {
             setVaultMode("passphrase");
             setUnlockWithPassphraseFallback(true);
-            setUnlockHint(
-              toInvestorMessage("VAULT_PASSKEY_ENROLL_REQUIRED")
-            );
+            setUnlockHint(toInvestorMessage("VAULT_PASSKEY_ENROLL_REQUIRED"));
           } else if (
             preferPassphraseForAutomation &&
             VaultService.getWrapperByMethod(vaultData, "passphrase")
@@ -229,7 +248,10 @@ export function VaultFlow({
             setUnlockWithPassphraseFallback(false);
           }
         } catch (metadataError) {
-          console.warn("Vault mode detection failed, defaulting to passphrase:", metadataError);
+          console.warn(
+            "Vault mode detection failed, defaulting to passphrase:",
+            metadataError,
+          );
           setVaultMode("passphrase");
           setAvailableGeneratedMethod(null);
           setUnlockWithPassphraseFallback(false);
@@ -239,11 +261,13 @@ export function VaultFlow({
       } catch (err) {
         console.error("Vault status check failed:", err);
         const errorCode =
-          typeof (err as { code?: unknown } | null | undefined)?.code === "string"
+          typeof (err as { code?: unknown } | null | undefined)?.code ===
+          "string"
             ? (err as { code: string }).code
             : null;
         const errorHint =
-          typeof (err as { hint?: unknown } | null | undefined)?.hint === "string"
+          typeof (err as { hint?: unknown } | null | undefined)?.hint ===
+          "string"
             ? (err as { hint: string }).hint
             : null;
         if (errorCode === "DATABASE_UNAVAILABLE") {
@@ -254,7 +278,11 @@ export function VaultFlow({
       }
     };
     checkStatus();
-  }, [nativeTestConfig.vaultPassphrase, shouldPreferPassphraseUnlock, user.uid]);
+  }, [
+    nativeTestConfig.vaultPassphrase,
+    shouldPreferPassphraseUnlock,
+    user.uid,
+  ]);
 
   useLayoutEffect(() => {
     if (step !== "unlock") {
@@ -283,7 +311,9 @@ export function VaultFlow({
       setError(null);
       // 1. Generate encrypted vault data
       const vaultData = await VaultService.createVault(passphrase);
-      const vaultKeyHash = await VaultService.hashVaultKey(vaultData.vaultKeyHex);
+      const vaultKeyHash = await VaultService.hashVaultKey(
+        vaultData.vaultKeyHex,
+      );
 
       // 2. Save multi-wrapper vault state (mandatory passphrase wrapper)
       await VaultService.setupVaultState(user.uid, {
@@ -306,10 +336,12 @@ export function VaultFlow({
       const persistedState = await VaultService.getVaultState(user.uid);
       await VaultService.assertVaultKeyMatchesState(
         persistedState,
-        vaultData.vaultKeyHex
+        vaultData.vaultKeyHex,
       );
       if (!VaultService.getWrapperByMethod(persistedState, "passphrase")) {
-        throw new Error("Vault setup verification failed: passphrase wrapper missing.");
+        throw new Error(
+          "Vault setup verification failed: passphrase wrapper missing.",
+        );
       }
 
       setVaultMode("passphrase");
@@ -318,57 +350,68 @@ export function VaultFlow({
       setStep("recovery"); // Show recovery key dialog
     } catch (err: any) {
       console.error("Create vault error:", err);
-      toast.error(err.message || "We could not create your Vault. Please try again.");
+      toast.error(
+        err.message || "We could not create your Vault. Please try again.",
+      );
     } finally {
       setIsUnlocking(false);
     }
   };
 
-  const handleUnlockPassphraseWith = useCallback(async (passphraseValue: string) => {
-    setIsUnlocking(true);
-    try {
-      setError(null);
-      const vaultData = await VaultService.getVaultState(user.uid);
-      const decryptedKey = await VaultService.unlockWithMethod({
-        state: vaultData,
-        method: "passphrase",
-        secretMaterial: passphraseValue,
-      });
+  const handleUnlockPassphraseWith = useCallback(
+    async (passphraseValue: string) => {
+      setIsUnlocking(true);
+      try {
+        setError(null);
+        const vaultData = await VaultService.getVaultState(user.uid);
+        const decryptedKey = await VaultService.unlockWithMethod({
+          state: vaultData,
+          method: "passphrase",
+          secretMaterial: passphraseValue,
+        });
 
-      if (decryptedKey) {
-        if (enableGeneratedDefault) {
-          const capability = await VaultMethodService.getCapabilityMatrix();
-          if (capability.recommendedMethod !== "passphrase") {
-            const hasRecommendedWrapper =
-              VaultService.getWrapperByMethod(vaultData, capability.recommendedMethod) !== null;
-            const promptState = await VaultMethodPromptLocalService.load(user.uid);
-            const dismissedForRecommendedMethod =
-              promptState?.dismissed_for_method === capability.recommendedMethod &&
-              promptState?.dismissed_for_rp_id === currentRpId;
+        if (decryptedKey) {
+          if (enableGeneratedDefault) {
+            const capability = await VaultMethodService.getCapabilityMatrix();
+            if (capability.recommendedMethod !== "passphrase") {
+              const hasRecommendedWrapper =
+                VaultService.getWrapperByMethod(
+                  vaultData,
+                  capability.recommendedMethod,
+                ) !== null;
+              const promptState = await VaultMethodPromptLocalService.load(
+                user.uid,
+              );
+              const dismissedForRecommendedMethod =
+                promptState?.dismissed_for_method ===
+                  capability.recommendedMethod &&
+                promptState?.dismissed_for_rp_id === currentRpId;
 
-            if (!hasRecommendedWrapper && !dismissedForRecommendedMethod) {
-              setPendingUnlockKey(decryptedKey);
-              setRecommendedQuickMethod(capability.recommendedMethod);
-              setStep("method");
-              return;
+              if (!hasRecommendedWrapper && !dismissedForRecommendedMethod) {
+                setPendingUnlockKey(decryptedKey);
+                setRecommendedQuickMethod(capability.recommendedMethod);
+                setStep("method");
+                return;
+              }
             }
           }
+          await finalizeUnlock(decryptedKey);
+        } else {
+          const message = "That passphrase did not match. Please try again.";
+          setError(message);
+          toast.error(message);
         }
-        await finalizeUnlock(decryptedKey);
-      } else {
-        const message = "That passphrase did not match. Please try again.";
+      } catch (err: any) {
+        console.error("Unlock error:", err);
+        const message = toInvestorVaultUnlockError(err);
         setError(message);
         toast.error(message);
+      } finally {
+        setIsUnlocking(false);
       }
-    } catch (err: any) {
-      console.error("Unlock error:", err);
-      const message = toInvestorVaultUnlockError(err);
-      setError(message);
-      toast.error(message);
-    } finally {
-      setIsUnlocking(false);
-    }
-  }, [currentRpId, enableGeneratedDefault, finalizeUnlock, user.uid]);
+    },
+    [currentRpId, enableGeneratedDefault, finalizeUnlock, user.uid],
+  );
 
   const handleUnlockPassphrase = useCallback(async () => {
     const passphraseToUse = passphrase;
@@ -387,7 +430,11 @@ export function VaultFlow({
 
     const liveConfig = getNativeTestConfig();
     const testPassphrase = liveConfig.vaultPassphrase?.trim();
-    if (!testPassphrase || step !== "unlock" || !isNativeUiTestSession(liveConfig)) {
+    if (
+      !testPassphrase ||
+      step !== "unlock" ||
+      !isNativeUiTestSession(liveConfig)
+    ) {
       return;
     }
 
@@ -411,7 +458,12 @@ export function VaultFlow({
         window.__HUSHH_NATIVE_TEST__.triggerVaultUnlock = null;
       }
     };
-  }, [handleUnlockPassphraseWith, isUnlocking, shouldPreferPassphraseUnlock, step]);
+  }, [
+    handleUnlockPassphraseWith,
+    isUnlocking,
+    shouldPreferPassphraseUnlock,
+    step,
+  ]);
 
   useEffect(() => {
     if (step !== "method" || !isNativeUiTestSession() || !pendingUnlockKey) {
@@ -423,10 +475,13 @@ export function VaultFlow({
           await VaultMethodPromptLocalService.dismiss(
             user.uid,
             recommendedQuickMethod,
-            currentRpId
+            currentRpId,
           );
         } catch (dismissError) {
-          console.warn("[VaultFlow] UITest quick-unlock dismissal failed:", dismissError);
+          console.warn(
+            "[VaultFlow] UITest quick-unlock dismissal failed:",
+            dismissError,
+          );
         }
       }
       await finalizeUnlock(pendingUnlockKey);
@@ -448,17 +503,19 @@ export function VaultFlow({
         Capacitor.isNativePlatform() &&
         vaultMode === "generated_default_web_prf"
       ) {
-        throw new Error(
-          toInvestorMessage("VAULT_PASSKEY_ENROLL_REQUIRED")
-        );
+        throw new Error(toInvestorMessage("VAULT_PASSKEY_ENROLL_REQUIRED"));
       }
       const vaultData = await VaultService.getVaultState(user.uid);
-      const generatedWrapper = VaultService.getWrapperByMethod(vaultData, vaultMode, {
-        wrapperId:
-          vaultData.primaryMethod === vaultMode
-            ? vaultData.primaryWrapperId
-            : undefined,
-      });
+      const generatedWrapper = VaultService.getWrapperByMethod(
+        vaultData,
+        vaultMode,
+        {
+          wrapperId:
+            vaultData.primaryMethod === vaultMode
+              ? vaultData.primaryWrapperId
+              : undefined,
+        },
+      );
       if (!generatedWrapper) {
         throw new Error("Quick unlock is not enabled on this device yet.");
       }
@@ -498,7 +555,7 @@ export function VaultFlow({
         recoveryKeyInput,
         vaultData.recoveryEncryptedVaultKey,
         vaultData.recoverySalt,
-        vaultData.recoveryIv
+        vaultData.recoveryIv,
       );
 
       if (decryptedKey) {
@@ -537,7 +594,7 @@ export function VaultFlow({
       const vaultData = await VaultService.getVaultState(user.uid);
       const passphraseWrapper = VaultService.getWrapperByMethod(
         vaultData,
-        "passphrase"
+        "passphrase",
       );
       let decryptedKey: string | null = null;
 
@@ -558,9 +615,12 @@ export function VaultFlow({
       if (vaultMode === "passphrase" && enableGeneratedDefault) {
         const capability = await VaultMethodService.getCapabilityMatrix();
         if (capability.recommendedMethod !== "passphrase") {
-          const promptState = await VaultMethodPromptLocalService.load(user.uid);
+          const promptState = await VaultMethodPromptLocalService.load(
+            user.uid,
+          );
           const dismissedForRecommendedMethod =
-            promptState?.dismissed_for_method === capability.recommendedMethod &&
+            promptState?.dismissed_for_method ===
+              capability.recommendedMethod &&
             promptState?.dismissed_for_rp_id === currentRpId;
           if (!dismissedForRecommendedMethod) {
             setPendingUnlockKey(decryptedKey);
@@ -579,7 +639,7 @@ export function VaultFlow({
       toast.error(
         vaultMode === "passphrase"
           ? "Quick unlock was not available. Enter your passphrase."
-          : "Quick unlock was not available. Try passphrase or recovery key."
+          : "Quick unlock was not available. Try passphrase or recovery key.",
       );
       setStep("unlock");
       return;
@@ -635,11 +695,7 @@ export function VaultFlow({
 
   return (
     <>
-      <Card
-        variant="none"
-        effect="fill"
-        className="overflow-hidden"
-      >
+      <Card variant="none" effect="fill" className="overflow-hidden">
         <CardContent className="max-h-[calc(100svh-8rem)] space-y-3 overflow-y-auto p-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] sm:max-h-[calc(100svh-10rem)] sm:space-y-4 sm:p-6">
           {/* Intro / Education Step */}
           {step === "intro" && (
@@ -649,33 +705,46 @@ export function VaultFlow({
                   <Icon icon={Shield} size={40} className="text-primary" />
                 </div>
               </div>
-              
+
               <div className="space-y-2">
-                <h3 className="text-2xl font-bold tracking-tight">Secure Your Digital Vault</h3>
+                <h3 className="text-2xl font-bold tracking-tight">
+                  Secure Your Digital Vault
+                </h3>
                 <p className="text-muted-foreground text-balance max-w-sm mx-auto">
-                  Hussh uses end-to-end encryption to protect your personal data.
-                  Create your passphrase first, then optionally enable faster sign-in.
+                  Hussh uses end-to-end encryption to protect your personal
+                  data. Create your passphrase first, then optionally enable
+                  faster sign-in.
                 </p>
               </div>
 
               <div className="text-left bg-muted/50 rounded-xl p-4 space-y-3 text-sm border border-border/50">
                 <div className="flex gap-3">
                   <div className="mt-0.5 min-w-[1.25rem] text-primary">
-                     <Icon icon={Check} size="md" />
+                    <Icon icon={Check} size="md" />
                   </div>
-                  <p><span className="font-semibold block text-foreground">You hold the only key</span> We cannot see your data or reset your password.</p>
+                  <p>
+                    <span className="font-semibold block text-foreground">
+                      You hold the only key
+                    </span>{" "}
+                    We cannot see your data or reset your password.
+                  </p>
                 </div>
                 <div className="flex gap-3">
-                   <div className="mt-0.5 min-w-[1.25rem] text-primary">
-                     <Icon icon={Check} size="md" />
+                  <div className="mt-0.5 min-w-[1.25rem] text-primary">
+                    <Icon icon={Check} size="md" />
                   </div>
-                  <p><span className="font-semibold block text-foreground">Protected by default</span> Your data stays private and secure.</p>
+                  <p>
+                    <span className="font-semibold block text-foreground">
+                      Protected by default
+                    </span>{" "}
+                    Your data stays private and secure.
+                  </p>
                 </div>
               </div>
 
               <div className="space-y-2">
-              <Button 
-                  variant="gradient" 
+                <Button
+                  variant="gradient"
                   size={ACTION_BUTTON_SIZE}
                   fullWidth
                   className="group whitespace-normal text-center leading-snug px-4"
@@ -691,7 +760,6 @@ export function VaultFlow({
                     className="ml-2 transition-transform group-hover:translate-x-1"
                   />
                 </Button>
-
               </div>
             </div>
           )}
@@ -700,14 +768,22 @@ export function VaultFlow({
           {step === "create" && (
             <div className="space-y-3">
               <div className="text-center">
-                <Icon icon={Lock} size={36} className="mx-auto text-primary mb-3" />
-                <h3 className="text-lg font-semibold sm:text-xl">Create Your Vault Passphrase</h3>
+                <Icon
+                  icon={Lock}
+                  size={36}
+                  className="mx-auto text-primary mb-3"
+                />
+                <h3 className="text-lg font-semibold sm:text-xl">
+                  Create Your Vault Passphrase
+                </h3>
                 <p className="mt-1.5 text-sm text-muted-foreground sm:text-base">
                   This passphrase protects your Vault. Keep it private.
                 </p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="passphrase" className="text-sm sm:text-base">Passphrase</Label>
+                <Label htmlFor="passphrase" className="text-sm sm:text-base">
+                  Passphrase
+                </Label>
                 <Input
                   id="passphrase"
                   type="password"
@@ -719,7 +795,9 @@ export function VaultFlow({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirm" className="text-sm sm:text-base">Confirm Passphrase</Label>
+                <Label htmlFor="confirm" className="text-sm sm:text-base">
+                  Confirm Passphrase
+                </Label>
                 <Input
                   id="confirm"
                   type="password"
@@ -729,13 +807,18 @@ export function VaultFlow({
                   className="h-11 px-3 text-base sm:h-12 sm:px-4 sm:text-lg"
                 />
                 {createPassphraseHelperText && (
-                  <p className="text-xs font-medium text-destructive" role="status">
+                  <p
+                    className="text-xs font-medium text-destructive"
+                    role="status"
+                  >
                     {createPassphraseHelperText}
                   </p>
                 )}
               </div>
               <div className="rounded-xl border border-border/60 bg-muted/20 p-2.5 text-[11px] text-muted-foreground sm:p-3 sm:text-sm">
-                <p className="font-semibold text-foreground">Passphrase requirements</p>
+                <p className="font-semibold text-foreground">
+                  Passphrase requirements
+                </p>
                 <ul className="mt-1 list-disc space-y-0.5 pl-4">
                   <li>Minimum 8 characters</li>
                   <li>Use a memorable phrase unique to you</li>
@@ -752,11 +835,20 @@ export function VaultFlow({
                 fullWidth
                 className="mt-2 h-11 text-sm sm:mt-4 sm:h-12 sm:text-base"
                 onClick={handleCreatePassphrase}
-                disabled={isUnlocking || passphrase.length < 8 || passphrase !== confirmPassphrase}
+                disabled={
+                  isUnlocking ||
+                  passphrase.length < 8 ||
+                  passphrase !== confirmPassphrase
+                }
               >
                 {isUnlocking ? (
                   <>
-                    <Icon icon={Loader2} size="md" className="mr-2 animate-spin" /> Creating Vault...
+                    <Icon
+                      icon={Loader2}
+                      size="md"
+                      className="mr-2 animate-spin"
+                    />{" "}
+                    Creating Vault...
                   </>
                 ) : (
                   "Create Vault"
@@ -774,7 +866,9 @@ export function VaultFlow({
                   size={24}
                   className="mx-auto mb-2 text-primary"
                 />
-                <h3 className="text-base font-semibold sm:text-lg">Unlock Your Vault</h3>
+                <h3 className="text-base font-semibold sm:text-lg">
+                  Unlock Your Vault
+                </h3>
                 <p className="mt-1 line-clamp-1 text-xs text-muted-foreground sm:text-sm">
                   {isGeneratedVaultMode
                     ? "Confirm with your device to open Vault"
@@ -788,7 +882,10 @@ export function VaultFlow({
               </div>
               {shouldShowPassphraseUnlock && (
                 <div className="space-y-1.5">
-                  <Label htmlFor="unlock-passphrase" className="text-xs font-medium sm:text-sm">
+                  <Label
+                    htmlFor="unlock-passphrase"
+                    className="text-xs font-medium sm:text-sm"
+                  >
                     Vault Key
                   </Label>
                   <Input
@@ -818,7 +915,12 @@ export function VaultFlow({
                   >
                     {isUnlocking ? (
                       <>
-                        <Icon icon={Loader2} size="sm" className="mr-2 animate-spin" /> Unlocking...
+                        <Icon
+                          icon={Loader2}
+                          size="sm"
+                          className="mr-2 animate-spin"
+                        />{" "}
+                        Unlocking...
                       </>
                     ) : (
                       "Unlock"
@@ -830,7 +932,11 @@ export function VaultFlow({
                   <div className="flex min-h-10 items-center justify-center rounded-xl border border-border/60 bg-muted/20 px-3 py-2 text-xs text-muted-foreground sm:text-sm">
                     {isUnlocking ? (
                       <span className="inline-flex items-center">
-                        <Icon icon={Loader2} size="sm" className="mr-2 animate-spin" />
+                        <Icon
+                          icon={Loader2}
+                          size="sm"
+                          className="mr-2 animate-spin"
+                        />
                         Prompting {generatedUnlockLabel.toLowerCase()}...
                       </span>
                     ) : (
@@ -839,23 +945,27 @@ export function VaultFlow({
                   </div>
                 )}
 
-                {hasActiveGeneratedWrapper && !unlockWithPassphraseFallback && error && (
-                  <Button
-                    variant="none"
-                    effect="fade"
-                    size="default"
-                    fullWidth
-                    className="h-10 text-sm sm:h-11"
-                    onClick={() => void handleUnlockGeneratedDefault()}
-                    disabled={isUnlocking}
-                  >
-                    Try again
-                  </Button>
-                )}
+                {hasActiveGeneratedWrapper &&
+                  !unlockWithPassphraseFallback &&
+                  error && (
+                    <Button
+                      variant="none"
+                      effect="fade"
+                      size="default"
+                      fullWidth
+                      className="h-10 text-sm sm:h-11"
+                      onClick={() => void handleUnlockGeneratedDefault()}
+                      disabled={isUnlocking}
+                    >
+                      Try again
+                    </Button>
+                  )}
 
                 {showUnlockOtherMethods ? (
                   <div className="space-y-1.5 pt-1">
-                    <p className="text-xs font-medium text-muted-foreground">Other methods</p>
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Other methods
+                    </p>
                     <div className="grid grid-cols-2 gap-2">
                       {showVaultKeyAlternative ? (
                         <Button
@@ -874,7 +984,8 @@ export function VaultFlow({
                           Vault Key
                         </Button>
                       ) : null}
-                      {(hasActiveGeneratedWrapper && unlockWithPassphraseFallback) ||
+                      {(hasActiveGeneratedWrapper &&
+                        unlockWithPassphraseFallback) ||
                       showPasskeyAlternative ? (
                         <Button
                           variant="none"
@@ -886,7 +997,10 @@ export function VaultFlow({
                             setError(null);
                             setPassphrase("");
                             setUnlockWithPassphraseFallback(false);
-                            if (!hasActiveGeneratedWrapper && availableGeneratedMethod) {
+                            if (
+                              !hasActiveGeneratedWrapper &&
+                              availableGeneratedMethod
+                            ) {
                               setVaultMode(availableGeneratedMethod);
                             }
                           }}
@@ -922,14 +1036,25 @@ export function VaultFlow({
           {step === "recovery" && !recoveryKey && (
             <div className="space-y-2.5">
               <div className="text-center">
-                <Icon icon={Key} size={24} className="mx-auto mb-2 text-primary" />
-                <h3 className="text-base font-semibold sm:text-lg">Enter Recovery Key</h3>
+                <Icon
+                  icon={Key}
+                  size={24}
+                  className="mx-auto mb-2 text-primary"
+                />
+                <h3 className="text-base font-semibold sm:text-lg">
+                  Enter Recovery Key
+                </h3>
                 <p className="mt-1 line-clamp-1 text-xs text-muted-foreground sm:text-sm">
                   Enter your recovery key to open Vault
                 </p>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="recovery-key" className="text-xs font-medium sm:text-sm">Recovery Key</Label>
+                <Label
+                  htmlFor="recovery-key"
+                  className="text-xs font-medium sm:text-sm"
+                >
+                  Recovery Key
+                </Label>
                 <Input
                   id="recovery-key"
                   placeholder="HRK-XXXX-XXXX-XXXX-XXXX"
@@ -952,14 +1077,21 @@ export function VaultFlow({
                 >
                   {isUnlocking ? (
                     <>
-                      <Icon icon={Loader2} size="sm" className="mr-2 animate-spin" /> Unlocking...
+                      <Icon
+                        icon={Loader2}
+                        size="sm"
+                        className="mr-2 animate-spin"
+                      />{" "}
+                      Unlocking...
                     </>
                   ) : (
                     "Unlock"
                   )}
                 </Button>
                 <div className="space-y-1.5">
-                  <p className="text-xs font-medium text-muted-foreground">Other methods</p>
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Other methods
+                  </p>
                   <div className="grid grid-cols-2 gap-2">
                     <Button
                       variant="none"
@@ -1007,18 +1139,22 @@ export function VaultFlow({
                 <Icon
                   icon={
                     recommendedQuickMethod === "generated_default_web_prf" ||
-                    recommendedQuickMethod === "generated_default_native_passkey_prf"
+                    recommendedQuickMethod ===
+                      "generated_default_native_passkey_prf"
                       ? Key
                       : Fingerprint
                   }
                   size={36}
                   className="mx-auto mb-3 text-primary"
                 />
-                <h3 className="text-lg font-semibold sm:text-xl">Enable quicker unlock?</h3>
+                <h3 className="text-lg font-semibold sm:text-xl">
+                  Enable quicker unlock?
+                </h3>
                 <p className="mt-1.5 text-sm text-muted-foreground sm:text-base">
                   You can keep passphrase unlock, or enable{" "}
                   {recommendedQuickMethod === "generated_default_web_prf" ||
-                  recommendedQuickMethod === "generated_default_native_passkey_prf"
+                  recommendedQuickMethod ===
+                    "generated_default_native_passkey_prf"
                     ? "passkey"
                     : "device biometric"}{" "}
                   and still retain passphrase and recovery-key backup.
@@ -1032,7 +1168,9 @@ export function VaultFlow({
                   size="default"
                   fullWidth
                   className="h-11 text-sm sm:h-12 sm:text-base"
-                  disabled={isUnlocking || !pendingUnlockKey || !recommendedQuickMethod}
+                  disabled={
+                    isUnlocking || !pendingUnlockKey || !recommendedQuickMethod
+                  }
                   onClick={async () => {
                     if (!pendingUnlockKey || !recommendedQuickMethod) return;
                     setIsUnlocking(true);
@@ -1040,7 +1178,8 @@ export function VaultFlow({
                       const result = await VaultMethodService.switchMethod({
                         userId: user.uid,
                         currentVaultKey: pendingUnlockKey,
-                        displayName: user.displayName || user.email || "Hussh User",
+                        displayName:
+                          user.displayName || user.email || "Hussh User",
                         targetMethod: recommendedQuickMethod,
                       });
                       setVaultMode(result.method);
@@ -1048,14 +1187,16 @@ export function VaultFlow({
                       if (!finalized) return;
                       toast.success(
                         result.method === "generated_default_web_prf" ||
-                        result.method === "generated_default_native_passkey_prf"
+                          result.method ===
+                            "generated_default_native_passkey_prf"
                           ? "Passkey unlock enabled."
-                          : "Biometric unlock enabled."
+                          : "Biometric unlock enabled.",
                       );
                     } catch (err: any) {
                       console.error("Quick unlock enable failed:", err);
                       toast.error(
-                        err?.message || "Couldn't enable quick unlock right now."
+                        err?.message ||
+                          "Couldn't enable quick unlock right now.",
                       );
                     } finally {
                       setIsUnlocking(false);
@@ -1064,13 +1205,18 @@ export function VaultFlow({
                 >
                   {isUnlocking ? (
                     <>
-                      <Icon icon={Loader2} size="md" className="mr-2 animate-spin" />
+                      <Icon
+                        icon={Loader2}
+                        size="md"
+                        className="mr-2 animate-spin"
+                      />
                       Enabling...
                     </>
                   ) : (
                     `Enable ${
                       recommendedQuickMethod === "generated_default_web_prf" ||
-                      recommendedQuickMethod === "generated_default_native_passkey_prf"
+                      recommendedQuickMethod ===
+                        "generated_default_native_passkey_prf"
                         ? "Passkey"
                         : "Biometric"
                     }`
@@ -1091,12 +1237,12 @@ export function VaultFlow({
                         await VaultMethodPromptLocalService.dismiss(
                           user.uid,
                           recommendedQuickMethod,
-                          currentRpId
+                          currentRpId,
                         );
                       } catch (dismissError) {
                         console.warn(
                           "[VaultFlow] Failed to persist quick-unlock dismissal:",
-                          dismissError
+                          dismissError,
                         );
                       }
                     }
@@ -1154,7 +1300,11 @@ export function VaultFlow({
               >
                 {copied ? (
                   <>
-                    <Icon icon={Check} size="sm" className="mr-2 text-green-500" />
+                    <Icon
+                      icon={Check}
+                      size="sm"
+                      className="mr-2 text-green-500"
+                    />
                     Copied!
                   </>
                 ) : (

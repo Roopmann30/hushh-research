@@ -71,7 +71,9 @@ function isPortfolioAnalyzeEligible(row: {
 
 function isLikelySecCommonEquityRow(row: TickerUniverseRow): boolean {
   if (row.tradable === false) return false;
-  const ticker = String(row.ticker || "").trim().toUpperCase();
+  const ticker = String(row.ticker || "")
+    .trim()
+    .toUpperCase();
   if (!ticker) return false;
 
   const combined = [
@@ -86,7 +88,7 @@ function isLikelySecCommonEquityRow(row: TickerUniverseRow): boolean {
   if (ticker.endsWith("X")) return false;
   if (
     /(?:\betf\b|\bfund\b|\bmutual\b|\btrust\b|\bmoney market\b|\bcash\b|\bsweep\b|\bbond\b|\bfixed income\b|\btreasury\b|\bmunicipal\b|\breit\b|\bcommodity\b|\bgold\b)/i.test(
-      combined
+      combined,
     )
   ) {
     return false;
@@ -136,9 +138,14 @@ function rankTickerRow(row: TickerUniverseRow, qUpper: string): number {
     ? 1000
     : 0;
   const confidence = Number(row.metadata_confidence || 0) * 100;
-  const sectorBoost = isSpecificSectorLabel(row.sector || row.sector_primary) ? 20 : 0;
+  const sectorBoost = isSpecificSectorLabel(row.sector || row.sector_primary)
+    ? 20
+    : 0;
   const exchangeBoost =
-    toNonEmpty(row.exchange) && String(row.exchange).toLowerCase() !== "portfolio" ? 5 : 0;
+    toNonEmpty(row.exchange) &&
+    String(row.exchange).toLowerCase() !== "portfolio"
+      ? 5
+      : 0;
   return prefixBoost + confidence + sectorBoost + exchangeBoost;
 }
 
@@ -151,12 +158,14 @@ export function KaiCommandPalette({
 }: KaiCommandPaletteProps) {
   const [query, setQuery] = useState("");
   const [universe, setUniverse] = useState<TickerUniverseRow[] | null>(
-    getTickerUniverseSnapshot()
+    getTickerUniverseSnapshot(),
   );
   const [loadingUniverse, setLoadingUniverse] = useState<boolean>(!universe);
   const [remoteMatches, setRemoteMatches] = useState<TickerUniverseRow[]>([]);
   const [universeError, setUniverseError] = useState<string | null>(null);
-  const [remoteSearchError, setRemoteSearchError] = useState<string | null>(null);
+  const [remoteSearchError, setRemoteSearchError] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!open) {
@@ -178,7 +187,9 @@ export function KaiCommandPalette({
         if (!cancelled) {
           setUniverse((prev) => prev ?? []);
           setUniverseError(
-            error instanceof Error ? error.message : "Failed to load ticker universe"
+            error instanceof Error
+              ? error.message
+              : "Failed to load ticker universe",
           );
         }
       } finally {
@@ -221,7 +232,7 @@ export function KaiCommandPalette({
           if (!cancelled) {
             setRemoteMatches([]);
             setRemoteSearchError(
-              error instanceof Error ? error.message : "Ticker search failed"
+              error instanceof Error ? error.message : "Ticker search failed",
             );
           }
         }
@@ -238,7 +249,9 @@ export function KaiCommandPalette({
     const map = new Map<string, TickerUniverseRow>();
     const rows = universe ?? [];
     for (const row of rows) {
-      const ticker = String(row.ticker || "").trim().toUpperCase();
+      const ticker = String(row.ticker || "")
+        .trim()
+        .toUpperCase();
       if (!ticker) continue;
       map.set(ticker, row);
     }
@@ -248,7 +261,9 @@ export function KaiCommandPalette({
   const portfolioRows = useMemo<TickerUniverseRow[]>(() => {
     const deduped = new Map<string, TickerUniverseRow>();
     for (const row of portfolioTickers) {
-      const symbol = String(row.symbol || "").trim().toUpperCase();
+      const symbol = String(row.symbol || "")
+        .trim()
+        .toUpperCase();
       if (!symbol) continue;
       if (!isPortfolioAnalyzeEligible(row)) continue;
       if (deduped.has(symbol)) continue;
@@ -267,7 +282,9 @@ export function KaiCommandPalette({
           "Portfolio holding",
         sector_primary: preferredSector,
         sector: preferredSector,
-        industry_primary: toNonEmpty(enriched?.industry || enriched?.industry_primary),
+        industry_primary: toNonEmpty(
+          enriched?.industry || enriched?.industry_primary,
+        ),
         exchange: toNonEmpty(enriched?.exchange) || "Portfolio",
         metadata_confidence:
           typeof enriched?.metadata_confidence === "number"
@@ -288,11 +305,13 @@ export function KaiCommandPalette({
     const search = query.trim();
     const mergeAndNormalizeRows = (
       candidates: TickerUniverseRow[],
-      qUpper: string
+      qUpper: string,
     ): TickerUniverseRow[] => {
       const byTicker = new Map<string, TickerUniverseRow>();
       for (const row of candidates) {
-        const ticker = String(row.ticker || "").trim().toUpperCase();
+        const ticker = String(row.ticker || "")
+          .trim()
+          .toUpperCase();
         if (!ticker) continue;
         const normalized: TickerUniverseRow = {
           ...row,
@@ -308,13 +327,18 @@ export function KaiCommandPalette({
           byTicker.set(ticker, normalized);
         }
       }
-      return Array.from(byTicker.values()).filter((row) => row.tradable !== false);
+      return Array.from(byTicker.values()).filter(
+        (row) => row.tradable !== false,
+      );
     };
 
     if (!search) {
       const mergedDefaultRows = mergeAndNormalizeRows(
-        [...portfolioRows, ...rows.filter((row) => isLikelySecCommonEquityRow(row))],
-        ""
+        [
+          ...portfolioRows,
+          ...rows.filter((row) => isLikelySecCommonEquityRow(row)),
+        ],
+        "",
       );
       return mergedDefaultRows
         .sort((a, b) => {
@@ -332,10 +356,12 @@ export function KaiCommandPalette({
     const searchUpper = search.toUpperCase();
     const portfolioMatches = portfolioRows.filter((row) => {
       const title = String(row.title || "").toLowerCase();
-      return row.ticker.includes(searchUpper) || title.includes(search.toLowerCase());
+      return (
+        row.ticker.includes(searchUpper) || title.includes(search.toLowerCase())
+      );
     });
     const local = searchTickerUniverse(rows, search, 20).filter((row) =>
-      isLikelySecCommonEquityRow(row)
+      isLikelySecCommonEquityRow(row),
     );
     const merged = [...portfolioMatches, ...local];
     for (const row of remoteMatches) {
@@ -369,7 +395,7 @@ export function KaiCommandPalette({
         appRuntimeState,
         limit: 24,
       }),
-    [appRuntimeState, query]
+    [appRuntimeState, query],
   );
 
   function runAction(actionId: string, slots?: Record<string, unknown>) {
@@ -401,7 +427,11 @@ export function KaiCommandPalette({
         <CommandGroup heading="Kai Actions">
           {actionMatches.length === 0 ? (
             <CommandItem className={commandItemClass} disabled>
-              <Icon icon={Compass} size="sm" className="mr-2 text-muted-foreground" />
+              <Icon
+                icon={Compass}
+                size="sm"
+                className="mr-2 text-muted-foreground"
+              />
               No matching Kai actions.
             </CommandItem>
           ) : null}
@@ -438,10 +468,16 @@ export function KaiCommandPalette({
                 ].join(" ")}
                 onSelect={() => runAction(action.action_id)}
               >
-                <Icon icon={icon} size="sm" className="mr-2 text-muted-foreground" />
+                <Icon
+                  icon={icon}
+                  size="sm"
+                  className="mr-2 text-muted-foreground"
+                />
                 <span className="font-medium">{action.label}</span>
                 {helperText ? (
-                  <span className="ml-2 truncate text-xs text-muted-foreground">{helperText}</span>
+                  <span className="ml-2 truncate text-xs text-muted-foreground">
+                    {helperText}
+                  </span>
                 ) : null}
               </CommandItem>
             );
@@ -480,7 +516,11 @@ export function KaiCommandPalette({
                   })
                 }
               >
-                <Icon icon={Search} size="sm" className="mr-2 text-muted-foreground" />
+                <Icon
+                  icon={Search}
+                  size="sm"
+                  className="mr-2 text-muted-foreground"
+                />
                 <span className="font-semibold">{ticker}</span>
                 <span className="ml-2 text-xs text-muted-foreground truncate">
                   {title}

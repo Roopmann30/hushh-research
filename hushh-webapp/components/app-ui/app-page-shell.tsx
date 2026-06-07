@@ -1,6 +1,10 @@
 // 1. Removed "use client" so this becomes a React Server Component (RSC)
 
-import type { ComponentPropsWithoutRef, ElementType, CSSProperties } from "react";
+import type {
+  ComponentPropsWithoutRef,
+  ElementType,
+  CSSProperties,
+} from "react";
 
 import {
   NativeTestBeacon,
@@ -39,7 +43,10 @@ export const APP_SHELL_FRAME_STYLE: CSSProperties = {
   maxWidth: "90rem",
 };
 
-export const APP_MEASURE_STYLES: Record<"reading" | "standard" | "expanded", CSSProperties> = {
+export const APP_MEASURE_STYLES: Record<
+  "reading" | "standard" | "expanded",
+  CSSProperties
+> = {
   reading: { maxWidth: "54rem" },
   standard: { maxWidth: "90rem" },
   expanded: { maxWidth: "96rem" },
@@ -80,7 +87,7 @@ export function AppPageShell<T extends ElementType = "main">({
         "app-page-shell",
         APP_SHELL_FRAME_CLASSNAME, // 3. Added the missing framing class
         APP_SHELL_MAX_WIDTHS[width], // 4. Utilizing Tailwind utility classes over inline styles
-        className
+        className,
       )}
       data-app-density={density}
       data-app-shell-width={width}

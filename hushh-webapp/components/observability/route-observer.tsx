@@ -16,7 +16,10 @@ export function ObservabilityRouteObserver() {
 
   useEffect(() => {
     captureGrowthAttribution(pathname);
-    trackPageView(pathname, mountedRef.current ? "route_change" : "initial_load");
+    trackPageView(
+      pathname,
+      mountedRef.current ? "route_change" : "initial_load",
+    );
     const scope = getRouteScope(pathname);
     if (scope === "investor") {
       setLastKaiPath(pathname);

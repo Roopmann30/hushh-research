@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import type { CSSProperties } from "react"
+import type { CSSProperties } from "react";
 import {
   CircleCheckIcon,
   InfoIcon,
   Loader2Icon,
   OctagonXIcon,
   TriangleAlertIcon,
-} from "lucide-react"
-import { useTheme } from "next-themes"
-import { Toaster as Sonner, type ToasterProps } from "sonner"
+} from "lucide-react";
+import { useTheme } from "next-themes";
+import { Toaster as Sonner, type ToasterProps } from "sonner";
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme()
+  const { theme = "system" } = useTheme();
 
   return (
     <Sonner
@@ -34,7 +34,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
         classNames: {
           toast:
             "w-full rounded-[20px] border border-border/70 px-4 py-3 text-center shadow-lg shadow-black/5 sm:max-w-[22rem] sm:text-left",
-          title: "text-[13px] font-medium leading-5 tracking-[-0.01em] text-center sm:text-left",
+          title:
+            "text-[13px] font-medium leading-5 tracking-[-0.01em] text-center sm:text-left",
           description:
             "line-clamp-2 text-[12px] leading-5 text-muted-foreground text-center sm:text-left",
           content: "flex-1 gap-1.5 text-center sm:text-left",
@@ -57,7 +58,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }
       {...props}
     />
-  )
-}
+  );
+};
 
-export { Toaster }
+export { Toaster };

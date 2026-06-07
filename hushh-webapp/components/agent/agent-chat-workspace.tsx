@@ -64,7 +64,10 @@ import {
   type AgentVoiceStatus,
 } from "@/lib/agent/agent-voice-state";
 import { handleAgentVoiceTranscriptTurn } from "@/lib/agent/agent-voice-turn";
-import { AgentTtsQueue, markdownToSpeechText } from "@/lib/agent/agent-voice-tts";
+import {
+  AgentTtsQueue,
+  markdownToSpeechText,
+} from "@/lib/agent/agent-voice-tts";
 import {
   AGENT_VOICE_SETTINGS_CHANGED_EVENT,
   isAgentGeminiVoiceEnabled,
@@ -166,7 +169,7 @@ const EXPLICIT_PKM_SAVE_PATTERN =
 
 async function withDeadline<T>(
   promise: Promise<T>,
-  timeoutMs: number
+  timeoutMs: number,
 ): Promise<{ timedOut: false; value: T } | { timedOut: true }> {
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
   try {
@@ -204,7 +207,10 @@ function createGreetingMessage(): AgentMessage {
   };
 }
 
-function formatAgentDisplayName(displayName?: string | null, email?: string | null): string {
+function formatAgentDisplayName(
+  displayName?: string | null,
+  email?: string | null,
+): string {
   const rawName = displayName?.trim() || email?.split("@")[0]?.trim() || "";
   const firstName = rawName
     .replace(/[._-]+/g, " ")
@@ -330,7 +336,11 @@ function AgentMarkdown({ text }: { text: string }) {
                 </code>
               );
             }
-            return <code className={cn("font-mono text-xs", className)}>{children}</code>;
+            return (
+              <code className={cn("font-mono text-xs", className)}>
+                {children}
+              </code>
+            );
           },
           pre: ({ children }) => (
             <pre className="my-3 overflow-x-auto rounded-md border border-border/70 bg-muted/60 p-3 leading-5">
@@ -344,7 +354,9 @@ function AgentMarkdown({ text }: { text: string }) {
           ),
           table: ({ children }) => (
             <div className="my-3 overflow-x-auto rounded-md border border-border/70">
-              <table className="min-w-full border-collapse text-left text-xs">{children}</table>
+              <table className="min-w-full border-collapse text-left text-xs">
+                {children}
+              </table>
             </div>
           ),
           th: ({ children }) => (
@@ -406,13 +418,15 @@ function useAnimatedAssistantText(targetText: string, active: boolean) {
         return;
       }
 
-      const elapsedMs = lastPaintAt ? Math.max(12, now - lastPaintAt) : AGENT_STREAM_RENDER_FRAME_MS;
+      const elapsedMs = lastPaintAt
+        ? Math.max(12, now - lastPaintAt)
+        : AGENT_STREAM_RENDER_FRAME_MS;
       lastPaintAt = now;
       const backlog = target.length - current.length;
       const charsPerSecond = backlog > 900 ? 2600 : backlog > 260 ? 1500 : 620;
       const step = Math.max(
         1,
-        Math.min(backlog, Math.ceil((charsPerSecond * elapsedMs) / 1000))
+        Math.min(backlog, Math.ceil((charsPerSecond * elapsedMs) / 1000)),
       );
       const nextText = target.slice(0, current.length + step);
       displayedTextRef.current = nextText;
@@ -425,7 +439,10 @@ function useAnimatedAssistantText(targetText: string, active: boolean) {
 
     const target = targetTextRef.current;
     const current = displayedTextRef.current;
-    if (target && (!target.startsWith(current) || current.length < target.length)) {
+    if (
+      target &&
+      (!target.startsWith(current) || current.length < target.length)
+    ) {
       frame = window.requestAnimationFrame(tick);
     }
 
@@ -444,7 +461,10 @@ function useAnimatedAssistantText(targetText: string, active: boolean) {
 
 function AgentThinkingDots() {
   return (
-    <span className="inline-flex items-center gap-1 py-1 text-muted-foreground" aria-label="Agent is thinking">
+    <span
+      className="inline-flex items-center gap-1 py-1 text-muted-foreground"
+      aria-label="Agent is thinking"
+    >
       <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:-160ms] motion-reduce:animate-none" />
       <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:-80ms] motion-reduce:animate-none" />
       <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current motion-reduce:animate-none" />
@@ -467,11 +487,17 @@ function AgentBubble({
   const isUser = message.role === "user";
   const isStreaming = message.status === "streaming";
   const isError = message.status === "error";
-  const animated = useAnimatedAssistantText(message.text, !isUser && isStreaming);
+  const animated = useAnimatedAssistantText(
+    message.text,
+    !isUser && isStreaming,
+  );
   const assistantText = isUser ? message.text : animated.displayedText;
   const showStreamingAffordance = !isUser && animated.isAnimating;
   const showResponseActions =
-    !isUser && !message.ephemeral && !isStreaming && assistantText.trim().length > 0;
+    !isUser &&
+    !message.ephemeral &&
+    !isStreaming &&
+    assistantText.trim().length > 0;
 
   const handleCopy = async () => {
     try {
@@ -487,7 +513,7 @@ function AgentBubble({
     <div
       className={cn(
         "flex w-full gap-3 animate-in fade-in slide-in-from-bottom-1 duration-200 motion-reduce:animate-none",
-        isUser ? "justify-end" : "justify-start"
+        isUser ? "justify-end" : "justify-start",
       )}
     >
       {!isUser ? (
@@ -498,7 +524,7 @@ function AgentBubble({
       <div
         className={cn(
           "min-w-0 max-w-[90%] sm:max-w-[min(82%,48rem)]",
-          isUser && "order-first sm:max-w-[min(76%,42rem)]"
+          isUser && "order-first sm:max-w-[min(76%,42rem)]",
         )}
       >
         <div
@@ -509,11 +535,13 @@ function AgentBubble({
               ? "rounded-2xl bg-primary px-4 py-2.5 text-primary-foreground shadow-sm shadow-primary/10"
               : "px-0 py-1 text-zinc-200",
             isError &&
-              "rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-2.5 text-destructive"
+              "rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-2.5 text-destructive",
           )}
         >
           {isUser ? (
-            <span className="whitespace-pre-wrap break-words">{message.text}</span>
+            <span className="whitespace-pre-wrap break-words">
+              {message.text}
+            </span>
           ) : assistantText ? (
             <AgentMarkdown text={assistantText} />
           ) : (
@@ -531,7 +559,7 @@ function AgentBubble({
         <div
           className={cn(
             "mt-1 flex items-center gap-2 text-[11px] text-zinc-500",
-            isUser && "justify-end text-right"
+            isUser && "justify-end text-right",
           )}
         >
           <span>{message.timestamp}</span>
@@ -544,7 +572,11 @@ function AgentBubble({
                 aria-label={copied ? "Response copied" : "Copy response"}
                 title={copied ? "Copied" : "Copy response"}
               >
-                {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                {copied ? (
+                  <Check className="h-3.5 w-3.5" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
               </button>
               <button
                 type="button"
@@ -557,7 +589,7 @@ function AgentBubble({
                   "grid h-7 w-7 place-items-center rounded-md border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
                   liked
                     ? "border-white/15 bg-zinc-800 text-zinc-100"
-                    : "border-transparent text-zinc-500 hover:border-white/10 hover:bg-white/[0.06] hover:text-zinc-200"
+                    : "border-transparent text-zinc-500 hover:border-white/10 hover:bg-white/[0.06] hover:text-zinc-200",
                 )}
                 aria-label="Like response"
                 aria-pressed={liked}
@@ -576,7 +608,7 @@ function AgentBubble({
                   "grid h-7 w-7 place-items-center rounded-md border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
                   disliked
                     ? "border-white/15 bg-zinc-800 text-zinc-100"
-                    : "border-transparent text-zinc-500 hover:border-white/10 hover:bg-white/[0.06] hover:text-zinc-200"
+                    : "border-transparent text-zinc-500 hover:border-white/10 hover:bg-white/[0.06] hover:text-zinc-200",
                 )}
                 aria-label="Dislike response"
                 aria-pressed={disliked}
@@ -615,7 +647,9 @@ function AgentPkmActivityLine({ item }: { item: AgentPkmActivity }) {
     <div
       className={cn(
         "flex min-w-0 items-center gap-2 pl-11 pr-2 text-xs",
-        item.status === "error" ? "text-destructive/80" : "text-muted-foreground"
+        item.status === "error"
+          ? "text-destructive/80"
+          : "text-muted-foreground",
       )}
       aria-live="polite"
     >
@@ -629,7 +663,9 @@ function AgentPkmActivityLine({ item }: { item: AgentPkmActivity }) {
   );
 }
 
-function storedMessageToAgentMessage(message: StoredAgentChatMessage): AgentMessage | null {
+function storedMessageToAgentMessage(
+  message: StoredAgentChatMessage,
+): AgentMessage | null {
   if (message.role !== "user" && message.role !== "assistant") return null;
   const createdAt = message.created_at ? new Date(message.created_at) : null;
   return {
@@ -647,12 +683,14 @@ function storedMessageToAgentMessage(message: StoredAgentChatMessage): AgentMess
   };
 }
 
-function shouldMinimizeForNavigationResult(result: AgentActionRuntimeResult): boolean {
+function shouldMinimizeForNavigationResult(
+  result: AgentActionRuntimeResult,
+): boolean {
   return Boolean(
     result.routeAfter &&
-      result.status !== "failed" &&
-      result.status !== "invalid" &&
-      result.status !== "noop"
+    result.status !== "failed" &&
+    result.status !== "invalid" &&
+    result.status !== "noop",
   );
 }
 
@@ -687,13 +725,19 @@ export function AgentChatWorkspace({
   const setAnalysisParams = useKaiSession((state) => state.setAnalysisParams);
   const [input, setInput] = useState("");
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const [conversations, setConversations] = useState<AgentChatConversation[]>([]);
-  const [messages, setMessages] = useState<AgentMessage[]>(() => [createGreetingMessage()]);
+  const [conversations, setConversations] = useState<AgentChatConversation[]>(
+    [],
+  );
+  const [messages, setMessages] = useState<AgentMessage[]>(() => [
+    createGreetingMessage(),
+  ]);
   const [isChatLoading, setIsChatLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isHistoryDrawerOpen, setIsHistoryDrawerOpen] = useState(false);
   const [isHistoryCollapsed, setIsHistoryCollapsed] = useState(false);
-  const [historyActionPendingId, setHistoryActionPendingId] = useState<string | null>(null);
+  const [historyActionPendingId, setHistoryActionPendingId] = useState<
+    string | null
+  >(null);
   const [isVoiceConnecting, setIsVoiceConnecting] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [activeFrontendToolCount, setActiveFrontendToolCount] = useState(0);
@@ -703,12 +747,12 @@ export function AgentChatWorkspace({
   const [voiceState, setVoiceState] = useState<AgentVoiceStatus>("idle");
   const [voiceTranscriptReview, setVoiceTranscriptReview] =
     useState<AgentVoiceTranscriptReview | null>(null);
-  const [selectedVoice, setSelectedVoice] = useState<AgentGeminiTtsVoice>(() =>
-    readAgentVoiceSettings().ttsVoice
+  const [selectedVoice, setSelectedVoice] = useState<AgentGeminiTtsVoice>(
+    () => readAgentVoiceSettings().ttsVoice,
   );
   const [hasPortfolioData, setHasPortfolioData] = useState(false);
   const [backgroundTaskState, setBackgroundTaskState] = useState(() =>
-    AppBackgroundTaskService.getState()
+    AppBackgroundTaskService.getState(),
   );
   const voiceClientRef = useRef<AgentVoiceClient | null>(null);
   const voiceTtsQueueRef = useRef<AgentTtsQueue | null>(null);
@@ -751,10 +795,12 @@ export function AgentChatWorkspace({
     clearAgentPkmContext(user?.uid);
   }, [isVaultUnlocked, user?.uid, vaultKey]);
   const routeQuery = searchParams?.toString() || "";
-  const pathnameWithQuery = routeQuery ? `${pathname || ""}?${routeQuery}` : pathname || "";
+  const pathnameWithQuery = routeQuery
+    ? `${pathname || ""}?${routeQuery}`
+    : pathname || "";
   const routeInfo = useMemo(
     () => deriveVoiceRouteScreen(pathname || "", routeQuery),
-    [pathname, routeQuery]
+    [pathname, routeQuery],
   );
   const activeAnalysisTask = useMemo(() => {
     if (!user?.uid) return null;
@@ -764,7 +810,7 @@ export function AgentChatWorkspace({
           task.userId === user.uid &&
           task.kind === "stock_analysis_stream" &&
           task.status === "running" &&
-          !task.dismissedAt
+          !task.dismissedAt,
       ) || null
     );
   }, [backgroundTaskState.tasks, user?.uid]);
@@ -776,7 +822,7 @@ export function AgentChatWorkspace({
           task.userId === user.uid &&
           task.kind === "portfolio_import_stream" &&
           task.status === "running" &&
-          !task.dismissedAt
+          !task.dismissedAt,
       ) || null
     );
   }, [backgroundTaskState.tasks, user?.uid]);
@@ -785,7 +831,11 @@ export function AgentChatWorkspace({
     return typeof ticker === "string" && ticker.trim() ? ticker.trim() : null;
   }, [activeAnalysisTask]);
   const hasChatAccess = Boolean(
-    !authLoading && user?.uid && isVaultUnlocked && vaultOwnerToken && tokenIsFresh
+    !authLoading &&
+    user?.uid &&
+    isVaultUnlocked &&
+    vaultOwnerToken &&
+    tokenIsFresh,
   );
   const availablePersonas = useMemo(() => {
     const personas = new Set<typeof activePersona>([activePersona]);
@@ -817,9 +867,12 @@ export function AgentChatWorkspace({
         analysis_ticker: activeAnalysisTicker || analysisParams?.ticker || null,
         analysis_run_id: activeAnalysisTask?.taskId || null,
         import_active:
-          Boolean(busyOperations["portfolio_import_stream"]) || Boolean(runningImportTask),
+          Boolean(busyOperations["portfolio_import_stream"]) ||
+          Boolean(runningImportTask),
         import_run_id: runningImportTask?.taskId || null,
-        busy_operations: Object.keys(busyOperations).filter((key) => busyOperations[key]),
+        busy_operations: Object.keys(busyOperations).filter(
+          (key) => busyOperations[key],
+        ),
       },
       portfolio: {
         has_portfolio_data: hasPortfolioData,
@@ -861,7 +914,7 @@ export function AgentChatWorkspace({
       vaultOwnerToken,
       voiceActive,
       voiceState,
-    ]
+    ],
   );
   const appRuntimeStateRef = useRef(appRuntimeState);
   useEffect(() => {
@@ -884,47 +937,48 @@ export function AgentChatWorkspace({
     isVoiceConnecting ||
     isStreaming ||
     voiceActive;
-  const statusText = useMemo(
-    () => {
-      if (authLoading) return "Checking access";
-      if (!user?.uid) return "Sign in required";
-      if (!isVaultUnlocked || !vaultOwnerToken || !tokenIsFresh) return "Vault locked";
-      if (!agentVoiceEnabled && voiceActive) return "Voice disabled";
-      if (voiceState === "connecting") return "Voice connecting";
-      if (voiceState === "listening") return "Listening";
-      if (voiceState === "muted") return "Muted";
-      if (voiceState === "transcribing") return "Transcribing";
-      if (voiceState === "thinking") return "Thinking";
-      if (voiceState === "speaking") return "Speaking";
-      if (voiceState === "error") return "Voice error";
-      if (isLoadingHistory) return "Loading";
-      if (isVoiceConnecting) return "Voice connecting";
-      if (isToolWorking) return "Working";
-      if (isPkmMemoryWorking) return "Saving memory";
-      if (isChatLoading) return "Thinking";
-      if (isStreaming) return "Streaming";
-      return "Ready";
-    },
-    [
-      authLoading,
-      agentVoiceEnabled,
-      isChatLoading,
-      isLoadingHistory,
-      isPkmMemoryWorking,
-      isToolWorking,
-      isStreaming,
-      isVoiceConnecting,
-      isVaultUnlocked,
-      tokenIsFresh,
-      user?.uid,
-      vaultOwnerToken,
-      voiceState,
-      voiceActive,
-    ]
-  );
+  const statusText = useMemo(() => {
+    if (authLoading) return "Checking access";
+    if (!user?.uid) return "Sign in required";
+    if (!isVaultUnlocked || !vaultOwnerToken || !tokenIsFresh)
+      return "Vault locked";
+    if (!agentVoiceEnabled && voiceActive) return "Voice disabled";
+    if (voiceState === "connecting") return "Voice connecting";
+    if (voiceState === "listening") return "Listening";
+    if (voiceState === "muted") return "Muted";
+    if (voiceState === "transcribing") return "Transcribing";
+    if (voiceState === "thinking") return "Thinking";
+    if (voiceState === "speaking") return "Speaking";
+    if (voiceState === "error") return "Voice error";
+    if (isLoadingHistory) return "Loading";
+    if (isVoiceConnecting) return "Voice connecting";
+    if (isToolWorking) return "Working";
+    if (isPkmMemoryWorking) return "Saving memory";
+    if (isChatLoading) return "Thinking";
+    if (isStreaming) return "Streaming";
+    return "Ready";
+  }, [
+    authLoading,
+    agentVoiceEnabled,
+    isChatLoading,
+    isLoadingHistory,
+    isPkmMemoryWorking,
+    isToolWorking,
+    isStreaming,
+    isVoiceConnecting,
+    isVaultUnlocked,
+    tokenIsFresh,
+    user?.uid,
+    vaultOwnerToken,
+    voiceState,
+    voiceActive,
+  ]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    });
   }, [messages, pkmReviews]);
 
   useEffect(() => {
@@ -961,10 +1015,16 @@ export function AgentChatWorkspace({
     const syncVoiceSettings = () => {
       setSelectedVoice(readAgentVoiceSettings().ttsVoice);
     };
-    window.addEventListener(AGENT_VOICE_SETTINGS_CHANGED_EVENT, syncVoiceSettings);
+    window.addEventListener(
+      AGENT_VOICE_SETTINGS_CHANGED_EVENT,
+      syncVoiceSettings,
+    );
     window.addEventListener("storage", syncVoiceSettings);
     return () => {
-      window.removeEventListener(AGENT_VOICE_SETTINGS_CHANGED_EVENT, syncVoiceSettings);
+      window.removeEventListener(
+        AGENT_VOICE_SETTINGS_CHANGED_EVENT,
+        syncVoiceSettings,
+      );
       window.removeEventListener("storage", syncVoiceSettings);
     };
   }, []);
@@ -985,8 +1045,12 @@ export function AgentChatWorkspace({
     const cache = CacheService.getInstance();
     const computeHasPortfolioData = () => {
       const cachedPortfolio =
-        cache.get<Record<string, unknown>>(CACHE_KEYS.PORTFOLIO_DATA(user.uid)) ??
-        cache.get<Record<string, unknown>>(CACHE_KEYS.DOMAIN_DATA(user.uid, "financial"));
+        cache.get<Record<string, unknown>>(
+          CACHE_KEYS.PORTFOLIO_DATA(user.uid),
+        ) ??
+        cache.get<Record<string, unknown>>(
+          CACHE_KEYS.DOMAIN_DATA(user.uid, "financial"),
+        );
       const nestedPortfolio =
         cachedPortfolio?.portfolio &&
         typeof cachedPortfolio.portfolio === "object" &&
@@ -994,8 +1058,10 @@ export function AgentChatWorkspace({
           ? (cachedPortfolio.portfolio as Record<string, unknown>)
           : null;
       const holdings =
-        (Array.isArray(cachedPortfolio?.holdings) && cachedPortfolio.holdings) ||
-        (Array.isArray(nestedPortfolio?.holdings) && nestedPortfolio.holdings) ||
+        (Array.isArray(cachedPortfolio?.holdings) &&
+          cachedPortfolio.holdings) ||
+        (Array.isArray(nestedPortfolio?.holdings) &&
+          nestedPortfolio.holdings) ||
         [];
       setHasPortfolioData(holdings.length > 0);
     };
@@ -1041,10 +1107,12 @@ export function AgentChatWorkspace({
 
   const updateMessage = (
     messageId: string,
-    update: (message: AgentMessage) => AgentMessage
+    update: (message: AgentMessage) => AgentMessage,
   ) => {
     setMessages((current) =>
-      current.map((message) => (message.id === messageId ? update(message) : message))
+      current.map((message) =>
+        message.id === messageId ? update(message) : message,
+      ),
     );
   };
 
@@ -1053,10 +1121,14 @@ export function AgentChatWorkspace({
   };
 
   const appendDebugEvent = useCallback(
-    (_turnId: string, _event: AgentDebugEvent["event"], _payload: AgentDebugEvent["payload"]) => {
+    (
+      _turnId: string,
+      _event: AgentDebugEvent["event"],
+      _payload: AgentDebugEvent["payload"],
+    ) => {
       // Debug events are intentionally kept internal while the Agent debug UI is disabled.
     },
-    []
+    [],
   );
 
   const addErrorMessage = (text: string) => {
@@ -1136,7 +1208,7 @@ export function AgentChatWorkspace({
       setPkmActivity([]);
       setPkmReviews([]);
     },
-    []
+    [],
   );
 
   const loadConversationList = useCallback(async () => {
@@ -1164,7 +1236,8 @@ export function AgentChatWorkspace({
 
   const handleSelectConversation = useCallback(
     async (nextConversationId: string) => {
-      if (nextConversationId === conversationId || historyInteractionDisabled) return;
+      if (nextConversationId === conversationId || historyInteractionDisabled)
+        return;
       const token = getVaultOwnerToken();
       if (!token) {
         toast.error("Vault access expired. Unlock again to continue.");
@@ -1186,7 +1259,7 @@ export function AgentChatWorkspace({
       getVaultOwnerToken,
       historyInteractionDisabled,
       restoreConversationMessages,
-    ]
+    ],
   );
 
   const handleSidebarCreateNewChat = useCallback(() => {
@@ -1199,7 +1272,7 @@ export function AgentChatWorkspace({
       setIsHistoryDrawerOpen(false);
       void handleSelectConversation(nextConversationId);
     },
-    [handleSelectConversation]
+    [handleSelectConversation],
   );
 
   const handleRenameConversation = useCallback(
@@ -1218,8 +1291,8 @@ export function AgentChatWorkspace({
         });
         setConversations((current) =>
           current.map((conversation) =>
-            conversation.id === targetConversationId ? renamed : conversation
-          )
+            conversation.id === targetConversationId ? renamed : conversation,
+          ),
         );
         void loadConversationList().catch(() => undefined);
         toast.success("Agent chat renamed.");
@@ -1229,7 +1302,7 @@ export function AgentChatWorkspace({
         setHistoryActionPendingId(null);
       }
     },
-    [getVaultOwnerToken, loadConversationList]
+    [getVaultOwnerToken, loadConversationList],
   );
 
   const handleDeleteConversation = useCallback(
@@ -1278,7 +1351,7 @@ export function AgentChatWorkspace({
       historyInteractionDisabled,
       restoreConversationMessages,
       user?.uid,
-    ]
+    ],
   );
 
   const handleDismissPkmReview = useCallback(
@@ -1290,9 +1363,11 @@ export function AgentChatWorkspace({
           candidate_count: review.cards.length,
         });
       }
-      setPkmReviews((current) => current.filter((item) => item.id !== reviewId));
+      setPkmReviews((current) =>
+        current.filter((item) => item.id !== reviewId),
+      );
     },
-    [appendDebugEvent, pkmReviews]
+    [appendDebugEvent, pkmReviews],
   );
 
   const handleSavePkmReview = useCallback(
@@ -1305,7 +1380,9 @@ export function AgentChatWorkspace({
       }
 
       setPkmReviews((current) =>
-        current.map((item) => (item.id === reviewId ? { ...item, saving: true } : item))
+        current.map((item) =>
+          item.id === reviewId ? { ...item, saving: true } : item,
+        ),
       );
       setActivePkmToolCount((count) => count + 1);
       appendDebugEvent(review.turnId, "pkm_review_save_start", {
@@ -1332,7 +1409,9 @@ export function AgentChatWorkspace({
               status: "done",
             },
           ]);
-          setPkmReviews((current) => current.filter((item) => item.id !== reviewId));
+          setPkmReviews((current) =>
+            current.filter((item) => item.id !== reviewId),
+          );
           void loadAgentPkmContext({
             userId: user.uid,
             vaultOwnerToken: token,
@@ -1344,7 +1423,9 @@ export function AgentChatWorkspace({
         }
 
         setPkmReviews((current) =>
-          current.map((item) => (item.id === reviewId ? { ...item, saving: false } : item))
+          current.map((item) =>
+            item.id === reviewId ? { ...item, saving: false } : item,
+          ),
         );
         toast.error(formatAgentPkmSaveSummary(result));
       } catch (error) {
@@ -1354,19 +1435,21 @@ export function AgentChatWorkspace({
             : "Failed to save PKM memory.";
         appendDebugEvent(review.turnId, "pkm_review_save_failed", { message });
         setPkmReviews((current) =>
-          current.map((item) => (item.id === reviewId ? { ...item, saving: false } : item))
+          current.map((item) =>
+            item.id === reviewId ? { ...item, saving: false } : item,
+          ),
         );
         toast.error(message);
       } finally {
         setActivePkmToolCount((count) => Math.max(0, count - 1));
       }
     },
-    [appendDebugEvent, getVaultOwnerToken, pkmReviews, user?.uid, vaultKey]
+    [appendDebugEvent, getVaultOwnerToken, pkmReviews, user?.uid, vaultKey],
   );
 
   const runAgentTurn = async (
     textInput: string,
-    options: AgentRunTurnOptions = { source: "typed" }
+    options: AgentRunTurnOptions = { source: "typed" },
   ) => {
     const text = textInput.trim();
     if (!text || !hasChatAccess || !user?.uid) return;
@@ -1412,13 +1495,17 @@ export function AgentChatWorkspace({
           if (failure.stage === "fallback") {
             if (!voiceTtsFailureReported) {
               voiceTtsFailureReported = true;
-              addErrorMessage("Agent voice playback failed. The text response is still available.");
+              addErrorMessage(
+                "Agent voice playback failed. The text response is still available.",
+              );
             }
             return;
           }
           if (!voiceTtsFailureReported) {
             voiceTtsFailureReported = true;
-            toast.error("Agent voice audio failed. Falling back to browser speech.");
+            toast.error(
+              "Agent voice audio failed. Falling back to browser speech.",
+            );
           }
         },
       });
@@ -1456,7 +1543,9 @@ export function AgentChatWorkspace({
       if (!isVoiceTurn || !voiceTtsQueueRef.current) return;
       const cleanReceipt = markdownToSpeechText(messageText);
       if (!cleanReceipt) return;
-      const currentAssistantSpeech = markdownToSpeechText(voiceAssistantMarkdown);
+      const currentAssistantSpeech = markdownToSpeechText(
+        voiceAssistantMarkdown,
+      );
       if (currentAssistantSpeech.includes(cleanReceipt)) {
         voiceReceiptSpoken = true;
         return;
@@ -1477,7 +1566,9 @@ export function AgentChatWorkspace({
       flushAssistantDelta();
       updateMessage(assistantMessageId, (message) => ({
         ...message,
-        text: message.text || (isVoiceTurn ? "Voice turn canceled." : "Agent turn canceled."),
+        text:
+          message.text ||
+          (isVoiceTurn ? "Voice turn canceled." : "Agent turn canceled."),
         status: "done",
       }));
       setIsChatLoading(false);
@@ -1486,7 +1577,7 @@ export function AgentChatWorkspace({
 
     const upsertToolStatusMessage = (
       messageText: string,
-      status: AgentMessage["status"] = "streaming"
+      status: AgentMessage["status"] = "streaming",
     ) => {
       const cleanText = messageText.trim() || "Working on that in Kai...";
       if (toolStatusMessageId) {
@@ -1533,13 +1624,15 @@ export function AgentChatWorkspace({
 
     const upsertPkmStatusMessage = (
       messageText: string,
-      status: AgentPkmActivity["status"] = "streaming"
+      status: AgentPkmActivity["status"] = "streaming",
     ) => {
       if (latestVisibleTurnIdRef.current !== debugTurnId) return;
       const cleanText = messageText.trim();
       if (!cleanText) {
         if (pkmStatusItemId) {
-          setPkmActivity((current) => current.filter((item) => item.id !== pkmStatusItemId));
+          setPkmActivity((current) =>
+            current.filter((item) => item.id !== pkmStatusItemId),
+          );
           pkmStatusItemId = null;
         }
         return;
@@ -1553,8 +1646,8 @@ export function AgentChatWorkspace({
                   text: cleanText,
                   status,
                 }
-              : item
-          )
+              : item,
+          ),
         );
         return;
       }
@@ -1570,8 +1663,14 @@ export function AgentChatWorkspace({
       ]);
     };
 
-    const toolResultStatus = (result: AgentActionRuntimeResult): AgentMessage["status"] => {
-      if (result.status === "blocked" || result.status === "failed" || result.status === "invalid") {
+    const toolResultStatus = (
+      result: AgentActionRuntimeResult,
+    ): AgentMessage["status"] => {
+      if (
+        result.status === "blocked" ||
+        result.status === "failed" ||
+        result.status === "invalid"
+      ) {
         return "error";
       }
       return "done";
@@ -1580,15 +1679,21 @@ export function AgentChatWorkspace({
     const executePkmAddTool = async (toolEvent: AgentChatToolEvent) => {
       if (!vaultKey || !token) {
         appendDebugEvent(debugTurnId, "pkm_tool_skipped", {
-          reason: !vaultKey ? "vault_key_unavailable" : "vault_owner_token_unavailable",
+          reason: !vaultKey
+            ? "vault_key_unavailable"
+            : "vault_owner_token_unavailable",
           tool: toolEvent,
         });
-        upsertPkmStatusMessage("Unlock your vault before saving to PKM.", "error");
+        upsertPkmStatusMessage(
+          "Unlock your vault before saving to PKM.",
+          "error",
+        );
         return;
       }
 
       const sourceText =
-        typeof toolEvent.slots.source_text === "string" && toolEvent.slots.source_text.trim()
+        typeof toolEvent.slots.source_text === "string" &&
+        toolEvent.slots.source_text.trim()
           ? toolEvent.slots.source_text.trim()
           : text;
 
@@ -1598,7 +1703,10 @@ export function AgentChatWorkspace({
         current_domains: turnPkmContext.domains,
         source_text: sourceText,
       });
-      upsertPkmStatusMessage("Checking PKM and saving what fits...", "streaming");
+      upsertPkmStatusMessage(
+        "Checking PKM and saving what fits...",
+        "streaming",
+      );
 
       try {
         const preview = await previewAgentPkmMemory({
@@ -1637,7 +1745,7 @@ export function AgentChatWorkspace({
           appendDebugEvent(debugTurnId, "pkm_tool_save_result", saveResult);
           upsertPkmStatusMessage(
             formatAgentPkmSaveSummary(saveResult),
-            saveResult.saved > 0 ? "done" : "error"
+            saveResult.saved > 0 ? "done" : "error",
           );
           if (saveResult.saved > 0) {
             void loadAgentPkmContext({
@@ -1650,7 +1758,10 @@ export function AgentChatWorkspace({
           }
         }
 
-        if (reviewCards.length > 0 && latestVisibleTurnIdRef.current === debugTurnId) {
+        if (
+          reviewCards.length > 0 &&
+          latestVisibleTurnIdRef.current === debugTurnId
+        ) {
           setPkmReviews((current) => [
             ...current.filter((review) => review.turnId !== debugTurnId),
             {
@@ -1668,13 +1779,16 @@ export function AgentChatWorkspace({
           if (autoSaveCards.length === 0) {
             upsertPkmStatusMessage(
               "Agent found PKM memory that needs your review before saving.",
-              "done"
+              "done",
             );
           }
         }
 
         if (autoSaveCards.length === 0 && reviewCards.length === 0) {
-          upsertPkmStatusMessage("I didn't find durable PKM memory to save from that.", "done");
+          upsertPkmStatusMessage(
+            "I didn't find durable PKM memory to save from that.",
+            "done",
+          );
         }
       } catch (error) {
         const message =
@@ -1685,7 +1799,10 @@ export function AgentChatWorkspace({
           message,
           tool: toolEvent,
         });
-        upsertPkmStatusMessage("Agent could not save that PKM memory.", "error");
+        upsertPkmStatusMessage(
+          "Agent could not save that PKM memory.",
+          "error",
+        );
       } finally {
         setActivePkmToolCount((count) => Math.max(0, count - 1));
       }
@@ -1739,7 +1856,8 @@ export function AgentChatWorkspace({
     };
 
     const executeToolIfNeeded = (toolEvent: AgentChatToolEvent) => {
-      const callKey = toolEvent.callId || `${toolEvent.actionId || "unknown"}-${turnId}`;
+      const callKey =
+        toolEvent.callId || `${toolEvent.actionId || "unknown"}-${turnId}`;
       if (executedToolCalls.has(callKey)) return;
       if (toolEvent.execution !== "frontend" || !toolEvent.actionId) return;
       executedToolCalls.add(callKey);
@@ -1748,12 +1866,14 @@ export function AgentChatWorkspace({
 
     const runPkmMemoryCapture = async (
       pkmContext: AgentPkmContext,
-      signal: AbortSignal
+      signal: AbortSignal,
     ) => {
       if (signal.aborted) return;
       if (!vaultKey || !token) {
         appendDebugEvent(debugTurnId, "pkm_memory_skipped", {
-          reason: !vaultKey ? "vault_key_unavailable" : "vault_owner_token_unavailable",
+          reason: !vaultKey
+            ? "vault_key_unavailable"
+            : "vault_owner_token_unavailable",
         });
         return;
       }
@@ -1764,7 +1884,10 @@ export function AgentChatWorkspace({
         execution: "frontend",
         current_domains: pkmContext.domains,
       });
-      upsertPkmStatusMessage("Checking whether this belongs in PKM...", "streaming");
+      upsertPkmStatusMessage(
+        "Checking whether this belongs in PKM...",
+        "streaming",
+      );
 
       try {
         const preview = await previewAgentPkmMemory({
@@ -1791,7 +1914,10 @@ export function AgentChatWorkspace({
         });
 
         if (autoSaveCards.length > 0) {
-          upsertPkmStatusMessage("Saving durable memory to PKM...", "streaming");
+          upsertPkmStatusMessage(
+            "Saving durable memory to PKM...",
+            "streaming",
+          );
           appendDebugEvent(debugTurnId, "pkm_memory_save_start", {
             candidate_count: autoSaveCards.length,
           });
@@ -1807,7 +1933,7 @@ export function AgentChatWorkspace({
           appendDebugEvent(debugTurnId, "pkm_memory_save_result", saveResult);
           upsertPkmStatusMessage(
             formatAgentPkmSaveSummary(saveResult),
-            saveResult.saved > 0 ? "done" : "error"
+            saveResult.saved > 0 ? "done" : "error",
           );
           if (saveResult.saved > 0) {
             void loadAgentPkmContext({
@@ -1819,7 +1945,10 @@ export function AgentChatWorkspace({
           }
         }
 
-        if (reviewCards.length > 0 && latestVisibleTurnIdRef.current === debugTurnId) {
+        if (
+          reviewCards.length > 0 &&
+          latestVisibleTurnIdRef.current === debugTurnId
+        ) {
           if (signal.aborted) return;
           setPkmReviews((current) => [
             ...current.filter((review) => review.turnId !== debugTurnId),
@@ -1838,7 +1967,7 @@ export function AgentChatWorkspace({
           if (autoSaveCards.length === 0) {
             upsertPkmStatusMessage(
               "Agent found PKM memory that needs your review before saving.",
-              "done"
+              "done",
             );
           }
         }
@@ -1855,7 +1984,10 @@ export function AgentChatWorkspace({
         appendDebugEvent(debugTurnId, "pkm_memory_failed", {
           message,
         });
-        upsertPkmStatusMessage("Agent could not update PKM memory for this turn.", "error");
+        upsertPkmStatusMessage(
+          "Agent could not update PKM memory for this turn.",
+          "error",
+        );
       } finally {
         setActivePkmToolCount((count) => Math.max(0, count - 1));
       }
@@ -1885,7 +2017,11 @@ export function AgentChatWorkspace({
         });
         if (replaced) return nextMessages;
       }
-      return [...current, ...(appendUserMessage ? [userMessage] : []), assistantMessage];
+      return [
+        ...current,
+        ...(appendUserMessage ? [userMessage] : []),
+        assistantMessage,
+      ];
     });
     if (options.source === "typed" && appendUserMessage) {
       setInput("");
@@ -1938,7 +2074,10 @@ export function AgentChatWorkspace({
       voiceTtsQueueRef.current?.speakNow(message);
       setIsChatLoading(false);
       setIsStreaming(false);
-      setAgentVoiceStatus(voiceClientRef.current?.isActive ? "error" : "idle", message);
+      setAgentVoiceStatus(
+        voiceClientRef.current?.isActive ? "error" : "idle",
+        message,
+      );
     };
 
     const loadTurnPkmContext = async (): Promise<AgentPkmContext> => {
@@ -1972,7 +2111,10 @@ export function AgentChatWorkspace({
         vaultKey,
         message: text,
       });
-      const result = await withDeadline(contextPromise, VOICE_PKM_CONTEXT_DEADLINE_MS);
+      const result = await withDeadline(
+        contextPromise,
+        VOICE_PKM_CONTEXT_DEADLINE_MS,
+      );
       if (!result.timedOut) return result.value;
 
       appendDebugEvent(debugTurnId, "pkm_context_deferred_for_voice_latency", {
@@ -2023,7 +2165,7 @@ export function AgentChatWorkspace({
 
       armVoiceStreamWatchdog(
         VOICE_AGENT_FIRST_EVENT_TIMEOUT_MS,
-        "Agent voice response timed out before it started. Please try again."
+        "Agent voice response timed out before it started. Please try again.",
       );
       await streamAgentChat({
         userId,
@@ -2037,7 +2179,7 @@ export function AgentChatWorkspace({
             if (streamAbortController.signal.aborted) return;
             armVoiceStreamWatchdog(
               VOICE_AGENT_IDLE_TIMEOUT_MS,
-              "Agent voice response stalled. Please try again."
+              "Agent voice response stalled. Please try again.",
             );
             if (nextConversationId) {
               setConversationId(nextConversationId);
@@ -2047,7 +2189,7 @@ export function AgentChatWorkspace({
             if (streamAbortController.signal.aborted) return;
             armVoiceStreamWatchdog(
               VOICE_AGENT_IDLE_TIMEOUT_MS,
-              "Agent voice tool call stalled. Please try again."
+              "Agent voice tool call stalled. Please try again.",
             );
             appendDebugEvent(debugTurnId, "tool_start", toolEvent);
           },
@@ -2055,12 +2197,12 @@ export function AgentChatWorkspace({
             if (streamAbortController.signal.aborted) return;
             armVoiceStreamWatchdog(
               VOICE_AGENT_IDLE_TIMEOUT_MS,
-              "Agent voice tool call stalled. Please try again."
+              "Agent voice tool call stalled. Please try again.",
             );
             appendDebugEvent(debugTurnId, "tool_waiting", toolEvent);
             upsertToolStatusMessage(
               toolEvent.message || "Working on that in Kai...",
-              "streaming"
+              "streaming",
             );
             speakVoiceReceipt(toolEvent.message || "Working on that in Kai...");
             executeToolIfNeeded(toolEvent);
@@ -2069,22 +2211,27 @@ export function AgentChatWorkspace({
             if (streamAbortController.signal.aborted) return;
             armVoiceStreamWatchdog(
               VOICE_AGENT_IDLE_TIMEOUT_MS,
-              "Agent voice tool result stalled. Please try again."
+              "Agent voice tool result stalled. Please try again.",
             );
             appendDebugEvent(debugTurnId, "tool_result", toolEvent);
-            if (toolEvent.execution === "blocked" || toolEvent.status === "blocked") {
+            if (
+              toolEvent.execution === "blocked" ||
+              toolEvent.status === "blocked"
+            ) {
               upsertToolStatusMessage(
                 toolEvent.message || "That action is blocked in Agent.",
-                "error"
+                "error",
               );
-              speakVoiceReceipt(toolEvent.message || "That action is blocked in Agent.");
+              speakVoiceReceipt(
+                toolEvent.message || "That action is blocked in Agent.",
+              );
             }
           },
           onToken: (delta) => {
             if (streamAbortController.signal.aborted) return;
             armVoiceStreamWatchdog(
               VOICE_AGENT_IDLE_TIMEOUT_MS,
-              "Agent voice response stalled. Please try again."
+              "Agent voice response stalled. Please try again.",
             );
             queueAssistantDelta(delta);
             queueVoiceAssistantDelta(delta);
@@ -2142,14 +2289,18 @@ export function AgentChatWorkspace({
         if (message.status === "error") return message;
         return {
           ...message,
-          text: message.text || "I couldn't generate a response. Please try again.",
+          text:
+            message.text || "I couldn't generate a response. Please try again.",
           status: "done",
         };
       });
       if (!pkmAddToolHandled && !EXPLICIT_PKM_SAVE_PATTERN.test(text)) {
         const pkmAbortController = new AbortController();
         pkmAbortControllersRef.current.add(pkmAbortController);
-        void runPkmMemoryCapture(turnPkmContext, pkmAbortController.signal).finally(() => {
+        void runPkmMemoryCapture(
+          turnPkmContext,
+          pkmAbortController.signal,
+        ).finally(() => {
           pkmAbortControllersRef.current.delete(pkmAbortController);
         });
       }
@@ -2198,7 +2349,10 @@ export function AgentChatWorkspace({
     await runAgentTurn(input, { source: "typed" });
   };
 
-  function setAgentVoiceStatus(status: AgentVoiceStatus, message?: string | null) {
+  function setAgentVoiceStatus(
+    status: AgentVoiceStatus,
+    message?: string | null,
+  ) {
     setVoiceState(status);
     setGlobalVoiceStatus(status, message ?? null);
   }
@@ -2305,7 +2459,10 @@ export function AgentChatWorkspace({
               | "backend_gemini"
               | "browser_native_uncertain"
               | "empty" = "empty";
-            let result = nativeCandidate && !nativeCandidate.uncertain ? nativeCandidate : null;
+            let result =
+              nativeCandidate && !nativeCandidate.uncertain
+                ? nativeCandidate
+                : null;
 
             if (result) {
               transcriptionSource = "browser_native";
@@ -2396,7 +2553,9 @@ export function AgentChatWorkspace({
               return;
             }
             if (isAbortError(error)) {
-              throw new Error("Voice transcription timed out. Please try again.");
+              throw new Error(
+                "Voice transcription timed out. Please try again.",
+              );
             }
             throw error;
           } finally {
@@ -2431,7 +2590,13 @@ export function AgentChatWorkspace({
 
   useEffect(() => {
     if (!voiceActive) return;
-    if (agentVoiceEnabled && user?.uid && isVaultUnlocked && vaultOwnerToken && tokenIsFresh) {
+    if (
+      agentVoiceEnabled &&
+      user?.uid &&
+      isVaultUnlocked &&
+      vaultOwnerToken &&
+      tokenIsFresh
+    ) {
       return;
     }
     void handleCancelVoice();
@@ -2454,10 +2619,14 @@ export function AgentChatWorkspace({
         : null;
   const displayName = useMemo(
     () => formatAgentDisplayName(user?.displayName, user?.email),
-    [user?.displayName, user?.email]
+    [user?.displayName, user?.email],
   );
-  const hasStartedConversation = messages.some((message) => message.id !== "agent-greeting");
-  const visibleMessages = messages.filter((message) => message.id !== "agent-greeting");
+  const hasStartedConversation = messages.some(
+    (message) => message.id !== "agent-greeting",
+  );
+  const visibleMessages = messages.filter(
+    (message) => message.id !== "agent-greeting",
+  );
   const latestRetryableAssistantId =
     [...visibleMessages]
       .reverse()
@@ -2466,15 +2635,19 @@ export function AgentChatWorkspace({
           message.role === "assistant" &&
           !message.ephemeral &&
           message.status !== "streaming" &&
-          message.text.trim().length > 0
+          message.text.trim().length > 0,
       )?.id ?? null;
   const handleRetryAssistantResponse = (messageId: string) => {
     if (isChatLoading || isStreaming) return;
-    const assistantIndex = messages.findIndex((message) => message.id === messageId);
+    const assistantIndex = messages.findIndex(
+      (message) => message.id === messageId,
+    );
     if (assistantIndex < 0) return;
     const previousUserMessage = [...messages.slice(0, assistantIndex)]
       .reverse()
-      .find((message) => message.role === "user" && message.text.trim().length > 0);
+      .find(
+        (message) => message.role === "user" && message.text.trim().length > 0,
+      );
     const retryText = previousUserMessage?.text.trim();
     if (!retryText) {
       toast.error("No previous message found to retry.");
@@ -2493,7 +2666,9 @@ export function AgentChatWorkspace({
     window.setTimeout(() => composerTextareaRef.current?.focus(), 0);
   }, []);
   const swipeStartYRef = useRef<number | null>(null);
-  const handleHeaderPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+  const handleHeaderPointerDown = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
     if (!onMinimize || event.pointerType === "mouse") return;
     swipeStartYRef.current = event.clientY;
   };
@@ -2508,7 +2683,7 @@ export function AgentChatWorkspace({
   const renderHistorySidebar = (
     sidebarClassName?: string,
     onClose?: () => void,
-    collapsed = false
+    collapsed = false,
   ) => (
     <AgentHistorySidebar
       conversations={conversations}
@@ -2534,14 +2709,14 @@ export function AgentChatWorkspace({
         isPopover
           ? "h-full overflow-hidden bg-[#0d0f13]"
           : "h-[calc(100dvh-var(--app-top-content-offset,0px)-var(--app-bottom-fixed-ui,0px)-var(--app-safe-area-bottom-effective,0px))] min-h-[420px] overflow-hidden bg-[#0b0d10]",
-        className
+        className,
       )}
       data-agent-chat-workspace={variant}
     >
       <div
         className={cn(
           "relative flex min-h-0 flex-1",
-          isPopover ? "overflow-hidden p-2 sm:p-3" : "overflow-hidden"
+          isPopover ? "overflow-hidden p-2 sm:p-3" : "overflow-hidden",
         )}
       >
         <div className="hidden h-full lg:flex">
@@ -2550,7 +2725,9 @@ export function AgentChatWorkspace({
         <div
           className={cn(
             "fixed inset-0 z-[520] bg-black/55 backdrop-blur-sm transition-opacity duration-200 lg:hidden",
-            isHistoryDrawerOpen ? "opacity-100" : "pointer-events-none opacity-0"
+            isHistoryDrawerOpen
+              ? "opacity-100"
+              : "pointer-events-none opacity-0",
           )}
           aria-hidden="true"
           onClick={() => setIsHistoryDrawerOpen(false)}
@@ -2558,28 +2735,29 @@ export function AgentChatWorkspace({
         <div
           className={cn(
             "fixed inset-y-0 left-0 z-[530] w-[min(88vw,320px)] transform transition-transform duration-200 ease-out lg:hidden",
-            isHistoryDrawerOpen ? "translate-x-0" : "-translate-x-full"
+            isHistoryDrawerOpen ? "translate-x-0" : "-translate-x-full",
           )}
           role="dialog"
           aria-modal="true"
           aria-hidden={!isHistoryDrawerOpen}
           aria-label="Agent chat history"
         >
-          {renderHistorySidebar("h-full w-full shadow-2xl shadow-black/40", () =>
-            setIsHistoryDrawerOpen(false)
+          {renderHistorySidebar(
+            "h-full w-full shadow-2xl shadow-black/40",
+            () => setIsHistoryDrawerOpen(false),
           )}
         </div>
 
         <section
           className={cn(
             "relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#15171c]",
-            isPopover && "rounded-lg border border-white/10 shadow-sm"
+            isPopover && "rounded-lg border border-white/10 shadow-sm",
           )}
         >
           <div
             className={cn(
               "flex h-14 shrink-0 touch-pan-y items-center justify-between gap-3 border-b border-white/10 bg-[#15171c]/95 px-3 backdrop-blur sm:h-16 sm:px-5",
-              !isPopover && "lg:px-6"
+              !isPopover && "lg:px-6",
             )}
             onPointerDown={handleHeaderPointerDown}
             onPointerUp={handleHeaderPointerEnd}
@@ -2618,14 +2796,16 @@ export function AgentChatWorkspace({
               <span className="hidden rounded-md border border-white/10 bg-white/[0.03] px-2.5 py-1 text-xs font-medium text-zinc-400 sm:inline-flex">
                 {statusText}
               </span>
-              {windowControls ? <div className="ml-1">{windowControls}</div> : null}
+              {windowControls ? (
+                <div className="ml-1">{windowControls}</div>
+              ) : null}
             </div>
           </div>
 
           <div
             className={cn(
               "min-h-0 flex-1 overflow-y-auto scroll-smooth px-4 pt-5 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent sm:px-6",
-              isPopover ? "pb-4" : "pb-6 lg:px-8"
+              isPopover ? "pb-4" : "pb-6 lg:px-8",
             )}
           >
             <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col gap-6">
@@ -2685,7 +2865,8 @@ export function AgentChatWorkspace({
                   Confirm voice transcript
                 </p>
                 <p className="mt-2 text-sm text-foreground">
-                  {voiceTranscriptReview.transcript || "I could not hear a clear transcript."}
+                  {voiceTranscriptReview.transcript ||
+                    "I could not hear a clear transcript."}
                 </p>
                 {voiceTranscriptReview.reason ? (
                   <p className="mt-1 text-xs text-muted-foreground">
@@ -2706,7 +2887,9 @@ export function AgentChatWorkspace({
                     size="sm"
                     disabled={!voiceTranscriptReview.transcript.trim()}
                     onClick={() =>
-                      handleVoiceTranscriptAccepted(voiceTranscriptReview.transcript)
+                      handleVoiceTranscriptAccepted(
+                        voiceTranscriptReview.transcript,
+                      )
                     }
                   >
                     Continue
@@ -2720,7 +2903,8 @@ export function AgentChatWorkspace({
             onSubmit={handleSubmit}
             className={cn(
               "shrink-0 border-t border-white/10 bg-[#15171c]/95 px-3 py-3 backdrop-blur sm:px-5",
-              !isPopover && "pb-[calc(0.75rem+var(--app-safe-area-bottom-effective,0px))]"
+              !isPopover &&
+                "pb-[calc(0.75rem+var(--app-safe-area-bottom-effective,0px))]",
             )}
           >
             <div className="mx-auto w-full max-w-3xl">
@@ -2744,7 +2928,11 @@ export function AgentChatWorkspace({
                     value={input}
                     onChange={(event) => setInput(event.target.value)}
                     onKeyDown={(event) => {
-                      if (event.key !== "Enter" || event.shiftKey || event.nativeEvent.isComposing) {
+                      if (
+                        event.key !== "Enter" ||
+                        event.shiftKey ||
+                        event.nativeEvent.isComposing
+                      ) {
                         return;
                       }
                       event.preventDefault();
@@ -2752,7 +2940,9 @@ export function AgentChatWorkspace({
                         event.currentTarget.form?.requestSubmit();
                       }
                     }}
-                    disabled={!hasChatAccess || isLoadingHistory || isVoiceConnecting}
+                    disabled={
+                      !hasChatAccess || isLoadingHistory || isVoiceConnecting
+                    }
                     placeholder="Message Agent..."
                     rows={1}
                     className="max-h-40 min-h-8 min-w-0 flex-1 resize-none bg-transparent px-1 py-2 text-sm leading-6 text-zinc-100 outline-none placeholder:text-zinc-500 disabled:cursor-not-allowed disabled:opacity-60"

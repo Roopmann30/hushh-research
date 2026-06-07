@@ -46,7 +46,10 @@ type AgentHistorySidebarProps = {
   onToggleCollapsed?: () => void;
   onCreateNew: () => void;
   onSelectConversation: (conversationId: string) => void;
-  onRenameConversation: (conversationId: string, title: string) => Promise<void> | void;
+  onRenameConversation: (
+    conversationId: string,
+    title: string,
+  ) => Promise<void> | void;
   onDeleteConversation: (conversationId: string) => Promise<void> | void;
 };
 
@@ -76,11 +79,14 @@ export function AgentHistorySidebar({
 }: AgentHistorySidebarProps) {
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
-  const [deleteTarget, setDeleteTarget] = useState<AgentChatConversation | null>(null);
+  const [deleteTarget, setDeleteTarget] =
+    useState<AgentChatConversation | null>(null);
 
   const renamingConversation = useMemo(
-    () => conversations.find((conversation) => conversation.id === renamingId) || null,
-    [conversations, renamingId]
+    () =>
+      conversations.find((conversation) => conversation.id === renamingId) ||
+      null,
+    [conversations, renamingId],
   );
 
   useEffect(() => {
@@ -119,7 +125,7 @@ export function AgentHistorySidebar({
         className={cn(
           "flex min-h-0 shrink-0 flex-col overflow-hidden border-r border-white/10 bg-[#101216] text-zinc-200 transition-[width] duration-200 ease-out",
           collapsed ? "w-16" : "w-72",
-          className
+          className,
         )}
         aria-label="Agent chat history"
         data-collapsed={collapsed ? "true" : "false"}
@@ -225,8 +231,10 @@ export function AgentHistorySidebar({
                   key={conversation.id}
                   className={cn(
                     "group rounded-lg transition-colors",
-                    active && "bg-primary/15 text-zinc-50 ring-1 ring-primary/20",
-                    !active && "text-zinc-400 hover:bg-white/[0.06] hover:text-zinc-100"
+                    active &&
+                      "bg-primary/15 text-zinc-50 ring-1 ring-primary/20",
+                    !active &&
+                      "text-zinc-400 hover:bg-white/[0.06] hover:text-zinc-100",
                   )}
                 >
                   {isRenaming ? (
@@ -269,7 +277,7 @@ export function AgentHistorySidebar({
                         type="button"
                         className={cn(
                           "flex h-10 min-w-0 flex-1 items-center gap-2 rounded-lg text-left text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-primary/60",
-                          collapsed ? "justify-center px-0" : "px-2"
+                          collapsed ? "justify-center px-0" : "px-2",
                         )}
                         onClick={() => onSelectConversation(conversation.id)}
                         disabled={disabled || pending}
@@ -277,7 +285,9 @@ export function AgentHistorySidebar({
                         title={title}
                       >
                         <MessageSquare className="h-4 w-4 shrink-0 opacity-75" />
-                        {collapsed ? null : <span className="truncate">{title}</span>}
+                        {collapsed ? null : (
+                          <span className="truncate">{title}</span>
+                        )}
                       </button>
                       {collapsed ? null : (
                         <DropdownMenu>
@@ -295,8 +305,14 @@ export function AgentHistorySidebar({
                               <MoreHorizontal className="h-3.5 w-3.5" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" sideOffset={6} className="z-[520]">
-                            <DropdownMenuItem onSelect={() => startRename(conversation)}>
+                          <DropdownMenuContent
+                            align="end"
+                            sideOffset={6}
+                            className="z-[520]"
+                          >
+                            <DropdownMenuItem
+                              onSelect={() => startRename(conversation)}
+                            >
                               <Pencil className="h-4 w-4" />
                               Rename chat
                             </DropdownMenuItem>
@@ -333,12 +349,18 @@ export function AgentHistorySidebar({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={Boolean(deleteTarget && actionPendingId === deleteTarget.id)}>
+            <AlertDialogCancel
+              disabled={Boolean(
+                deleteTarget && actionPendingId === deleteTarget.id,
+              )}
+            >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
-              disabled={Boolean(deleteTarget && actionPendingId === deleteTarget.id)}
+              disabled={Boolean(
+                deleteTarget && actionPendingId === deleteTarget.id,
+              )}
               onClick={(event) => {
                 event.preventDefault();
                 void confirmDelete();

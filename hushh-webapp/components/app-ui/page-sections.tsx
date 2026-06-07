@@ -3,7 +3,11 @@
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 
-import { SurfaceCard, type SurfaceAccent, type SurfaceTone } from "@/components/app-ui/surfaces";
+import {
+  SurfaceCard,
+  type SurfaceAccent,
+  type SurfaceTone,
+} from "@/components/app-ui/surfaces";
 import { Icon } from "@/lib/morphy-ux/ui";
 import { cn } from "@/lib/utils";
 
@@ -24,15 +28,17 @@ type SectionAccent =
   | "rose"
   | "violet";
 
-const ACCENT_STYLES: Record<SectionAccent, {
-  eyebrow: string;
-  icon: string;
-  divider: string;
-}> = {
+const ACCENT_STYLES: Record<
+  SectionAccent,
+  {
+    eyebrow: string;
+    icon: string;
+    divider: string;
+  }
+> = {
   neutral: {
     eyebrow: "text-muted-foreground",
-    icon:
-      "border border-black/10 bg-white text-black shadow-[0_10px_28px_-18px_rgba(0,0,0,0.28)] dark:border-white/10 dark:bg-white/8 dark:text-white dark:shadow-none",
+    icon: "border border-black/10 bg-white text-black shadow-[0_10px_28px_-18px_rgba(0,0,0,0.28)] dark:border-white/10 dark:bg-white/8 dark:text-white dark:shadow-none",
     divider: "bg-border/50",
   },
   kai: {
@@ -77,8 +83,7 @@ const ACCENT_STYLES: Record<SectionAccent, {
   },
   default: {
     eyebrow: "text-muted-foreground",
-    icon:
-      "border border-black/10 bg-white text-black shadow-[0_10px_28px_-18px_rgba(0,0,0,0.28)] dark:border-white/10 dark:bg-white/8 dark:text-white dark:shadow-none",
+    icon: "border border-black/10 bg-white text-black shadow-[0_10px_28px_-18px_rgba(0,0,0,0.28)] dark:border-white/10 dark:bg-white/8 dark:text-white dark:shadow-none",
     divider: "bg-border/50",
   },
   sky: {
@@ -175,7 +180,7 @@ export function PageHeader({
             iconSize="lg"
             iconClassName={cn(
               "flex w-10 shrink-0 items-center justify-center rounded-[var(--app-card-radius-feature)] px-2 py-3 sm:w-12 sm:px-3",
-              styles.icon
+              styles.icon,
             )}
           />
         ) : null}
@@ -183,7 +188,9 @@ export function PageHeader({
           <div
             className={cn(
               "gap-[var(--page-header-row-gap)] sm:flex-row sm:items-center sm:justify-between",
-              actionsInlineMobile ? "flex items-start justify-between" : "flex flex-col"
+              actionsInlineMobile
+                ? "flex items-start justify-between"
+                : "flex flex-col",
             )}
             data-slot="page-header-row"
           >
@@ -192,7 +199,7 @@ export function PageHeader({
                 <p
                   className={cn(
                     "text-xs font-semibold uppercase tracking-[0.24em]",
-                    styles.eyebrow
+                    styles.eyebrow,
                   )}
                 >
                   {eyebrow}
@@ -214,7 +221,9 @@ export function PageHeader({
               <div
                 className={cn(
                   "flex flex-wrap items-center gap-2 sm:w-auto sm:shrink-0 sm:justify-end sm:self-center",
-                  actionsInlineMobile ? "w-auto shrink-0 justify-end self-start" : "w-full"
+                  actionsInlineMobile
+                    ? "w-auto shrink-0 justify-end self-start"
+                    : "w-full",
                 )}
                 data-slot="page-header-actions"
               >
@@ -260,7 +269,10 @@ export function SectionHeader({
 }) {
   const styles = ACCENT_STYLES[accent];
   return (
-    <div className={cn("space-y-[var(--section-header-stack-gap)]", className)} data-testid={testId}>
+    <div
+      className={cn("space-y-[var(--section-header-stack-gap)]", className)}
+      data-testid={testId}
+    >
       <div className="flex items-stretch gap-3">
         {icon || leading ? (
           <HeaderLeading
@@ -269,7 +281,7 @@ export function SectionHeader({
             iconSize="md"
             iconClassName={cn(
               "flex w-9 shrink-0 items-center justify-center rounded-[var(--app-card-radius-feature)] px-2 py-2.5 sm:w-10 sm:px-2.5",
-              styles.icon
+              styles.icon,
             )}
           />
         ) : null}
@@ -280,7 +292,12 @@ export function SectionHeader({
           >
             <div className="min-w-0 flex-1 space-y-[var(--section-header-copy-gap)]">
               {eyebrow ? (
-                <p className={cn("text-xs font-semibold uppercase tracking-[0.2em]", styles.eyebrow)}>
+                <p
+                  className={cn(
+                    "text-xs font-semibold uppercase tracking-[0.2em]",
+                    styles.eyebrow,
+                  )}
+                >
                   {eyebrow}
                 </p>
               ) : null}

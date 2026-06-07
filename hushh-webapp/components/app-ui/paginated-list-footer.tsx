@@ -48,7 +48,7 @@ export function PaginatedListFooter({
       aria-label="Pagination"
       className={cn(
         "flex items-center justify-between border-t border-border/60 px-4 py-3 text-sm text-muted-foreground",
-        className
+        className,
       )}
     >
       <span>

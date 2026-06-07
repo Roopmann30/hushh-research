@@ -1,7 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Check, Edit3, Loader2, Lock, RefreshCw, ShieldAlert, Sparkles, Trash2, Users, X } from "lucide-react";
+import {
+  Check,
+  Edit3,
+  Loader2,
+  Lock,
+  RefreshCw,
+  ShieldAlert,
+  Sparkles,
+  Trash2,
+  Users,
+  X,
+} from "lucide-react";
 
 import {
   SurfaceCard,
@@ -70,7 +81,8 @@ function initials(label: string | null | undefined): string {
 
 function globalAccessLabel(scope: string | null | undefined): string | null {
   if (scope === "pkm.read") return "Can access all of your saved data.";
-  if (scope === "vault.owner") return "Can manage your full vault and everything inside it.";
+  if (scope === "vault.owner")
+    return "Can manage your full vault and everything inside it.";
   return null;
 }
 
@@ -86,9 +98,12 @@ export function PkmNaturalPanel({
   const { user, loading } = useAuth();
   const { isVaultUnlocked, vaultKey, vaultOwnerToken } = useVault();
 
-  const [metadata, setMetadata] = useState<PersonalKnowledgeModelMetadata | null>(null);
+  const [metadata, setMetadata] =
+    useState<PersonalKnowledgeModelMetadata | null>(null);
   const [fullBlob, setFullBlob] = useState<Record<string, unknown>>({});
-  const [manifests, setManifests] = useState<Record<string, DomainManifest | null>>({});
+  const [manifests, setManifests] = useState<
+    Record<string, DomainManifest | null>
+  >({});
   const [activeGrants, setActiveGrants] = useState<ConsentCenterEntry[]>([]);
   const [bootstrapLoading, setBootstrapLoading] = useState(true);
   const [bootstrapError, setBootstrapError] = useState<string | null>(null);
@@ -96,8 +111,12 @@ export function PkmNaturalPanel({
   const [editingCardId, setEditingCardId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
   const [memoryActionId, setMemoryActionId] = useState<string | null>(null);
-  const [memoryActionMessage, setMemoryActionMessage] = useState<string | null>(null);
-  const [memoryActionError, setMemoryActionError] = useState<string | null>(null);
+  const [memoryActionMessage, setMemoryActionMessage] = useState<string | null>(
+    null,
+  );
+  const [memoryActionError, setMemoryActionError] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -135,7 +154,7 @@ export function PkmNaturalPanel({
         const nextMetadata = await PersonalKnowledgeModelService.getMetadata(
           user.uid,
           force,
-          vaultOwnerToken
+          vaultOwnerToken,
         );
         const manifestPairs = await Promise.all(
           nextMetadata.domains.map(async (domain) => [
@@ -143,9 +162,9 @@ export function PkmNaturalPanel({
             await PersonalKnowledgeModelService.getDomainManifest(
               user.uid,
               domain.key,
-              vaultOwnerToken
+              vaultOwnerToken,
             ).catch(() => null),
-          ])
+          ]),
         );
         const center = await ConsentCenterService.getCenter({
           idToken,
@@ -168,7 +187,9 @@ export function PkmNaturalPanel({
       } catch (nextError) {
         if (!cancelled) {
           setBootstrapError(
-            nextError instanceof Error ? nextError.message : "Failed to load the natural PKM view."
+            nextError instanceof Error
+              ? nextError.message
+              : "Failed to load the natural PKM view.",
           );
         }
       } finally {
@@ -182,7 +203,15 @@ export function PkmNaturalPanel({
     return () => {
       cancelled = true;
     };
-  }, [isVaultUnlocked, loading, refreshNonce, refreshToken, user, vaultKey, vaultOwnerToken]);
+  }, [
+    isVaultUnlocked,
+    loading,
+    refreshNonce,
+    refreshToken,
+    user,
+    vaultKey,
+    vaultOwnerToken,
+  ]);
 
   const memorySnapshot = useMemo(
     () =>
@@ -190,37 +219,48 @@ export function PkmNaturalPanel({
         metadata,
         fullBlob,
       }),
-    [fullBlob, metadata]
+    [fullBlob, metadata],
   );
 
   const domainInsightByKey = useMemo(
-    () => new Map(memorySnapshot.domainInsights.map((insight) => [insight.domain, insight])),
-    [memorySnapshot.domainInsights]
+    () =>
+      new Map(
+        memorySnapshot.domainInsights.map((insight) => [
+          insight.domain,
+          insight,
+        ]),
+      ),
+    [memorySnapshot.domainInsights],
   );
 
   const globalAccessEntries = useMemo(() => {
     return activeGrants
-      .filter((entry) => entry.scope === "pkm.read" || entry.scope === "vault.owner")
-      .map((entry): NaturalAccessEntry => ({
-        id: entry.id,
-        requesterLabel: String(entry.counterpart_label || "Connected app"),
-        requesterImageUrl: entry.counterpart_image_url,
-        readableAccessLabel: globalAccessLabel(entry.scope) || "Has broad access.",
-        coverageKind: "broad",
-        status: String(entry.status || "active"),
-        expiresAt:
-          typeof entry.expires_at === "string"
-            ? entry.expires_at
-            : typeof entry.expires_at === "number"
-              ? new Date(entry.expires_at).toISOString()
-              : null,
-      }));
+      .filter(
+        (entry) => entry.scope === "pkm.read" || entry.scope === "vault.owner",
+      )
+      .map(
+        (entry): NaturalAccessEntry => ({
+          id: entry.id,
+          requesterLabel: String(entry.counterpart_label || "Connected app"),
+          requesterImageUrl: entry.counterpart_image_url,
+          readableAccessLabel:
+            globalAccessLabel(entry.scope) || "Has broad access.",
+          coverageKind: "broad",
+          status: String(entry.status || "active"),
+          expiresAt:
+            typeof entry.expires_at === "string"
+              ? entry.expires_at
+              : typeof entry.expires_at === "number"
+                ? new Date(entry.expires_at).toISOString()
+                : null,
+        }),
+      );
   }, [activeGrants]);
 
   const domainEntries = useMemo(() => {
     if (!metadata) return [];
     const domainScopedGrants = activeGrants.filter(
-      (entry) => entry.scope !== "pkm.read" && entry.scope !== "vault.owner"
+      (entry) => entry.scope !== "pkm.read" && entry.scope !== "vault.owner",
     );
     return metadata.domains.map((domain) => ({
       domain,
@@ -235,7 +275,10 @@ export function PkmNaturalPanel({
         return {
           ...base,
           summary: insight.summary || base.summary,
-          highlights: insight.highlights.length > 0 ? insight.highlights : base.highlights,
+          highlights:
+            insight.highlights.length > 0
+              ? insight.highlights
+              : base.highlights,
           updatedAt: insight.updatedAt || base.updatedAt,
         };
       })(),
@@ -251,7 +294,7 @@ export function PkmNaturalPanel({
     const nextMetadata = await PersonalKnowledgeModelService.getMetadata(
       user.uid,
       true,
-      vaultOwnerToken
+      vaultOwnerToken,
     );
     setMetadata(nextMetadata);
   }
@@ -266,7 +309,7 @@ export function PkmNaturalPanel({
   function memoryWriteSummary(
     card: PkmMemoryCard,
     action: "edited" | "deleted",
-    nextDomainData: Record<string, unknown>
+    nextDomainData: Record<string, unknown>,
   ) {
     const now = new Date().toISOString();
     const nextDomainSnapshot = buildPkmMemorySnapshot({
@@ -279,11 +322,16 @@ export function PkmNaturalPanel({
     });
     return {
       readable_summary: `${card.domainTitle} memory was ${action} from your data view.`,
-      readable_highlights: [`${action === "edited" ? "Updated" : "Removed"} ${card.title}`],
+      readable_highlights: [
+        `${action === "edited" ? "Updated" : "Removed"} ${card.title}`,
+      ],
       readable_updated_at: now,
-      readable_source_label: action === "edited" ? "Edited memory" : "Deleted memory",
+      readable_source_label:
+        action === "edited" ? "Edited memory" : "Deleted memory",
       readable_event_summary: `${action === "edited" ? "Updated" : "Removed"} ${card.title}.`,
-      memory_count: nextDomainSnapshot.cards.filter((item) => item.domain === card.domain).length,
+      memory_count: nextDomainSnapshot.cards.filter(
+        (item) => item.domain === card.domain,
+      ).length,
     };
   }
 
@@ -304,7 +352,11 @@ export function PkmNaturalPanel({
         vaultOwnerToken,
         build: () => ({
           domainData: params.nextDomainData,
-          summary: memoryWriteSummary(params.card, params.action, params.nextDomainData),
+          summary: memoryWriteSummary(
+            params.card,
+            params.action,
+            params.nextDomainData,
+          ),
           mergeDecision: {
             merge_mode: "replace_domain",
           },
@@ -315,18 +367,23 @@ export function PkmNaturalPanel({
       }
       setFullBlob((current) => ({
         ...current,
-        [params.card.domain]: result.fullBlob[params.card.domain] || params.nextDomainData,
+        [params.card.domain]:
+          result.fullBlob[params.card.domain] || params.nextDomainData,
       }));
       clearAgentPkmContext(user.uid);
       await refreshMetadataAfterMemoryWrite();
       setEditingCardId(null);
       setEditValue("");
       setMemoryActionMessage(
-        params.action === "edited" ? "Memory card updated." : "Memory card deleted."
+        params.action === "edited"
+          ? "Memory card updated."
+          : "Memory card deleted.",
       );
     } catch (error) {
       setMemoryActionError(
-        error instanceof Error ? error.message : "Failed to update saved memory."
+        error instanceof Error
+          ? error.message
+          : "Failed to update saved memory.",
       );
     } finally {
       setMemoryActionId(null);
@@ -382,7 +439,10 @@ export function PkmNaturalPanel({
           <ShieldAlert className="h-4 w-4" />
           Sign in to review your readable PKM view.
         </div>
-        <p>This tab is tied to your live account, so it only loads once you are signed in.</p>
+        <p>
+          This tab is tied to your live account, so it only loads once you are
+          signed in.
+        </p>
       </SurfaceInset>
     );
   }
@@ -395,8 +455,8 @@ export function PkmNaturalPanel({
           Unlock your vault to see the readable PKM view.
         </div>
         <p>
-          The Natural tab uses the same private PKM metadata as the explorer, but presents it in a
-          much simpler shape.
+          The Natural tab uses the same private PKM metadata as the explorer,
+          but presents it in a much simpler shape.
         </p>
       </SurfaceInset>
     );
@@ -410,14 +470,21 @@ export function PkmNaturalPanel({
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/80">
               Data + Access
             </p>
-            <h2 className="text-sm font-semibold">What Kai knows about you, in plain English</h2>
+            <h2 className="text-sm font-semibold">
+              What Kai knows about you, in plain English
+            </h2>
             <p className="max-w-3xl text-sm text-muted-foreground">
-              This view keeps the saved data readable for a normal app user. It focuses on what Kai
-              knows, when it was last updated, and which connected apps can currently access it.
+              This view keeps the saved data readable for a normal app user. It
+              focuses on what Kai knows, when it was last updated, and which
+              connected apps can currently access it.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button variant="none" effect="fade" onClick={() => setRefreshNonce((value) => value + 1)}>
+            <Button
+              variant="none"
+              effect="fade"
+              onClick={() => setRefreshNonce((value) => value + 1)}
+            >
               <RefreshCw className="mr-2 h-4 w-4" />
               Refresh
             </Button>
@@ -434,10 +501,18 @@ export function PkmNaturalPanel({
         ) : null}
 
         <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary">{metadata?.domains.length || 0} domains</Badge>
-          <Badge variant="secondary">{metadata?.totalAttributes || 0} saved details</Badge>
-          <Badge variant="secondary">{memorySnapshot.totalCards} memory cards</Badge>
-          <Badge variant="secondary">{activeGrants.length} active access grants</Badge>
+          <Badge variant="secondary">
+            {metadata?.domains.length || 0} domains
+          </Badge>
+          <Badge variant="secondary">
+            {metadata?.totalAttributes || 0} saved details
+          </Badge>
+          <Badge variant="secondary">
+            {memorySnapshot.totalCards} memory cards
+          </Badge>
+          <Badge variant="secondary">
+            {activeGrants.length} active access grants
+          </Badge>
           <Badge variant="secondary">
             Last updated {formatTimestamp(metadata?.lastUpdated || null)}
           </Badge>
@@ -452,23 +527,36 @@ export function PkmNaturalPanel({
               Cross-domain access
             </SurfaceCardTitle>
             <SurfaceCardDescription>
-              These apps or agents currently have access that spans more than one domain.
+              These apps or agents currently have access that spans more than
+              one domain.
             </SurfaceCardDescription>
           </SurfaceCardHeader>
           <SurfaceCardContent className="grid gap-3 md:grid-cols-2">
             {globalAccessEntries.map((entry) => (
-              <div key={entry.id} className="rounded-2xl border bg-muted/20 p-4">
+              <div
+                key={entry.id}
+                className="rounded-2xl border bg-muted/20 p-4"
+              >
                 <div className="flex items-start gap-3">
                   <Avatar className="h-11 w-11 border">
-                    <AvatarImage src={entry.requesterImageUrl || undefined} alt={entry.requesterLabel} />
-                    <AvatarFallback>{initials(entry.requesterLabel)}</AvatarFallback>
+                    <AvatarImage
+                      src={entry.requesterImageUrl || undefined}
+                      alt={entry.requesterLabel}
+                    />
+                    <AvatarFallback>
+                      {initials(entry.requesterLabel)}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-semibold">{entry.requesterLabel}</p>
+                      <p className="text-sm font-semibold">
+                        {entry.requesterLabel}
+                      </p>
                       <Badge variant="secondary">Broad access</Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground">{entry.readableAccessLabel}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {entry.readableAccessLabel}
+                    </p>
                     <p className="text-xs text-muted-foreground">
                       Expires {formatTimestamp(entry.expiresAt)}
                     </p>
@@ -486,8 +574,8 @@ export function PkmNaturalPanel({
             <div className="space-y-1">
               <SurfaceCardTitle>Memory cards</SurfaceCardTitle>
               <SurfaceCardDescription>
-                Decrypted only while your vault is unlocked. Edit or delete cards to update the
-                encrypted PKM domain.
+                Decrypted only while your vault is unlocked. Edit or delete
+                cards to update the encrypted PKM domain.
               </SurfaceCardDescription>
             </div>
             <Badge variant="secondary">{memorySnapshot.totalCards} cards</Badge>
@@ -506,8 +594,9 @@ export function PkmNaturalPanel({
         <SurfaceCardContent>
           {memorySnapshot.cards.length === 0 ? (
             <div className="rounded-2xl border border-dashed bg-muted/10 px-4 py-4 text-sm text-muted-foreground">
-              No readable memory cards yet. Save a profile fact, preference, project note, receipt,
-              or portfolio detail and it will show up here after vault unlock.
+              No readable memory cards yet. Save a profile fact, preference,
+              project note, receipt, or portfolio detail and it will show up
+              here after vault unlock.
             </div>
           ) : (
             <div className="grid gap-3 lg:grid-cols-2">
@@ -516,16 +605,25 @@ export function PkmNaturalPanel({
                 const savingEdit = memoryActionId === `${card.id}:edited`;
                 const deleting = memoryActionId === `${card.id}:deleted`;
                 return (
-                  <div key={card.id} className="rounded-2xl border bg-muted/15 p-4">
+                  <div
+                    key={card.id}
+                    className="rounded-2xl border bg-muted/15 p-4"
+                  >
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div className="min-w-0 flex-1 space-y-2">
                         <div className="flex flex-wrap gap-2">
                           <Badge variant="secondary">{card.domainTitle}</Badge>
-                          <Badge variant="outline">{Math.round(card.confidence * 100)}%</Badge>
+                          <Badge variant="outline">
+                            {Math.round(card.confidence * 100)}%
+                          </Badge>
                           <Badge variant="outline">{card.sourceLabel}</Badge>
                         </div>
-                        <h3 className="text-sm font-semibold leading-6">{card.title}</h3>
-                        <p className="text-xs text-muted-foreground">{card.detail}</p>
+                        <h3 className="text-sm font-semibold leading-6">
+                          {card.title}
+                        </h3>
+                        <p className="text-xs text-muted-foreground">
+                          {card.detail}
+                        </p>
                         <p className="text-xs text-muted-foreground">
                           Updated {formatTimestamp(card.updatedAt)}
                         </p>
@@ -586,10 +684,12 @@ export function PkmNaturalPanel({
                               </AlertDialogTrigger>
                               <AlertDialogContent size="sm">
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete this memory?</AlertDialogTitle>
+                                  <AlertDialogTitle>
+                                    Delete this memory?
+                                  </AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    This removes the selected detail from the encrypted{" "}
-                                    {card.domainTitle} PKM domain.
+                                    This removes the selected detail from the
+                                    encrypted {card.domainTitle} PKM domain.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
@@ -630,8 +730,9 @@ export function PkmNaturalPanel({
             No saved PKM domains yet.
           </div>
           <p>
-            Generate a PKM preview in the Tool tab and save it once you are happy with the
-            structure. This readable view will appear automatically after the write.
+            Generate a PKM preview in the Tool tab and save it once you are
+            happy with the structure. This readable view will appear
+            automatically after the write.
           </p>
         </SurfaceInset>
       ) : (
@@ -647,13 +748,19 @@ export function PkmNaturalPanel({
                     </SurfaceCardDescription>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">{domain.attributeCount} details</Badge>
+                    <Badge variant="secondary">
+                      {domain.attributeCount} details
+                    </Badge>
                     {presentation.sections.length > 0 ? (
-                      <Badge variant="secondary">{presentation.sections.length} sections</Badge>
+                      <Badge variant="secondary">
+                        {presentation.sections.length} sections
+                      </Badge>
                     ) : null}
                   </div>
                 </div>
-                <p className="text-sm leading-6 text-foreground/90">{presentation.summary}</p>
+                <p className="text-sm leading-6 text-foreground/90">
+                  {presentation.summary}
+                </p>
               </SurfaceCardHeader>
               <SurfaceCardContent className="space-y-5">
                 {presentation.highlights.length > 0 ? (
@@ -663,7 +770,11 @@ export function PkmNaturalPanel({
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {presentation.highlights.map((highlight) => (
-                        <Badge key={highlight} variant="outline" className="whitespace-normal py-1">
+                        <Badge
+                          key={highlight}
+                          variant="outline"
+                          className="whitespace-normal py-1"
+                        >
                           {highlight}
                         </Badge>
                       ))}
@@ -692,33 +803,45 @@ export function PkmNaturalPanel({
                       Access
                     </p>
                     {presentation.sourceLabel ? (
-                      <p className="text-xs text-muted-foreground">{presentation.sourceLabel}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {presentation.sourceLabel}
+                      </p>
                     ) : null}
                   </div>
                   {accessEntries.length > 0 ? (
                     <div className="space-y-3">
                       {accessEntries.map((entry) => (
-                        <div key={entry.id} className="rounded-2xl border bg-muted/20 p-4">
+                        <div
+                          key={entry.id}
+                          className="rounded-2xl border bg-muted/20 p-4"
+                        >
                           <div className="flex items-start gap-3">
                             <Avatar className="h-10 w-10 border">
                               <AvatarImage
                                 src={entry.requesterImageUrl || undefined}
                                 alt={entry.requesterLabel}
                               />
-                              <AvatarFallback>{initials(entry.requesterLabel)}</AvatarFallback>
+                              <AvatarFallback>
+                                {initials(entry.requesterLabel)}
+                              </AvatarFallback>
                             </Avatar>
                             <div className="min-w-0 flex-1 space-y-1">
                               <div className="flex flex-wrap items-center gap-2">
-                                <p className="text-sm font-semibold">{entry.requesterLabel}</p>
+                                <p className="text-sm font-semibold">
+                                  {entry.requesterLabel}
+                                </p>
                                 <Badge variant="secondary">
-                                  {entry.coverageKind === "broad" ? "Broad access" : "Limited access"}
+                                  {entry.coverageKind === "broad"
+                                    ? "Broad access"
+                                    : "Limited access"}
                                 </Badge>
                               </div>
                               <p className="text-sm text-muted-foreground">
                                 {entry.readableAccessLabel}
                               </p>
                               <p className="text-xs text-muted-foreground">
-                                Status {entry.status} • Expires {formatTimestamp(entry.expiresAt)}
+                                Status {entry.status} • Expires{" "}
+                                {formatTimestamp(entry.expiresAt)}
                               </p>
                             </div>
                           </div>
@@ -727,7 +850,8 @@ export function PkmNaturalPanel({
                     </div>
                   ) : (
                     <div className="rounded-2xl border border-dashed bg-muted/10 px-4 py-4 text-sm text-muted-foreground">
-                      No connected apps have active access to this part of your PKM right now.
+                      No connected apps have active access to this part of your
+                      PKM right now.
                     </div>
                   )}
                 </div>

@@ -31,7 +31,7 @@ export function AuthProviderButton({
       onClick={onClick}
       className={cn(
         "text-[17px] font-medium border border-border/70 bg-background/80 dark:bg-background/55",
-        className
+        className,
       )}
     >
       <span className="inline-flex items-center gap-3">

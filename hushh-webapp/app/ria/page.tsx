@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import {
-  BriefcaseBusiness,
-  CircleAlert,
-} from "lucide-react";
+import { BriefcaseBusiness, CircleAlert } from "lucide-react";
 
-import { RiaCompatibilityState, RiaPageShell, RiaSurface } from "@/components/ria/ria-page-shell";
+import {
+  RiaCompatibilityState,
+  RiaPageShell,
+  RiaSurface,
+} from "@/components/ria/ria-page-shell";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { usePersonaState } from "@/lib/persona/persona-context";
@@ -30,28 +31,32 @@ function verificationState(status?: string | null) {
       return {
         label: "Ready",
         title: "Your advisor workspace is ready.",
-        description: "Relationships, picks, and investor requests can move without extra setup.",
+        description:
+          "Relationships, picks, and investor requests can move without extra setup.",
         tone: "success" as HeroTone,
       };
     case "submitted":
       return {
         label: "In review",
         title: "Verification is still moving.",
-        description: "The workflow stays readable while trust checks finish in the background.",
+        description:
+          "The workflow stays readable while trust checks finish in the background.",
         tone: "warning" as HeroTone,
       };
     case "rejected":
       return {
         label: "Needs update",
         title: "A few trust details need another pass.",
-        description: "Refresh the profile so investor access and advisor sharing can continue cleanly.",
+        description:
+          "Refresh the profile so investor access and advisor sharing can continue cleanly.",
         tone: "critical" as HeroTone,
       };
     default:
       return {
         label: "Draft",
         title: "Finish the advisor setup once.",
-        description: "After that, the rest of the RIA workflow stays in the background.",
+        description:
+          "After that, the rest of the RIA workflow stays in the background.",
         tone: "neutral" as HeroTone,
       };
   }
@@ -124,7 +129,9 @@ function SummaryCell({
       <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
         {label}
       </p>
-      <p className="text-lg font-semibold tracking-tight text-foreground">{value}</p>
+      <p className="text-lg font-semibold tracking-tight text-foreground">
+        {value}
+      </p>
       <p className="text-xs leading-5 text-muted-foreground">{helper}</p>
     </div>
   );
@@ -147,7 +154,9 @@ export default function RiaHomePage() {
 
   const homeResource = useStaleResource<RiaHomeResponse>({
     cacheKey: user?.uid ? `ria_home_${user.uid}` : "ria_home_guest",
-    enabled: Boolean(user?.uid && (riaCapability !== "setup" || personaRefreshing)),
+    enabled: Boolean(
+      user?.uid && (riaCapability !== "setup" || personaRefreshing),
+    ),
     load: async () => {
       if (!user?.uid) {
         throw new Error("Sign in to access the RIA workspace");
@@ -159,7 +168,9 @@ export default function RiaHomePage() {
     },
   });
 
-  const verification = verificationState(homeResource.data?.verification_status);
+  const verification = verificationState(
+    homeResource.data?.verification_status,
+  );
   const iamUnavailable = Boolean(homeResource.error?.includes("IAM schema"));
   const activeClients = homeResource.data?.counts.active_clients ?? 0;
   const needsAttention = homeResource.data?.counts.needs_attention ?? 0;
@@ -171,7 +182,8 @@ export default function RiaHomePage() {
     (activeClients > 0
       ? `You have ${activeClients} active client relationship${activeClients === 1 ? "" : "s"}.`
       : verification.title);
-  const heroDescription = leadItem?.subtitle || leadItem?.next_action || verification.description;
+  const heroDescription =
+    leadItem?.subtitle || leadItem?.next_action || verification.description;
   const voiceControls = useMemo(
     () => [
       {
@@ -207,14 +219,15 @@ export default function RiaHomePage() {
         description: item.next_action || item.subtitle || null,
       })),
     ],
-    [queueItems]
+    [queueItems],
   );
 
   const voiceSurfaceMetadata = useMemo(
     () => ({
       screenId: "ria_home",
       title: "RIA Home",
-      purpose: "Advisor workspace home with readiness, relationship counts, and priority queue.",
+      purpose:
+        "Advisor workspace home with readiness, relationship counts, and priority queue.",
       sections: [
         {
           id: "ria_home_readiness",
@@ -228,7 +241,11 @@ export default function RiaHomePage() {
       controls: voiceControls,
       activeTab: "home",
       visibleModules: ["Readiness", "Priority queue", "Relationships"],
-      availableActions: ["Open RIA Clients", "Open RIA Picks", "Open RIA Connect Marketplace"],
+      availableActions: [
+        "Open RIA Clients",
+        "Open RIA Picks",
+        "Open RIA Connect Marketplace",
+      ],
       screenMetadata: {
         verification_status: homeResource.data?.verification_status || null,
         active_clients: activeClients,
@@ -244,7 +261,7 @@ export default function RiaHomePage() {
       needsAttention,
       queueItems.length,
       voiceControls,
-    ]
+    ],
   );
   usePublishVoiceSurfaceMetadata(voiceSurfaceMetadata);
 
@@ -259,11 +276,12 @@ export default function RiaHomePage() {
         routeId: "/ria",
         marker: "native-route-ria-home",
         authState: user ? "authenticated" : "pending",
-        dataState: homeResource.loading && !homeResource.data
-          ? "loading"
-          : iamUnavailable
-            ? "unavailable-valid"
-            : "loaded",
+        dataState:
+          homeResource.loading && !homeResource.data
+            ? "loading"
+            : iamUnavailable
+              ? "unavailable-valid"
+              : "loaded",
         errorCode: homeResource.error ? "ria_home" : null,
         errorMessage: homeResource.error,
       }}
@@ -271,12 +289,17 @@ export default function RiaHomePage() {
         iamUnavailable ? null : (
           <RiaSurface
             accent="ria"
-            className={cn("space-y-5 p-5 sm:p-6", heroToneClass(verification.tone))}
+            className={cn(
+              "space-y-5 p-5 sm:p-6",
+              heroToneClass(verification.tone),
+            )}
             data-testid="ria-home-primary"
           >
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 space-y-3">
-                <Badge className={cn("w-fit", badgeToneClass(verification.tone))}>
+                <Badge
+                  className={cn("w-fit", badgeToneClass(verification.tone))}
+                >
                   {verification.label}
                 </Badge>
                 <div className="space-y-2">
@@ -332,15 +355,18 @@ export default function RiaHomePage() {
 
       {!iamUnavailable ? (
         <div className="grid gap-4">
-          <RiaSurface className="space-y-4 p-4 sm:p-5" data-testid="ria-home-queue">
+          <RiaSurface
+            className="space-y-4 p-4 sm:p-5"
+            data-testid="ria-home-queue"
+          >
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-1">
                 <p className="text-sm font-semibold tracking-tight text-foreground">
                   Priority queue
                 </p>
                 <p className="text-sm leading-6 text-muted-foreground">
-                  Relationships, approvals, and invites only appear here when they still need a
-                  real move from you.
+                  Relationships, approvals, and invites only appear here when
+                  they still need a real move from you.
                 </p>
               </div>
               <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/55 bg-background/70 text-muted-foreground">
@@ -355,8 +381,8 @@ export default function RiaHomePage() {
 
               {!homeResource.loading && queueItems.length === 0 ? (
                 <div className="px-4 py-5 text-sm text-muted-foreground">
-                  Nothing urgent right now. When a relationship, consent request, or invite needs
-                  the next move, it will land here.
+                  Nothing urgent right now. When a relationship, consent
+                  request, or invite needs the next move, it will land here.
                 </div>
               ) : null}
 
@@ -365,7 +391,7 @@ export default function RiaHomePage() {
                   key={item.id}
                   className={cn(
                     "flex items-start justify-between gap-3 px-4 py-4",
-                    index > 0 && "border-t border-border/55"
+                    index > 0 && "border-t border-border/55",
                   )}
                 >
                   <div className="min-w-0 space-y-1">
@@ -373,13 +399,20 @@ export default function RiaHomePage() {
                       <span className="text-sm font-semibold tracking-tight text-foreground">
                         {item.title}
                       </span>
-                      <Badge className={cn("capitalize", queueToneClass(item.status))}>
+                      <Badge
+                        className={cn(
+                          "capitalize",
+                          queueToneClass(item.status),
+                        )}
+                      >
                         <span className="sr-only">Status: </span>
                         {formatStatusLabel(item.status)}
                       </Badge>
                     </div>
                     <p className="text-sm leading-6 text-muted-foreground">
-                      {item.subtitle || item.next_action || "Review the next step."}
+                      {item.subtitle ||
+                        item.next_action ||
+                        "Review the next step."}
                     </p>
                   </div>
                   <Link

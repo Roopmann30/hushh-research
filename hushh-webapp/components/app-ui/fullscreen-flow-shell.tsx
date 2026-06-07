@@ -41,7 +41,7 @@ export function FullscreenFlowShell<T extends ElementType = "main">({
     <Component
       className={cn(
         "fullscreen-flow-shell mx-auto flex w-full flex-col",
-        className
+        className,
       )}
       style={{ maxWidth: WIDTH_CLASS_MAP[width], ...style }}
       data-fullscreen-flow-shell-width={width}
