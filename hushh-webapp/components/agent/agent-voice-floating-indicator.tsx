@@ -27,15 +27,15 @@ export function AgentVoiceFloatingIndicator({
   const label = message || getAgentVoiceStatusLabel(status);
   const icon =
     status === "transcribing" || status === "thinking" ? (
-      <Loader2 className="h-4 w-4 animate-spin" />
+      <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
     ) : status === "muted" ? (
-      <MicOff className="h-4 w-4" />
+      <MicOff className="h-4 w-4" aria-hidden="true" />
     ) : status === "speaking" ? (
-      <Volume2 className="h-4 w-4" />
+      <Volume2 className="h-4 w-4" aria-hidden="true" />
     ) : status === "error" ? (
-      <AlertCircle className="h-4 w-4" />
+      <AlertCircle className="h-4 w-4" aria-hidden="true" />
     ) : (
-      <Mic className="h-4 w-4" />
+      <Mic className="h-4 w-4" aria-hidden="true" />
     );
 
   return (
