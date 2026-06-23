@@ -46,6 +46,8 @@ function PaginationLink({
   className,
   isActive,
   size = "icon",
+  "aria-disabled": ariaDisabled,
+  tabIndex,
   ...props
 }: PaginationLinkProps) {
   return (
@@ -53,6 +55,10 @@ function PaginationLink({
       aria-current={isActive ? "page" : undefined}
       data-slot="pagination-link"
       data-active={isActive}
+      aria-disabled={ariaDisabled}
+      tabIndex={
+        ariaDisabled === true || ariaDisabled === "true" ? -1 : tabIndex
+      }
       className={cn(
         buttonVariants({
           variant: isActive ? "outline" : "ghost",
@@ -69,7 +75,6 @@ function PaginationLink({
 
 function PaginationPrevious({
   className,
-  "aria-disabled": ariaDisabled,
   ...props
 }: React.ComponentProps<typeof PaginationLink>) {
   return (
@@ -77,13 +82,7 @@ function PaginationPrevious({
       aria-label="Go to previous page"
       size="default"
       className={cn("gap-1 px-2.5 sm:pl-2.5", className)}
-      aria-disabled={ariaDisabled}
       {...props}
-      tabIndex={
-        ariaDisabled === true || ariaDisabled === "true"
-          ? -1
-          : undefined
-      }
     >
       <ChevronLeftIcon aria-hidden="true" />
       <span className="hidden sm:block">Previous</span>
@@ -93,7 +92,6 @@ function PaginationPrevious({
 
 function PaginationNext({
   className,
-  "aria-disabled": ariaDisabled,
   ...props
 }: React.ComponentProps<typeof PaginationLink>) {
   return (
@@ -101,13 +99,7 @@ function PaginationNext({
       aria-label="Go to next page"
       size="default"
       className={cn("gap-1 px-2.5 sm:pr-2.5", className)}
-      aria-disabled={ariaDisabled}
       {...props}
-      tabIndex={
-        ariaDisabled === true || ariaDisabled === "true"
-          ? -1
-          : undefined
-      }
     >
       <span className="hidden sm:block">Next</span>
       <ChevronRightIcon aria-hidden="true" />
