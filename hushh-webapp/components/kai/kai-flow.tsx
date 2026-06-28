@@ -1306,7 +1306,9 @@ export function KaiFlow({
         if (resumeError instanceof Error && resumeError.name === "AbortError") {
           return;
         }
-        console.warn("[KaiFlow] Failed to resume import stream:", resumeError);
+        if (process.env.NODE_ENV !== "production") {
+          console.warn("[KaiFlow] Failed to resume import stream:", resumeError);
+        }
       } finally {
         abortControllerRef.current = null;
         resumeImportStreamInFlightRef.current = false;
@@ -1357,7 +1359,9 @@ export function KaiFlow({
             );
           })
           .catch((syncError) => {
-            console.warn("[KaiFlow] Deferred onboarding sync failed after save:", syncError);
+            if (process.env.NODE_ENV !== "production") {
+              console.warn("[KaiFlow] Deferred onboarding sync failed after save:", syncError);
+            }
             AppBackgroundTaskService.failTask(
               taskId,
               syncError instanceof Error ? syncError.message : "Sync failed",
@@ -1366,7 +1370,9 @@ export function KaiFlow({
           });
       })
       .catch((pendingError) => {
-        console.warn("[KaiFlow] Failed to preflight profile sync state:", pendingError);
+        if (process.env.NODE_ENV !== "production") {
+          console.warn("[KaiFlow] Failed to preflight profile sync state:", pendingError);
+        }
       });
   }, [effectiveVaultOwnerToken, userId, vaultKey]);
 
