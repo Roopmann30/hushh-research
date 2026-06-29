@@ -250,7 +250,9 @@ export function ManagePortfolioView() {
                 console.log("[ManagePortfolio] Decrypted and cached portfolio data");
               }
             } catch (decryptError) {
-              console.error("[ManagePortfolio] Failed to decrypt the financial PKM domain:", decryptError);
+              if (process.env.NODE_ENV !== "production") {
+                console.error("[ManagePortfolio] Failed to decrypt the financial PKM domain:", decryptError);
+              }
               toast.error("Unable to decrypt portfolio data. Please re-import your statement.");
             }
           }
@@ -295,7 +297,9 @@ export function ManagePortfolioView() {
         // Step 2: Holdings loaded
         completeStep();
       } catch (error) {
-        console.error("[ManagePortfolio] Error loading portfolio:", error);
+        if (process.env.NODE_ENV !== "production") {
+          console.error("[ManagePortfolio] Error loading portfolio:", error);
+        }
         toast.error("Failed to load portfolio data");
         completeStep(); // Complete step 2 on error
       } finally {
@@ -421,7 +425,9 @@ export function ManagePortfolioView() {
         throw new Error("Failed to save portfolio");
       }
     } catch (error) {
-      console.error("[ManagePortfolio] Save error:", error);
+      if (process.env.NODE_ENV !== "production") {
+        console.error("[ManagePortfolio] Save error:", error);
+      }
       toast.error("Failed to save portfolio");
     } finally {
       setIsSaving(false);
