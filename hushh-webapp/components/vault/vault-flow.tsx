@@ -230,8 +230,7 @@ export function VaultFlow({
             setVaultMode(vaultData.primaryMethod);
             setUnlockWithPassphraseFallback(false);
           }
-        } catch (metadataError) {
-          console.warn("Vault mode detection failed, defaulting to passphrase:", metadataError);
+        } catch (_metadataError) {
           setVaultMode("passphrase");
           setAvailableGeneratedMethod(null);
           setUnlockWithPassphraseFallback(false);
