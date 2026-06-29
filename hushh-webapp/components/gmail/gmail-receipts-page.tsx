@@ -977,10 +977,12 @@ export default function ProfileReceiptsPage() {
       setReceiptMemoryMessage("Your shopping summary is saved.");
       toast.success("Insights saved");
     } catch (error) {
-      console.error(
-        "[ProfileReceiptsPage] Failed to save receipt insights:",
-        error,
-      );
+      if (process.env.NODE_ENV !== "production") {
+        console.error(
+          "[ProfileReceiptsPage] Failed to save receipt insights:",
+          error,
+        );
+      }
       const message = sanitizeGmailUserMessage(error, {
         fallback:
           "We couldn't save your insights right now. Please try again in a moment.",
