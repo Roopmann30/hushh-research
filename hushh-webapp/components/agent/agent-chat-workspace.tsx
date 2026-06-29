@@ -2563,19 +2563,6 @@ export function AgentChatWorkspace({
                 reason: "No speech was captured.",
               };
             }
-            console.info("[Agent voice] STT timing", {
-              source: transcriptionSource,
-              mime_type: audio.type || "unknown",
-              audio_bytes: audio.size,
-              captured_ms: Math.round(durationMs),
-              stt_ms: Math.round(performance.now() - sttStartedAt),
-              native_transcript_chars: nativeCandidate?.transcript.length ?? 0,
-              native_uncertain: nativeCandidate?.uncertain ?? null,
-              native_reason: nativeCandidate?.reason ?? null,
-              transcript_chars: result.transcript.length,
-              uncertain: result.uncertain,
-              reason: result.reason,
-            });
             if (
               sttAbortController.signal.aborted ||
               voiceSessionEpoch !== voiceSessionEpochRef.current ||
