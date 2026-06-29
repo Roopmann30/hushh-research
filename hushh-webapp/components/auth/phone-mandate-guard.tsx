@@ -94,7 +94,7 @@ export function PhoneMandateGuard({
         if (!cancelled) {
           setBackendPhoneVerified(AccountIdentityService.hasVerifiedPhone(identity));
         }
-      } catch (error) {
+      } catch (_error) {
         if (!cancelled) {
           setBackendPhoneVerified(firebasePhoneVerified);
         }
