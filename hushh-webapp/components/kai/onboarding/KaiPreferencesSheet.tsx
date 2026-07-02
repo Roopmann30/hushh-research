@@ -41,7 +41,7 @@ export function KaiPreferencesSheet(props: {
           vaultOwnerToken: props.vaultOwnerToken,
         });
         if (!cancelled) setProfile(p);
-      } catch (error) {
+      } catch {
         // Fallback to null profile is handled gracefully below
         if (!cancelled) setProfile(null);
       } finally {
