@@ -42,7 +42,7 @@ export function KaiPreferencesSheet(props: {
         });
         if (!cancelled) setProfile(p);
       } catch (error) {
-        console.warn("[KaiPreferencesSheet] Failed to load profile:", error);
+        // Fallback to null profile is handled gracefully below
         if (!cancelled) setProfile(null);
       } finally {
         if (!cancelled) setLoading(false);
