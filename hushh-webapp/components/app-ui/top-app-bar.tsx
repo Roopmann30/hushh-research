@@ -505,10 +505,7 @@ export function TopAppBar({ className }: TopAppBarProps) {
           trackRiaExistingSessionEntry();
         }
         router.push(nextRoute);
-      } catch (error) {
-        if (process.env.NODE_ENV !== "production") {
-          console.error("[TopAppBar] Failed to switch persona:", error);
-        }
+      } catch {
         trackEvent("persona_switched", {
           action: target,
           result: "error",
@@ -853,10 +850,7 @@ function OnboardingRouteActions() {
       setOnboardingFlowActiveCookie(false);
       await signOut();
       router.push(ROUTES.HOME);
-    } catch (error) {
-      if (process.env.NODE_ENV !== "production") {
-        console.error("[TopAppBar] Failed to sign out:", error);
-      }
+    } catch {
       toast.error("Couldn't sign out. Please retry.");
     }
   }
@@ -886,10 +880,7 @@ function OnboardingRouteActions() {
       toast.success("Account deleted.");
       await signOut();
       router.push(ROUTES.HOME);
-    } catch (error) {
-      if (process.env.NODE_ENV !== "production") {
-        console.error("[TopAppBar] Failed to delete account:", error);
-      }
+    } catch {
       toast.error("Failed to delete account. Please retry.");
     } finally {
       setIsDeleting(false);
